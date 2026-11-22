@@ -128,7 +128,7 @@ export default function FamilyWorkspace({userId,onNotice}:{userId:string;onNotic
   if(!supabase)return
   if(decision==='approve'&&!learnerAcknowledgements[id]){onNotice('Please confirm that you understand the requested access before approving.');return}
   setBusy('response-'+id)
-  const {data,error}=await supabase.rpc('respond_guardian_connection',{
+  const {error}=await supabase.rpc('respond_guardian_connection',{
    p_relationship_id:id,p_decision:decision,p_consent_version:LEARNER_CONSENT_VERSION
   })
   setBusy('')
@@ -171,7 +171,6 @@ export default function FamilyWorkspace({userId,onNotice}:{userId:string;onNotic
  const active=outgoing.filter(x=>x.status==='active')
  const pending=outgoing.filter(x=>x.status==='pending')
  const totalRecords=useMemo(()=>active.reduce((n,r)=>n+(summary[r.id]?.progress??0)+(summary[r.id]?.assessments??0),0),[active,summary])
- const activeInvites=invites.filter(x=>!x.redeemed_at&&!x.revoked_at&&new Date(x.expires_at)>new Date())
 
  if(!userId)return <section className="family-workspace"><div className="page-intro"><p className="eyebrow">PARENT & GUARDIAN PORTAL</p><h1>Be part of<br/><em>their progress.</em></h1><p>Sign in to manage authorised learner connections and academic visibility.</p></div></section>
 
