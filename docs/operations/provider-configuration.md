@@ -43,6 +43,8 @@ Do not switch to production mode. Production payments require explicit approval,
 
 The webhook endpoint has JWT verification disabled because PayFast cannot supply a Learnora user JWT. Its own signature and server-validation checks are mandatory.
 
+The `learnora-admin` function requires a valid user JWT and an active permission record in `platform_administrators`. No administrator is pre-seeded. Follow [the platform administrator bootstrap procedure](./platform-admin-bootstrap.md) only after independent account verification.
+
 ## Knowledge source publishing
 
 The ingestion endpoint accepts text content (maximum 200,000 characters per request), splits it into chunks and stores a draft source. Draft content is not available to learner AI retrieval. A trusted source-review/publishing workflow is still required. Only ingest material Learnora or the submitting institution is authorised to use.
