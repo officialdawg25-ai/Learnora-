@@ -24,7 +24,8 @@ export default function DiscoverWorkspace({userId,courses,onEnrol,onNotice}:{use
    supabase.from('institution_directory_profiles').select('organisation_id,display_name,description,region').eq('public_listing',true).limit(24),
    supabase.from('learner_discovery_profiles').select('user_id,display_name,bio,subjects,interests,education_level').eq('discoverable',true).limit(40),
    supabase.from('learning_spaces').select('id,space_type,title,description,subject,education_level').eq('status','active').eq('visibility','public').limit(40),
-   supabase.from('learner_discovery_profiles').select('user_id,display_name,bio,subjects,interests,education_level,discoverable').eq('user_id',userId).maybeSingle()
+   supabase.from('learner_discovery_profiles').select('user_id,display_name,bio,subjects,interests,education_level,discoverable').eq('user_id',userId).maybeSingle(),
+   supabase.rpc('discoverable_learning_connections')
   ])
   if(e.error)onNotice('Educator directory is unavailable: '+e.error.message);else setEducators((e.data??[]) as Educator[])
   if(i.error)onNotice('Institution directory is unavailable: '+i.error.message);else setInstitutions((i.data??[]) as Institution[])
