@@ -59,6 +59,12 @@ begin
  if has_table_privilege('anon','public.assessment_question_keys','select') then
   raise exception 'Anonymous answer-key access detected';
  end if;
+ if has_function_privilege('authenticated','public.review_institution_verification(uuid,text,uuid,text)','execute') then
+  raise exception 'Institution review RPC must be service-role only';
+ end if;
+ if not has_function_privilege('service_role','public.review_institution_verification(uuid,text,uuid,text)','execute') then
+  raise exception 'Institution review RPC service-role grant missing';
+ end if;
 
  select count(*) into v_bucket_count from storage.buckets
  where id='learnora-verification' and public=false and file_size_limit<=10485760;
@@ -69,7 +75,7 @@ begin
  end if;
 
  select count(*) into v_migration_count from supabase_migrations.schema_migrations;
- if v_migration_count<34 then raise exception 'Remote migration ledger unexpectedly short: %',v_migration_count; end if;
+ if v_migration_count<35 then raise exception 'Remote migration ledger unexpectedly short: %',v_migration_count; end if;
 
  raise notice 'Learnora security invariants passed: % public tables with RLS, % migrations.',v_rls,v_migration_count;
 end
