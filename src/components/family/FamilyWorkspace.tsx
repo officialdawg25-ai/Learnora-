@@ -6,6 +6,7 @@ type Relationship={id:string;learner_user_id:string;relationship_type:string;sta
 export default function FamilyWorkspace({userId,onNotice}:{userId:string;onNotice:(s:string)=>void}){
  const [learnerId,setLearnerId]=useState('')
  const [relationship,setRelationship]=useState('parent')
+ const [evidenceReference,setEvidenceReference]=useState('')
  const [progressConsent,setProgressConsent]=useState(true)
  const [assessmentConsent,setAssessmentConsent]=useState(true)
  const [rows,setRows]=useState<Relationship[]>([])
@@ -32,10 +33,10 @@ export default function FamilyWorkspace({userId,onNotice}:{userId:string;onNotic
   e.preventDefault();if(!supabase||!userId)return
   if(!progressConsent&&!assessmentConsent){onNotice('Select at least one requested access scope.');return}
   setBusy(true)
-  const {error}=await supabase.from('guardian_relationships').insert({guardian_user_id:userId,learner_user_id:learnerId.trim(),relationship_type:relationship,consent_scopes:[...(progressConsent?['learning_progress']:[]),...(assessmentConsent?['assessment_reports']:[])],consent_version:'learnora-guardian-consent-v1-draft',status:'pending'})
+  const {error}=await supabase.from('guardian_relationships').insert({guardian_user_id:userId,learner_user_id:learnerId.trim(),relationship_type:relationship,evidence_reference:evidenceReference.trim()||null,consent_scopes:[...(progressConsent?['learning_progress']:[]),...(assessmentConsent?['assessment_reports']:[])],consent_version:'learnora-guardian-consent-v1-draft',status:'pending'})
   setBusy(false)
   if(error)onNotice('Guardian relationship request was not submitted: '+error.message)
-  else{setLearnerId('');onNotice('Guardian relationship request submitted. Access remains blocked until identity, authority and consent are independently verified.');await load()}
+  else{setLearnerId('');setEvidenceReference('');onNotice('Guardian relationship request submitted. Access remains blocked until identity, authority and consent are independently verified.');await load()}
  }
  if(!userId)return <section className="family-workspace"><div className="page-intro"><p className="eyebrow">FAMILY AND GUARDIAN ACCESS</p><h1>Support their<br/><em>next steps.</em></h1><p>Sign in to submit a guardian relationship request.</p></div></section>;
  return <section className="family-workspace">
@@ -44,9 +45,9 @@ export default function FamilyWorkspace({userId,onNotice}:{userId:string;onNotic
    <section className="studio-panel"><div className="panel-heading"><div><p className="eyebrow">REQUEST ACCESS</p><h2>Connect a learner.</h2></div><ShieldCheck size={22}/></div>
     <form className="form-stack builder-form" onSubmit={submit}>
      <label>Learner's Learnora user ID<input required value={learnerId} onChange={e=>setLearnerId(e.target.value)} placeholder="Learner UUID"/></label>
-     <label>Relationship<select value={relationship} onChange={e=>setRelationship(e.target.value)}><option value="parent">Parent</option><option value="legal_guardian">Legal guardian</option><option value="caregiver">Caregiver</option></select></label>
+     <label>Relationship<select value={relationship} onChange={e=>setRelationship(e.target.value)}><option value="parent">Parent</option><option value="legal_guardian">Legal guardian</option><option value="caregiver">Caregiver</option></select></label><label>Independent verification reference (optional)<input value={evidenceReference} onChange={e=>setEvidenceReference(e.target.value)} placeholder="Reference from an approved verification process"/></label>
      <div className="consent-scope"><strong>Requested access scopes</strong><label><input type="checkbox" checked={progressConsent} onChange={e=>setProgressConsent(e.target.checked)}/> Learning progress</label><label><input type="checkbox" checked={assessmentConsent} onChange={e=>setAssessmentConsent(e.target.checked)}/> Assessment reports</label></div>
-     <p className="form-hint">This is a draft consent workflow, not legal consent or proof of guardianship. No access is granted by submitting this request.</p>
+     <p className="form-hint">This is a draft consent workflow, not legal consent or proof of guardianship. Provide only an external verification case reference, never an ID number or document. No access is granted by submitting this request.</p>
      <button className="button button-dark" disabled={busy||!userId}>Submit verification request</button>
     </form>
    </section>
