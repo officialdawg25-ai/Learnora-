@@ -28,21 +28,46 @@ Deno.serve(async(req:Request)=>{
  const {data:existingEnrolment}=await userClient.from("enrolments").select("id").eq("course_id",courseId).eq("learner_id",user.id).in("status",["active","completed"]).maybeSingle();
  if(existingEnrolment)return json(409,{error:"You are already enrolled in this course."});
  let order:any;
- const {data:priorOrder}=await admin.from("orders").select("*").eq("idempotency_key",key).maybeSingle();
- if(priorOrder){if(priorOrder.learner_id!==user.id||priorOrder.course_id!==courseId)return json(409,{error:"Idempotency key already used for a different order."});order=priorOrder;}
- else {
-  const {data:created,error}=await admin.from("orders").insert({learner_id:user.id,course_id:courseId,amount_minor:course.price_minor,currency:course.currency,idempotency_key:key}).select("*").single();
-  if(error||!created)return json(500,{error:"Could not create payment order."});order=created;
+ const {data:priorOrder,error:priorOrderError}=await admin.from("orders").select("*").eq("idempotency_key",key).maybeSingle();
+ if(priorOrderError)return json(500,{error:"Could not verify the existing order."});
+ if(priorOrder){
+  if(priorOrder.learner_id!==user.id||priorOrder.course_id!==courseId)return json(409,{error:"Idempotency key already used for a different order."});
+  order=priorOrder;
+ }else{
+  const {data:pendingOrder,error:pendingOrderError}=await admin.from("orders").select("*").eq("learner_id",user.id).eq("course_id",courseId).eq("status","pending").order("created_at",{ascending:false}).limit(1).maybeSingle();
+  if(pendingOrderError)return json(500,{error:"Could not check for an existing pending order."});
+  if(pendingOrder)order=pendingOrder;
+  else{
+   const {data:created,error}=await admin.from("orders").insert({learner_id:user.id,course_id:courseId,amount_minor:course.price_minor,currency:course.currency,idempotency_key:key}).select("*").single();
+   if(error||!created){
+    const {data:concurrentOrder,error:retryError}=await admin.from("orders").select("*").eq("learner_id",user.id).eq("course_id",courseId).eq("status","pending").order("created_at",{ascending:false}).limit(1).maybeSingle();
+    if(retryError||!concurrentOrder)return json(500,{error:"Could not create or recover the pending payment order."});
+    order=concurrentOrder;
+   }else order=created;
+  }
  }
  if(order.status!=="pending")return json(409,{error:"This order is no longer payable."});
  let payment:any;
  const paymentKey=`payfast:${key}`;
- const {data:priorPayment}=await admin.from("payment_transactions").select("*").eq("idempotency_key",paymentKey).maybeSingle();
- if(priorPayment)payment=priorPayment;
- else {
-  const merchantPaymentId=crypto.randomUUID();
-  const {data:created,error}=await admin.from("payment_transactions").insert({order_id:order.id,provider:"payfast",merchant_payment_id:merchantPaymentId,idempotency_key:paymentKey,amount_minor:order.amount_minor,currency:order.currency,status:"initiated"}).select("*").single();
-  if(error||!created)return json(500,{error:"Could not initialise payment transaction."});payment=created;
+ const {data:priorPayment,error:priorPaymentError}=await admin.from("payment_transactions").select("*").eq("idempotency_key",paymentKey).maybeSingle();
+ if(priorPaymentError)return json(500,{error:"Could not verify the existing payment attempt."});
+ if(priorPayment){
+  if(priorPayment.order_id!==order.id)return json(409,{error:"Payment idempotency key belongs to another order."});
+  payment=priorPayment;
+ }else{
+  const activeStatuses=["initiated","authorized","confirmed","settled"];
+  const {data:activePayment,error:activePaymentError}=await admin.from("payment_transactions").select("*").eq("order_id",order.id).in("status",activeStatuses).order("created_at",{ascending:false}).limit(1).maybeSingle();
+  if(activePaymentError)return json(500,{error:"Could not check for an active payment attempt."});
+  if(activePayment)payment=activePayment;
+  else{
+   const merchantPaymentId=crypto.randomUUID();
+   const {data:created,error}=await admin.from("payment_transactions").insert({order_id:order.id,provider:"payfast",merchant_payment_id:merchantPaymentId,idempotency_key:paymentKey,amount_minor:order.amount_minor,currency:order.currency,status:"initiated"}).select("*").single();
+   if(error||!created){
+    const {data:concurrentPayment,error:retryError}=await admin.from("payment_transactions").select("*").eq("order_id",order.id).in("status",activeStatuses).order("created_at",{ascending:false}).limit(1).maybeSingle();
+    if(retryError||!concurrentPayment)return json(500,{error:"Could not initialise or recover the payment attempt."});
+    payment=concurrentPayment;
+   }else payment=created;
+  }
  }
  if(payment.status!=="initiated")return json(409,{error:"Payment transaction is no longer awaiting checkout."});
  const profile=await userClient.from("profiles").select("display_name").eq("id",user.id).maybeSingle();
