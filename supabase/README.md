@@ -41,8 +41,6 @@ The remote Supabase migration ledger was inspected directly. All 35 applied Lear
 - 20261122120613 — learnora_checkout_concurrency_guards
 - 20261122120831 — learnora_institution_verification_fk_indexes
 - 20261122120936 — learnora_institution_verification_atomic_review
-- 20261122120542 — learnora_institution_verification_review
-- 20261122120613 — learnora_checkout_concurrency_guards
 
 ## Security and operating notes
 
