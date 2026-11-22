@@ -86,7 +86,11 @@ for select to authenticated using (
   user_id = (select auth.uid()) or (public_profile and verification_status = 'verified')
 );
 create policy educator_profiles_insert_self on public.educator_profiles
-for insert to authenticated with check (user_id = (select auth.uid()));
+for insert to authenticated with check (
+  user_id = (select auth.uid())
+  and verification_status = 'unverified'
+  and public_profile = false
+);
 create policy educator_profiles_update_self on public.educator_profiles
 for update to authenticated using (user_id = (select auth.uid()))
 with check (user_id = (select auth.uid()));
@@ -214,6 +218,10 @@ begin
 end;
 $function$;
 
+revoke all on function private.snapshot_course(uuid) from public, anon, authenticated;
+revoke all on function private.capture_course_version_from_content() from public, anon, authenticated;
+grant execute on function private.can_admin_academy(uuid) to authenticated;
+
 create or replace function public.submit_course_for_review(p_course_id uuid)
 returns uuid
 language plpgsql security invoker
@@ -275,6 +283,11 @@ drop trigger if exists lessons_snapshot_after_change on public.lessons;
 create trigger lessons_snapshot_after_change
 after insert or update on public.lessons
 for each row execute function private.capture_course_version_from_content();
+
+create trigger educator_profiles_updated_at before update on public.educator_profiles
+for each row execute function private.set_updated_at();
+create trigger academy_memberships_updated_at before update on public.academy_memberships
+for each row execute function private.set_updated_at();
 
 create or replace view public.educator_course_analytics
 with (security_invoker=true)
