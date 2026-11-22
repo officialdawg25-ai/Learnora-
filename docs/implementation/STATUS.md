@@ -5,21 +5,25 @@ Updated: 2026-11-22
 ## Verified baseline
 
 - GitHub repository was initially README-only on main.
-- Supabase project is active, PostgreSQL 17, and initially had no public tables or migration history.
-- No Edge Functions were present at audit time.
+- Supabase project is active, PostgreSQL 17, eu-west-1.
+- Remote migration ledger currently reports six applied Learnora migrations; see [Supabase project notes](../../supabase/README.md).
+- No Edge Functions were present at the latest verified audit.
+- No application storage buckets were present at the initial audit.
 
 ## Implemented in the foundation branch
 
 - React + TypeScript + Vite application shell.
 - Responsive discovery, learner-space and educator-studio screens.
 - Supabase email/password auth integration and auth profile bootstrap trigger.
-- Published course discovery, free enrolment, academy creation and draft course creation.
-- Core database domains for profiles, organisations, memberships, academies, courses, modules, lessons, enrolments, objectives, progress, assessments, attempts, AI usage metering and audit events.
+- Published course discovery, subject filtering, free enrolment, academy creation and draft course creation.
+- Core database domains for profiles, organisations, memberships, academies, courses, modules, lessons, enrolments, objectives, progress, assessments, attempts, assessment answer keys, AI usage metering and audit events.
 - RLS enabled for all 16 current public tables.
 - Private helper functions for organisation membership, academy management and paid/free course content access.
 - Anonymous course/academy discovery limited to published records.
-- Client update privileges removed from memberships, enrolments, progress and assessment attempts until server-controlled workflows are implemented. Assessment answer keys are stored separately from learner-visible question options and are educator-manager-only.
+- Client update privileges removed from memberships, enrolments, progress and assessment attempts until server-controlled workflows are implemented.
+- Assessment answer keys are stored separately from learner-visible question options and are educator-manager-only.
 - Academy association requires appropriate organisation membership.
+- Six remote migrations are recorded. The first two remote migrations still require exact source reconciliation into version control before this repository is the canonical migration source.
 
 ## Explicitly not implemented
 
@@ -34,20 +38,20 @@ Updated: 2026-11-22
 ## Verification status
 
 - Supabase migration applications returned success.
-- Catalog inspection confirmed RLS enabled on all 15 current public tables.
+- Catalog inspection confirmed RLS enabled on all 16 current public tables.
 - Supabase security advisor returned no findings after hardening.
-- Performance advisor returned only unused-index informational findings after duplicate-index remediation.
+- Performance advisor returned unused-index informational findings only; these are not reasons to remove indexes without workload evidence.
 - No Edge Functions are deployed.
-- GitHub Actions TypeScript/Vite production build passed on commit 8d35604685b5bb9f3d3f20da0db0b2c2cefdd7d3.
-- Dependency audit at that commit reported no high-severity advisories after upgrading Vite to 6.4.6.
+- A GitHub Actions TypeScript/Vite production build passed on a prior foundation-branch commit. Recheck CI on the latest head before merge.
 - Browser/device and real-account workflow tests have not been run.
+- No production deployment or production-readiness claim is made.
 
 ## Next required steps
 
-1. Reconcile the initial remote migration into version-controlled SQL with Supabase CLI.
-2. Clone/check out this branch, install pinned dependencies and run the production build.
-3. Configure Vite Supabase URL and publishable key in deployment secrets.
-4. Test signup, email confirmation, signin, public course discovery, free enrolment and educator academy/course creation with real test accounts.
-5. Implement lesson authoring/player and secure assessment RPCs before learner progress is exposed.
+1. Reconcile the exact source SQL for all six remote migrations; do not blindly reapply remote migrations.
+2. Validate CI against the latest foundation branch head.
+3. Configure the Supabase URL and publishable key in the deployment environment.
+4. Test signup, email confirmation, signin, public course discovery, free enrolment, academy creation and draft-course creation with real test accounts in an approved test environment.
+5. Implement lesson authoring/player and secure assessment RPCs before learner progress is exposed as mastery.
 6. Implement educator verification, guardian consent and safeguarded institutional memberships before onboarding minors or institutions.
 7. Implement verified payment workflows and an accounting ledger before enabling paid programmes.
