@@ -79,10 +79,9 @@ Dedicated learner destinations are implemented for Overview, Discover, My Learni
 
 ## Build and deployment evidence
 
-- Cloudflare Pages build for integrated application commit `e5dd4e1ab645fa5874675e49d455e3c61c1fbc78` passed `tsc --noEmit` and `vite build`; 1,668 modules transformed and assets deployed successfully.
-- Verified isolated preview of that application build: https://05f1f6d6.learnora-staging.pages.dev
-- Subsequent branch changes include database-only policy/index migrations; the next isolated preview build will validate the final integrated commit.
-- Cloudflare Pages project `learnora-staging` has production deployments disabled; no production deployment was performed.
+- Cloudflare Pages build for integrated staging commit `9251e3cc8aaf674f5500070019f147029c256c82` passed `tsc --noEmit` and `vite build`; 1,668 modules transformed and assets deployed successfully.
+- Verified isolated preview: https://24edc7f6.learnora-staging.pages.dev
+- Cloudflare Pages project `learnora-staging` has production deployments disabled; the staging-branch production trigger was skipped and no production deployment was performed.
 - The build reports a non-blocking main JavaScript chunk warning (548.46 kB minified).
 
 ## Remaining validation
