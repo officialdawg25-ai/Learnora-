@@ -34,6 +34,6 @@ create policy refunds_insert_owner_verified_payment on public.refunds
 for insert to authenticated with check (
  requested_by=(select auth.uid())
  and status='requested'
- and exists(select 1 from public.orders o where o.id=order_id and o.learner_id=(select auth.uid()) and o.amount_minor=amount_minor and o.currency=currency and o.status in ('paid','partially_refunded'))
- and exists(select 1 from public.payment_transactions p where p.id=payment_transaction_id and p.order_id=order_id and p.status in ('confirmed','settled'))
+ and exists(select 1 from public.orders o where o.id=order_id and o.learner_id=(select auth.uid()) and o.amount_minor=refunds.amount_minor and o.currency=refunds.currency and o.status in ('paid','partially_refunded'))
+ and exists(select 1 from public.payment_transactions p where p.id=refunds.payment_transaction_id and p.order_id=refunds.order_id and p.status in ('confirmed','settled'))
 );
