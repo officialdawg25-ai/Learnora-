@@ -152,3 +152,11 @@
 .assessment-options label{display:grid;gap:6px}
 @media(max-width:800px){.player-layout{grid-template-columns:1fr}.player-sidebar{order:2}.player-main{order:1}}
 @media(max-width:520px){.assessment-options{grid-template-columns:1fr}.player-top{align-items:flex-start;flex-direction:column}}
+
+.assessment-review-queue{margin-top:24px;padding-top:18px;border-top:1px solid var(--line)}
+.assessment-review-item{display:grid;gap:10px;padding:16px 0;border-bottom:1px solid var(--line)}
+.assessment-review-item>strong{font-size:12px}
+.assessment-review-item>small{font-size:10px;color:var(--muted)}
+.review-answer{padding:9px 12px;background:#f7f7f4}
+.review-answer strong{font-size:11px}
+.review-answer p{font-size:11px;line-height:1.5;color:var(--muted);white-space:pre-wrap;overflow-wrap:anywhere}
