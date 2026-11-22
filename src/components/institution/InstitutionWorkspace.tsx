@@ -71,6 +71,7 @@ export default function InstitutionWorkspace({userId,onNotice}:{userId:string;on
   const {error}=await supabase.from('class_courses').insert({class_id:classId,course_id:courseId,assigned_by:userId})
   setBusy(false);if(error)onNotice('Course assignment failed: '+error.message);else{onNotice('Course assigned to the class.');if(organisationId)await loadOrganisation(organisationId)}
  }
+ if(!userId)return <section className="institution-workspace"><div className="page-intro"><p className="eyebrow">INSTITUTIONAL INFRASTRUCTURE</p><h1>Education,<br/><em>in context.</em></h1><p>Sign in to establish or manage an institution.</p></div></section>;
  return <section className="institution-workspace">
   <div className="page-intro"><p className="eyebrow">INSTITUTIONAL INFRASTRUCTURE</p><h1>Education,<br/><em>in context.</em></h1><p>Manage institution membership, classes, course allocation and academic reporting within your authorised organisation.</p></div>
   <div className="institution-grid">
