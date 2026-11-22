@@ -1,0 +1,56 @@
+.parent360{display:grid;gap:22px;margin-top:20px;color:var(--ink,#222)}
+.parent360-loading{display:flex;align-items:center;gap:12px;padding:30px;color:var(--muted,#737373)}
+.parent360-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap}
+.parent360-heading h2{margin:5px 0 8px;font-size:clamp(1.45rem,3vw,2rem);letter-spacing:-.04em}
+.parent360-heading p:not(.eyebrow){margin:0;color:var(--muted,#737373);max-width:620px}
+.parent360-status{display:inline-flex;align-items:center;gap:7px;padding:9px 12px;border:1px solid var(--line,#e7e7e7);border-radius:999px;font-size:12px;color:var(--muted,#666)}
+.parent360-metrics{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.parent360-metrics article,.parent360-panel,.parent360-invoices article{border:1px solid var(--line,#e8e8e8);border-radius:14px;padding:17px;background:var(--surface,#fff)}
+.parent360-metrics article span,.parent360-invoice-values small{display:block;color:var(--muted,#777);font-size:10px;letter-spacing:.09em}
+.parent360-metrics article strong{display:block;font-size:25px;margin-top:8px}
+.parent360-table-wrap{overflow:auto;border:1px solid var(--line,#e8e8e8);border-radius:14px}
+.parent360-table{width:100%;border-collapse:collapse;min-width:650px;background:var(--surface,#fff)}
+.parent360-table th,.parent360-table td{text-align:left;padding:13px 15px;border-bottom:1px solid var(--line,#eee);font-size:13px}
+.parent360-table th{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted,#777)}
+.parent360-pill{display:inline-flex;padding:5px 9px;border:1px solid var(--line,#ddd);border-radius:999px;font-size:10px;text-transform:capitalize;color:var(--muted,#666)}
+.parent360-pill.present,.parent360-pill.paid,.parent360-pill.confirmed{color:#28734e;border-color:#b9ddca}
+.parent360-pill.absent,.parent360-pill.overdue,.parent360-pill.failed{color:#a33b3b;border-color:#e7c2c2}
+.parent360-empty{padding:24px;text-align:center;color:var(--muted,#777);font-size:13px}
+.parent360-educators,.parent360-invoices,.parent360-events,.parent360-documents{display:grid;gap:12px}
+.parent360-educators article,.parent360-documents article,.parent360-events article{display:flex;align-items:flex-start;gap:14px;padding:16px;border:1px solid var(--line,#e8e8e8);border-radius:14px;background:var(--surface,#fff)}
+.parent360-educator-avatar{width:38px;height:38px;flex:none;border-radius:50%;display:grid;place-items:center;background:#f0eef8;color:#51418b;font-weight:650}
+.parent360-educators article>div{flex:1;min-width:0}
+.parent360-educators p,.parent360-events p{margin:5px 0;color:var(--muted,#777);font-size:13px}
+.parent360-educators small,.parent360-documents small,.parent360-events small{display:block;color:var(--muted,#777);font-size:11px;margin-top:5px}
+.parent360-panel h3{margin:0 0 14px;font-size:16px}
+.parent360-form{display:grid;gap:13px;max-width:720px}
+.parent360-form label{display:grid;gap:6px;font-size:12px;color:var(--muted,#666)}
+.parent360-form input,.parent360-form select,.parent360-form textarea,.parent360-reply textarea{width:100%;border:1px solid var(--line,#ddd);border-radius:9px;padding:11px 12px;background:var(--surface,#fff);color:inherit;font:inherit;font-size:13px}
+.parent360-messages{display:grid;grid-template-columns:240px minmax(0,1fr);border:1px solid var(--line,#e8e8e8);border-radius:14px;overflow:hidden;min-height:340px;background:var(--surface,#fff)}
+.parent360-messages>aside{border-right:1px solid var(--line,#eee);padding:10px;display:flex;flex-direction:column;gap:6px}
+.parent360-messages>aside button{text-align:left;border:0;background:transparent;border-radius:9px;padding:11px;cursor:pointer;color:inherit}
+.parent360-messages>aside button.active{background:var(--soft,#f4f2f8)}
+.parent360-messages>aside small{display:block;color:var(--muted,#777);margin-top:5px}
+.parent360-messages>section{padding:14px;display:flex;flex-direction:column;min-width:0}
+.parent360-message-list{display:flex;flex:1;flex-direction:column;gap:10px;max-height:390px;overflow:auto}
+.parent360-message-list article{max-width:82%;padding:10px 12px;border-radius:12px;background:#f3f3f3}
+.parent360-message-list article.mine{align-self:flex-end;background:#efedf8}
+.parent360-message-list p{margin:0;font-size:13px;white-space:pre-wrap;overflow-wrap:anywhere}
+.parent360-message-list small{display:block;margin-top:6px;color:var(--muted,#777);font-size:10px}
+.parent360-reply{display:flex;gap:8px;align-items:flex-end;margin-top:14px}
+.parent360-reply textarea{flex:1;resize:vertical}
+.parent360-invoice-top,.parent360-invoice-values,.parent360-payment-row{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.parent360-invoice-top h3{margin:5px 0;font-size:16px}
+.parent360-invoice-top small{color:var(--muted,#777)}
+.parent360-invoice-values{justify-content:flex-start;padding:16px 0;gap:32px}
+.parent360-invoice-values strong{display:block;margin-top:5px;font-size:15px}
+.parent360-invoices ul{list-style:none;padding:0;margin:0 0 15px;border-top:1px solid var(--line,#eee)}
+.parent360-invoices li{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line,#eee);font-size:12px}
+.parent360-note{display:flex;gap:8px;align-items:flex-start;color:var(--muted,#777);font-size:12px;line-height:1.5}
+.parent360-event-date{width:52px;height:52px;flex:none;border-radius:11px;background:var(--soft,#f4f2f8);display:grid;place-items:center;font-size:12px;font-weight:650}
+.parent360-events article>div{flex:1}
+.parent360-documents article{align-items:center}
+.parent360-documents article>div{flex:1}
+.parent360-payment-row{padding:12px 0;border-bottom:1px solid var(--line,#eee)}
+.parent360-payment-row small{display:block;margin-top:4px;color:var(--muted,#777);font-size:11px}
+@media(max-width:760px){.parent360-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.parent360-messages{grid-template-columns:1fr}.parent360-messages>aside{border-right:0;border-bottom:1px solid var(--line,#eee);max-height:145px;overflow:auto}.parent360-messages>aside button{padding:8px}.parent360-reply{align-items:stretch;flex-direction:column}.parent360-reply .button{align-self:flex-end}.parent360-documents article{flex-wrap:wrap}.parent360-invoice-values{gap:14px}.parent360-invoice-values>span{min-width:40%}}
