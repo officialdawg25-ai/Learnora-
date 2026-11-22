@@ -92,7 +92,7 @@ The deployed functions and their source files are versioned in the repository. N
 - Competency evidence review is implemented, but automated evidence processing/mastery calculation and educator feedback loops are not complete.
 - Credential issuance and opportunity publication require an authorised admin; no credentials or opportunities have been seeded.
 - Communities, messaging, live classrooms, offline sync, SCORM/xAPI/LTI, backup restore testing and full POPIA operational controls remain future work.
-- A learner lesson player, lesson completion recording, multiple-choice assessment attempts, deterministic objective marking and educator grading RPCs are implemented. Learner-facing attempt history is now displayed. Educator-facing review/marking screens for subjective responses, essay/file/rubric authoring, and richer mastery/progress feedback remain incomplete.
+- A learner lesson player, lesson completion recording, multiple-choice assessment attempts, deterministic objective marking and educator grading RPCs are implemented. Learner-facing attempt history is now displayed. Educator-facing review and manual grading for subjective responses are implemented. File-upload questions, rubric-based grading, competency mapping and richer mastery/progress feedback remain incomplete.
 
 ## Next execution sequence
 
@@ -102,6 +102,6 @@ The deployed functions and their source files are versioned in the repository. N
 4. Test educator evidence upload, team invitation, version snapshots and publication review with real accounts.
 5. Configure PayFast sandbox secrets/URLs, test checkout and ITN retries, execute a refund in sandbox and reconcile a statement.
 6. Configure one AI provider in a non-production environment, ingest authorised curriculum material, test retrieval, Tutor/Teacher quality and safety, and measure inference cost.
-7. Complete guardian verification, institution membership acceptance and child-safe communication policy before onboarding minors.
-8. Implement assessment attempt/marking workflows, evidence-to-competency processing, credential issuance and verified opportunity operations.
+7. Complete guardian verification, institution membership end-to-end testing, email invitation delivery and child-safe communication policy before onboarding minors.
+8. Expand assessments with file-upload questions, rubric-based grading and competency mapping; implement evidence-to-mastery automation, credential issuance and verified opportunity operations.
 9. Complete mobile/accessibility/security UAT, backup restore and legal review before any production-readiness decision.
