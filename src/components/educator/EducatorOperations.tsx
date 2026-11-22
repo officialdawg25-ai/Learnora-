@@ -158,5 +158,5 @@ export default function EducatorOperations({ academyId, userId, onNotice }: Prop
       <p className="form-hint">Submit a completed draft to the review queue. An authorised reviewer must approve it before it can become discoverable.</p>
       {analytics.filter(x=>x.publication_status==='draft').map(row=><div className="review-row" key={row.course_id}><span>{row.title}</span><button className="button button-outline" type="button" onClick={()=>void requestReview(row.course_id)}>Submit for review</button></div>)}
     </div>
-  </section><AssessmentBuilder academyId={academyId} userId={userId} onNotice={onNotice}/>
+  </section><AssessmentBuilder academyId={academyId} userId={userId} onNotice={onNotice}/></>
 }
