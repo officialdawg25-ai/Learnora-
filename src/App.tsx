@@ -11,10 +11,12 @@ import FamilyWorkspace from './components/family/FamilyWorkspace';
 import AcademicWorkspace from './components/academic/AcademicWorkspace';
 import PlatformAdminWorkspace from './components/admin/PlatformAdminWorkspace';
 import InvitationsWorkspace from './components/invitations/InvitationsWorkspace';
+type OrderRow={id:string;course_id:string;amount_minor:number;currency:string;status:string;created_at:string};
+type RefundRow={id:string;order_id:string;status:string;amount_minor:number;requested_at:string};
 type View='discover'|'my-learning'|'teach'|'ai'|'institution'|'family'|'academic'|'admin'|'invitations';
 const money=(minor:number,currency:string)=>new Intl.NumberFormat('en-ZA',{style:'currency',currency}).format(minor/100);
 export default function App(){
- const [session,setSession]=useState<Session|null>(null),[isPlatformAdmin,setIsPlatformAdmin]=useState(false),[courses,setCourses]=useState<Course[]>([]),[enrolled,setEnrolled]=useState<string[]>([]);
+ const [session,setSession]=useState<Session|null>(null),[isPlatformAdmin,setIsPlatformAdmin]=useState(false),[courses,setCourses]=useState<Course[]>([]),[enrolled,setEnrolled]=useState<string[]>([]),[orders,setOrders]=useState<OrderRow[]>([]),[refunds,setRefunds]=useState<RefundRow[]>([]),[refundOrderId,setRefundOrderId]=useState(''),[refundReason,setRefundReason]=useState('');
  const [view,setView]=useState<View>('discover'),[query,setQuery]=useState(''),[subject,setSubject]=useState('All subjects'),[busy,setBusy]=useState(false),[notice,setNotice]=useState('');
  const [authOpen,setAuthOpen]=useState(false),[authMode,setAuthMode]=useState<'signin'|'signup'>('signup'),[email,setEmail]=useState(''),[password,setPassword]=useState(''),[displayName,setDisplayName]=useState(''),[dateOfBirth,setDateOfBirth]=useState('');
  const [academyName,setAcademyName]=useState(''),[academyDescription,setAcademyDescription]=useState(''),[courseTitle,setCourseTitle]=useState(''),[courseSubject,setCourseSubject]=useState(''),[courseLevel,setCourseLevel]=useState('Secondary'),[courseSummary,setCourseSummary]=useState('');
