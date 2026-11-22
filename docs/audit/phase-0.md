@@ -7,7 +7,7 @@
 
 ## Executive finding
 
-The original main branch was README-only. The isolated foundation branch now contains a real React/Vite application, educator and learner experiences, 55 RLS-protected public tables, four deployed Edge Functions, a 19-migration source history and initial institutional, family and academic workspaces.
+The original main branch was README-only. The isolated foundation branch now contains a real React/Vite application, educator and learner experiences, 56 RLS-protected public tables, four deployed Edge Functions, a 19-migration source history and initial institutional, family and academic workspaces.
 
 The application and schema are materially more capable than the original audit baseline, but this is still a foundation build. Provider secrets, real-user tests, reviewer operations, safeguarding review and end-to-end financial/AI validation remain incomplete. Do not merge or launch based only on a green build.
 
