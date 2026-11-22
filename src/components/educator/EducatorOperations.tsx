@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import { BarChart3, ClipboardCheck, ShieldCheck, Users } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
-import AssessmentBuilder from './AssessmentBuilder'\nimport EducatorFamilyMessages from './EducatorFamilyMessages'\nimport './EducatorFamilyMessages.css'
+import AssessmentBuilder from './AssessmentBuilder'
+import EducatorFamilyMessages from './EducatorFamilyMessages'
+import './EducatorFamilyMessages.css'
 
 type Props = { academyId: string; userId: string; onNotice: (message: string) => void }
 type Analytics = { course_id: string; title: string; publication_status: string; total_enrolments: number; active_learners: number; completed_learners: number; completion_rate_percent: number }
