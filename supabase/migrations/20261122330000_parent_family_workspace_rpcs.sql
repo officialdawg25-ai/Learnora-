@@ -1,8 +1,6 @@
 -- Parent portal read model, secure document access and verified tuition settlement.
 create policy family_learner_details_parent_read on public.family_learner_details for select to authenticated
  using(created_by_parent=auth.uid() or private.is_verified_guardian(learner_user_id));
-create policy family_parent_details_owner_all on public.family_parent_details for all to authenticated using(user_id=auth.uid()) with check(user_id=auth.uid());
-
 create table if not exists public.family_parent_details (
  user_id uuid primary key references auth.users(id) on delete cascade,
  mobile_number text,
@@ -12,6 +10,7 @@ create table if not exists public.family_parent_details (
  updated_at timestamptz not null default now()
 );
 alter table public.family_parent_details enable row level security;
+create policy family_parent_details_owner_all on public.family_parent_details for all to authenticated using(user_id=auth.uid()) with check(user_id=auth.uid());
 create policy family_parent_details_owner_all on public.family_parent_details for all to authenticated using(user_id=auth.uid()) with check(user_id=auth.uid());
 
 insert into storage.buckets(id,name,public,file_size_limit,allowed_mime_types)
