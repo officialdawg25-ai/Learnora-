@@ -15,12 +15,22 @@ export default function SplashExperience({loading=false,onComplete}:Props){
    setTyped(current=>current+value[index]);
    pause(78,()=>type(value,index+1,done));
   };
-  type('THE FUTRUE',0,()=>{
-   pause(760,()=>{
-    setTyped('THE FUT');
-    pause(220,()=>type('URE OF LEARNING',0,()=>{}));
-   });
-  });
+  let current='';
+  const type=(value:string,index:number,done:()=>void)=>{
+   if(cancelled)return;
+   if(index>=value.length){done();return;}
+   current+=value[index];
+   setTyped(current);
+   pause(78,()=>type(value,index+1,done));
+  };
+  const erase=(targetLength:number,done:()=>void)=>{
+   if(cancelled)return;
+   if(current.length<=targetLength){pause(180,done);return;}
+   current=current.slice(0,-1);
+   setTyped(current);
+   pause(92,()=>erase(targetLength,done));
+  };
+  type('THE FUTRUE',0,()=>pause(760,()=>erase('THE FUT'.length,()=>type('URE OF LEARNING',0,()=>{}))));
   return()=>{cancelled=true;window.clearTimeout(timer);};
  },[loading]);
  if(loading)return <main className="splash-loading" role="status" aria-label="Loading Learnora"><div className="splash-loading-inner"><div className="splash-loading-mark"><img src="/brand/learnora-mark.svg" alt=""/></div><span className="splash-loading-label">PREPARING YOUR LEARNING SPACE</span><span className="splash-loading-track"/></div></main>;
