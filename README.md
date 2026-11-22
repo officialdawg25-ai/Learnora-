@@ -49,7 +49,7 @@ Cloudflare Pages project: `learnora-staging`
 
 Project reference: `gkloowmlfxfrwcxggnzl` (PostgreSQL 17, eu-west-1).
 
-The repository contains all 36 applied migrations under their exact remote migration IDs. All 56 public application tables have RLS enabled. The project has no seeded Auth users or platform administrators. Five Edge Functions are deployed; AI provider credentials and PayFast merchant secrets are not configured.
+The repository contains all 37 applied migrations under their exact remote migration IDs. All 56 public application tables have RLS enabled. The project has no seeded Auth users or platform administrators. Five Edge Functions are deployed; AI provider credentials and PayFast merchant secrets are not configured.
 
 ## Production-readiness gates
 
