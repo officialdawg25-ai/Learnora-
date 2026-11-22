@@ -222,8 +222,6 @@ export default function FamilyWorkspace({userId,onNotice,mode='learner'}:{userId
      {['active','pending'].includes(r.status)&&<button className="text-button family-revoke" disabled={!!busy} onClick={()=>void revokeRelationship(r.id)}>Revoke connection</button>}
     </article>)}</div>}
    </section>
-  </div>
-
   </div>}
   {mode==='learner'&&<div className="family-grid family-secondary-grid">
    <section className="studio-panel">
@@ -251,7 +249,6 @@ export default function FamilyWorkspace({userId,onNotice,mode='learner'}:{userId
      {r.status==='pending'&&r.learner_consent_status==='pending'&&<button className="text-button family-revoke" disabled={!!busy} onClick={()=>void revokeRelationship(r.id)}>Dismiss and revoke request</button>}
     </article>)}</div>}
    </section>
-  </div>
   </div>}
   <div className="family-legal-note"><LockKeyhole size={16}/><p><strong>Safeguarding distinction.</strong> Learner acknowledgement is not proof of legal guardianship or a substitute for consent from a competent person where required by law. Learnora must independently review the guardian's authority and evidence before activating any relationship. Learners and guardians can revoke an active connection; revocation immediately removes the relationship-based academic access.</p></div>
  </section>
