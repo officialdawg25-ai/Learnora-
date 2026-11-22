@@ -70,9 +70,12 @@ Deno.serve(async(req:Request)=>{
    resourceType="guardian_relationship";resourceId=rel.id;result={status:decision};
   }else if(action==="institution_verification"){
    const decision=body.decision;if(!["verified","more_information_required","rejected"].includes(decision))return json(400,{error:"Invalid institution verification decision"});
-   const {data:review,error}=await admin.rpc("review_institution_verification",{p_submission_id:body.submission_id,p_decision:decision,p_reviewer_id:user.id,p_notes:notes});
+   const submissionId=typeof body.submission_id==="string"?body.submission_id:"";
+   if(!submissionId)return json(400,{error:"Institution verification submission ID is required"});
+   const {data:review,error}=await admin.rpc("review_institution_verification",{p_submission_id:submissionId,p_decision:decision,p_reviewer_id:user.id,p_notes:notes});
+   if(error?.code==="P0002")return json(404,{error:"Pending institution verification not found"});
    if(error)throw error;
-   resourceType="institution_verification_submission";resourceId=body.submission_id;result=review;
+   resourceType="institution_verification_submission";resourceId=submissionId;result=review;
   }else if(action==="safeguarding_case"){
    const next=body.status;if(!["triage","investigating","resolved","closed"].includes(next))return json(400,{error:"Invalid safeguarding case status"});
    const {data:caseRow,error}=await admin.from("safeguarding_cases").update({status:next,assigned_to:user.id,resolution_notes:notes,resolved_at:["resolved","closed"].includes(next)?new Date().toISOString():null}).eq("id",body.case_id).select("id").maybeSingle();if(error||!caseRow)return json(404,{error:"Safeguarding case not found"});
