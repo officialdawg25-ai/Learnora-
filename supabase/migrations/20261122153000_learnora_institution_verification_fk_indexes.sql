@@ -1,2 +1,0 @@
-create index if not exists institution_verification_submitted_by_idx on public.institution_verification_submissions(submitted_by);
-create index if not exists institution_verification_reviewer_idx on public.institution_verification_submissions(reviewer_user_id);
