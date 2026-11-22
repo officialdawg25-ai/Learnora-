@@ -160,3 +160,8 @@
 .review-answer{padding:9px 12px;background:#f7f7f4}
 .review-answer strong{font-size:11px}
 .review-answer p{font-size:11px;line-height:1.5;color:var(--muted);white-space:pre-wrap;overflow-wrap:anywhere}
+
+.assessment-attempt-history{display:grid;gap:8px;margin:18px 0;padding:14px 16px;border:1px solid var(--line)}
+.assessment-attempt-history>strong{font-size:11px}
+.assessment-attempt-history>div{display:flex;justify-content:space-between;gap:12px;font-size:11px;color:var(--muted)}
+.assessment-attempt-history>div span:last-child{text-transform:capitalize;color:var(--ink)}
