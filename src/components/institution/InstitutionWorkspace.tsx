@@ -64,7 +64,7 @@ export default function InstitutionWorkspace({userId,onNotice}:{userId:string;on
  async function addMember(e:FormEvent<HTMLFormElement>){
   e.preventDefault();if(!supabase||!classId)return;setBusy(true)
   const {error}=await supabase.from('class_memberships').insert({class_id:classId,user_id:memberId.trim(),role:memberRole,status:'invited',created_by:userId})
-  setBusy(false);if(error)onNotice('Class invitation failed: '+error.message);else{setMemberId('');onNotice('Class invitation recorded for the existing Learnora user.')}
+  setBusy(false);if(error)onNotice('Class invitation failed: '+error.message);else{setMemberId('');onNotice('Class invitation created. The recipient can review and accept it from the Invitations workspace.')}
  }
  async function assignCourse(e:FormEvent<HTMLFormElement>){
   e.preventDefault();if(!supabase||!classId||!courseId)return;setBusy(true)
