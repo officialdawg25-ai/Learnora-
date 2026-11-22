@@ -7,11 +7,11 @@ Updated: 22 November 2026
 - Repository: `officialdawg25-ai/Learnora-`
 - Working branch: `foundation/learnora-platform-v1`
 - Supabase project: `gkloowmlfxfrwcxggnzl`, PostgreSQL 17, eu-west-1
-- Remote migration ledger: 21 applied migrations; every migration source is now versioned under its exact remote ID.
-- Public application schema: 54 tables; all 54 have RLS enabled.
+- Remote migration ledger: 23 applied migrations; every migration source is now versioned under its exact remote ID.
+- Public application schema: 55 tables; all 55 have RLS enabled.
 - Authentication users: 0. No synthetic accounts or learner records were inserted.
-- Learnora storage buckets: 0.
-- Active Edge Functions: `learnora-ai`, `learnora-knowledge-ingest`, `payfast-checkout`, `payfast-notify`.
+- Learnora storage buckets: 1 private `learnora-verification` bucket; no public bucket.
+- Active Edge Functions: `learnora-ai`, `learnora-knowledge-ingest`, `payfast-checkout`, `payfast-notify`, `learnora-admin`.
 
 ## Implemented application experiences
 
@@ -21,7 +21,7 @@ Updated: 22 November 2026
 - Learner learning-space and educator studio.
 - Educator academy and draft course creation.
 - Module and text/activity lesson authoring.
-- Educator profile, verification submission metadata, academy team invitations, course publication review submission and descriptive course analytics.
+- Educator profile, private credential evidence upload, verification submission metadata, academy team invitations, course publication review submission and descriptive course analytics.
 - Learnora AI navigation with Tutor and Teacher Intelligence modes.
 - Family/guardian relationship request workspace with consent scopes and pending status.
 - Institution workspace for organisation setup, classes, class membership invitations, course allocation and aggregate class reporting.
