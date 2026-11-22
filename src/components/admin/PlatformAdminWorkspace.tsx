@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react'
 import { ShieldCheck, CheckCircle2, FileSearch, Building2, GraduationCap, AlertTriangle } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 type QueueItem=Record<string,any>
-type Dashboard={educator_verifications:QueueItem[];publication_reviews:QueueItem[];guardian_requests:QueueItem[];institutions:QueueItem[];refunds:QueueItem[];safeguarding_cases:QueueItem[];competency_evidence:QueueItem[];opportunities:QueueItem[]}
-const empty:Dashboard={educator_verifications:[],publication_reviews:[],guardian_requests:[],institutions:[],refunds:[],safeguarding_cases:[],competency_evidence:[],opportunities:[]}
+type Dashboard={educator_verifications:QueueItem[];publication_reviews:QueueItem[];guardian_requests:QueueItem[];institutions:QueueItem[];refunds:QueueItem[];safeguarding_cases:QueueItem[];competency_evidence:QueueItem[];opportunities:QueueItem[];knowledge_sources:QueueItem[]}
+const empty:Dashboard={educator_verifications:[],publication_reviews:[],guardian_requests:[],institutions:[],refunds:[],safeguarding_cases:[],competency_evidence:[],opportunities:[],knowledge_sources:[]}
 export default function PlatformAdminWorkspace({onNotice}:{onNotice:(s:string)=>void}){
  const [dashboard,setDashboard]=useState<Dashboard>(empty)
  const [loading,setLoading]=useState(true)
@@ -52,6 +52,10 @@ export default function PlatformAdminWorkspace({onNotice}:{onNotice:(s:string)=>
    </section>
    <section className="studio-panel admin-queue"><div className="panel-heading"><div><p className="eyebrow">ACADEMIC EVIDENCE</p><h2>Competency evidence</h2></div><GraduationCap size={22}/></div>
     {dashboard.competency_evidence.length===0?<p className="form-hint">No competency evidence is awaiting review.</p>:dashboard.competency_evidence.map(x=><article className="admin-row" key={x.id}><div><strong>{x.evidence_type.replace('_',' ')}</strong><small>Learner {x.learner_user_id} · Competency {x.competency_id}</small></div><div className="admin-actions"><Action label="Verify evidence" action={()=>void act(x.id,{action:'competency_evidence_review',evidence_id:x.id,decision:'verified'})}/><Action label="Reject" action={()=>void act(x.id,{action:'competency_evidence_review',evidence_id:x.id,decision:'rejected'})}/></div></article>)}
+   </section>
+   <section className="studio-panel admin-queue"><div className="panel-heading"><div><p className="eyebrow">CURRICULUM KNOWLEDGE</p><h2>Source publication</h2></div><FileSearch size={22}/></div>
+    {dashboard.knowledge_sources.length===0?<p className="form-hint">No learning sources are awaiting publication review.</p>:dashboard.knowledge_sources.map(x=><article className="admin-row" key={x.id}><div><strong>{x.title}</strong><small>{x.source_type.replace('_',' ')} · Submitted by {x.created_by}</small>{x.source_url&&<a href={x.source_url} target="_blank" rel="noreferrer">Review source</a>}</div><div className="admin-actions"><Action label="Publish source" action={()=>void act(x.id,{action:'knowledge_publish',source_id:x.id})}/></div></article>)}
+    <p className="form-hint">Only authorised, licensed learning material should be published into the retrieval corpus.</p>
    </section>
    <section className="studio-panel admin-queue"><div className="panel-heading"><div><p className="eyebrow">OPPORTUNITY QUALITY</p><h2>Opportunity publication</h2></div><CheckCircle2 size={22}/></div>
     {dashboard.opportunities.length===0?<p className="form-hint">No opportunities are awaiting publication.</p>:dashboard.opportunities.map(x=><article className="admin-row" key={x.id}><div><strong>{x.title}</strong><small>{x.provider_name} · {x.verification_source}</small><a href={x.source_url} target="_blank" rel="noreferrer">Review source</a></div><div className="admin-actions"><Action label="Publish" action={()=>void act(x.id,{action:'opportunity_publish',opportunity_id:x.id})}/></div></article>)}
