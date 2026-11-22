@@ -686,3 +686,5 @@ body{background:var(--paper);color:var(--ink)}
 .institution-review-details strong{font-size:12px}.institution-review-details small,.institution-review-details a{font-size:9px;color:var(--muted)}
 .institution-review-details p{font-size:10px;line-height:1.6;margin:5px 0}
 @media(max-width:620px){.institution-application form{grid-template-columns:1fr}.institution-application form label:last-of-type{grid-column:auto}.institution-application form button{justify-self:stretch}}
+
+.community-room-actions{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
