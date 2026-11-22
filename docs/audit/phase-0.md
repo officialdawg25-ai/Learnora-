@@ -18,7 +18,7 @@ The application and schema are materially more capable than the original audit b
 | Main branch | Unchanged by this work; implementation is isolated on the foundation branch | VERIFIED |
 | Application | React + TypeScript + Vite; learner, educator, AI, family, institution and academic workspaces | VERIFIED |
 | Supabase | Active PostgreSQL 17 project | VERIFIED |
-| Migration history | 19 applied remote migrations; all exact-version SQL files are now present in the repository | VERIFIED |
+| Migration history | 21 applied remote migrations; all exact-version SQL files are now present in the repository | VERIFIED |
 | Public schema | 54 base tables, all with RLS enabled | VERIFIED |
 | Auth users | 0; no test accounts or demo learner data created | VERIFIED |
 | Learnora storage buckets | 0 | VERIFIED |
@@ -87,7 +87,7 @@ Before using Supabase CLI in another environment, run `supabase migration list -
 - Credential verification exposes only a minimal public index, not recipient identity.
 - Guardian access is scoped and remains pending until verified.
 - Institution class membership and academy team access are checked through server-side database helpers.
-- AI retrieval runs with the requesting user's JWT context; private source content is not globally indexed for every learner.
+- AI retrieval runs with the requesting user's JWT context; private source content is not globally indexed for every learner. Learner clients can only insert user-role chat messages; assistant messages are server-written. Unknown date of birth is treated as minor for AI capability routing.
 - PayFast payment confirmation is separate from settlement; educator payout/marketplace fund handling is not enabled.
 - Security and health advisors returned no findings at the latest check.
 
