@@ -54,6 +54,7 @@ export default function LearningPlayer({courseId,userId,onBack,onNotice}:{course
  }
  async function submitAssessment(){
   if(!supabase||!selectedAssessment)return
+  if(questions.some(q=>q.question_type==='numeric'&&answers[q.id]!==undefined&&answers[q.id]!==''&&!Number.isFinite(Number(answers[q.id])))){onNotice('Enter a valid number for numeric questions.');return}
   setBusy(true)
   const payload=Object.fromEntries(questions.filter(q=>answers[q.id]!==undefined&&answers[q.id]!== '').map(q=>[q.id,q.question_type==='numeric'?Number(answers[q.id]):answers[q.id]]))
   const {data,error}=await supabase.rpc('submit_assessment_attempt',{p_assessment_id:selectedAssessment,p_answers:payload})
