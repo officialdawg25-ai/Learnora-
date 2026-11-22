@@ -99,6 +99,22 @@ grant select,insert on public.class_memberships,public.class_courses to authenti
 grant select,insert on public.guardian_relationships to authenticated;
 revoke all on public.safeguarding_cases from anon,authenticated;
 
+create or replace function private.is_class_member(p_class_id uuid)
+returns boolean language sql stable security definer set search_path=''
+as $function$
+ select auth.uid() is not null and exists(select 1 from public.class_memberships cm
+  where cm.class_id=p_class_id and cm.user_id=(select auth.uid()) and cm.status='active');
+$function$;
+create or replace function private.is_class_staff(p_class_id uuid)
+returns boolean language sql stable security definer set search_path=''
+as $function$
+ select auth.uid() is not null and exists(select 1 from public.class_memberships cm
+  where cm.class_id=p_class_id and cm.user_id=(select auth.uid()) and cm.status='active' and cm.role in ('educator','assistant'));
+$function$;
+revoke all on function private.is_class_member(uuid) from public,anon;
+revoke all on function private.is_class_staff(uuid) from public,anon;
+grant execute on function private.is_class_member(uuid),private.is_class_staff(uuid) to authenticated;
+
 create policy institution_campuses_select_members on public.institution_campuses for select to authenticated
 using(private.has_active_membership(organisation_id,null));
 create policy institution_campuses_insert_admin on public.institution_campuses for insert to authenticated
@@ -116,7 +132,7 @@ using(private.has_active_membership(organisation_id,array['owner','admin','acade
 with check(private.has_active_membership(organisation_id,array['owner','admin','academic_manager']));
 
 create policy institution_classes_select_members on public.institution_classes for select to authenticated
-using(private.has_active_membership(organisation_id,null));
+using(private.has_active_membership(organisation_id,null) or private.is_class_member(id));
 create policy institution_classes_insert_admin on public.institution_classes for insert to authenticated
 with check(created_by=(select auth.uid()) and private.has_active_membership(organisation_id,array['owner','admin','academic_manager','department_head']));
 create policy institution_classes_update_admin on public.institution_classes for update to authenticated
@@ -125,12 +141,12 @@ with check(private.has_active_membership(organisation_id,array['owner','admin','
 
 create policy class_memberships_select_self_or_staff on public.class_memberships for select to authenticated
 using(user_id=(select auth.uid()) or exists(select 1 from public.institution_classes c where c.id=class_id and private.has_active_membership(c.organisation_id,array['owner','admin','academic_manager','department_head']))
-or exists(select 1 from public.class_memberships cm where cm.class_id=class_id and cm.user_id=(select auth.uid()) and cm.role in ('educator','assistant') and cm.status='active'));
+or private.is_class_staff(class_id));
 create policy class_memberships_insert_staff on public.class_memberships for insert to authenticated
 with check(created_by=(select auth.uid()) and exists(select 1 from public.institution_classes c where c.id=class_id and private.has_active_membership(c.organisation_id,array['owner','admin','academic_manager','department_head'])));
 
 create policy class_courses_select_members on public.class_courses for select to authenticated
-using(exists(select 1 from public.institution_classes c where c.id=class_id and private.has_active_membership(c.organisation_id,null)));
+using(private.is_class_member(class_id) or exists(select 1 from public.institution_classes c where c.id=class_id and private.has_active_membership(c.organisation_id,null)));
 create policy class_courses_insert_admin on public.class_courses for insert to authenticated
 with check(assigned_by=(select auth.uid()) and exists(select 1 from public.institution_classes c where c.id=class_id and private.has_active_membership(c.organisation_id,array['owner','admin','academic_manager','department_head'])));
 
@@ -152,6 +168,18 @@ as $function$
 $function$;
 revoke all on function private.guardian_has_scope(uuid,text) from public,anon;
 grant execute on function private.guardian_has_scope(uuid,text) to authenticated;
+
+create policy progress_select_authorised_guardian on public.learning_progress
+for select to authenticated using (private.guardian_has_scope(learner_id,'learning_progress'));
+create policy attempts_select_authorised_guardian on public.assessment_attempts
+for select to authenticated using (private.guardian_has_scope(learner_id,'assessment_reports'));
+create policy attempts_select_institution_staff on public.assessment_attempts
+for select to authenticated using (
+ exists(select 1 from public.assessments a
+  join public.class_courses cc on cc.course_id=a.course_id
+  join public.institution_classes ic on ic.id=cc.class_id
+  where a.id=assessment_id and private.has_active_membership(ic.organisation_id,array['owner','admin','academic_manager','department_head']))
+);
 
 create or replace view public.institution_class_analytics
 with (security_invoker=true)
