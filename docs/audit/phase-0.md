@@ -7,7 +7,7 @@
 
 ## Executive finding
 
-The original main branch was README-only. The isolated foundation branch now contains a real React/Vite application, educator and learner experiences, 54 RLS-protected public tables, four deployed Edge Functions, a 19-migration source history and initial institutional, family and academic workspaces.
+The original main branch was README-only. The isolated foundation branch now contains a real React/Vite application, educator and learner experiences, 55 RLS-protected public tables, four deployed Edge Functions, a 19-migration source history and initial institutional, family and academic workspaces.
 
 The application and schema are materially more capable than the original audit baseline, but this is still a foundation build. Provider secrets, real-user tests, reviewer operations, safeguarding review and end-to-end financial/AI validation remain incomplete. Do not merge or launch based only on a green build.
 
@@ -21,8 +21,8 @@ The application and schema are materially more capable than the original audit b
 | Migration history | 21 applied remote migrations; all exact-version SQL files are now present in the repository | VERIFIED |
 | Public schema | 54 base tables, all with RLS enabled | VERIFIED |
 | Auth users | 0; no test accounts or demo learner data created | VERIFIED |
-| Learnora storage buckets | 0 | VERIFIED |
-| Edge Functions | 4 deployed and ACTIVE | VERIFIED |
+| Learnora storage buckets | 1 private verification bucket | VERIFIED |
+| Edge Functions | 5 deployed and ACTIVE | VERIFIED |
 | Security advisor | No findings | VERIFIED |
 | Health advisor | No findings | VERIFIED |
 | Performance advisor | Remaining unused-index notices only; no unindexed-FK or multiple-permissive-policy findings | VERIFIED |
