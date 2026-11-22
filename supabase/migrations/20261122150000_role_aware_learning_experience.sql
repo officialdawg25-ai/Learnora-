@@ -188,22 +188,26 @@ using(public_listing and private.is_active_public_org(organisation_id));
 
 -- Replace permissive legacy creator policies with verified role checks.
 drop policy if exists academies_insert_owner_or_org_manager on public.academies;
+drop policy if exists academies_insert_authorised_educator_or_institution on public.academies;
 create policy academies_insert_authorised_educator_or_institution on public.academies for insert to authenticated
 with check(owner_user_id=(select auth.uid()) and (
  (organisation_id is null and exists(select 1 from public.user_roles r where r.user_id=(select auth.uid()) and r.role='educator' and r.status='active'))
  or (organisation_id is not null and private.has_active_membership(organisation_id,array['owner','admin']) and exists(select 1 from public.user_roles r where r.user_id=(select auth.uid()) and r.role='institution' and r.status='active'))
 ));
 drop policy if exists courses_insert_academy_manager on public.courses;
+drop policy if exists courses_insert_authorised_educator_or_institution on public.courses;
 create policy courses_insert_authorised_educator_or_institution on public.courses for insert to authenticated
 with check(created_by=(select auth.uid()) and private.can_manage_academy(academy_id) and exists(
  select 1 from public.user_roles r where r.user_id=(select auth.uid()) and r.status='active' and r.role in ('educator','institution','platform_admin')
 ));
 drop policy if exists organisations_insert_creator on public.organisations;
+drop policy if exists organisations_insert_authorised_institution on public.organisations;
 create policy organisations_insert_authorised_institution on public.organisations for insert to authenticated
 with check(created_by=(select auth.uid()) and exists(
  select 1 from public.user_roles r where r.user_id=(select auth.uid()) and r.role in ('institution','platform_admin') and r.status='active'
 ));
 drop policy if exists memberships_insert_self_owner on public.organisation_memberships;
+drop policy if exists memberships_insert_authorised_owner on public.organisation_memberships;
 create policy memberships_insert_authorised_owner on public.organisation_memberships for insert to authenticated
 with check(user_id=(select auth.uid()) and role='owner'
  and exists(select 1 from public.organisations o where o.id=organisation_id and o.created_by=(select auth.uid()))
