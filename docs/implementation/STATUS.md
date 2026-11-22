@@ -38,7 +38,9 @@ Updated: 2026-11-22
 - Supabase security advisor returned no findings after hardening.
 - Performance advisor returned only unused-index informational findings after duplicate-index remediation.
 - No Edge Functions are deployed.
-- Frontend build and browser/device tests have not been run because this execution used remote GitHub file operations and did not have a local repository checkout/runtime.
+- GitHub Actions TypeScript/Vite production build passed on commit 8d35604685b5bb9f3d3f20da0db0b2c2cefdd7d3.
+- Dependency audit at that commit reported no high-severity advisories after upgrading Vite to 6.4.6.
+- Browser/device and real-account workflow tests have not been run.
 
 ## Next required steps
 
