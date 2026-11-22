@@ -37,25 +37,19 @@ Deno.serve(async(req:Request)=>{
  try{
   if(action==="educator_verification"){
    const decision=body.decision;if(!["verified","more_information_required","rejected"].includes(decision))return json(400,{error:"Invalid verification decision"});
-   const {data:submission,error}=await admin.from("educator_verification_submissions").select("id,educator_user_id").eq("id",body.submission_id).maybeSingle();
-   if(error||!submission)return json(404,{error:"Verification submission not found"});
-   const {error:updateError}=await admin.from("educator_verification_submissions").update({status:decision,reviewer_user_id:user.id,reviewer_notes:notes,reviewed_at:new Date().toISOString()}).eq("id",submission.id);if(updateError)throw updateError;
-   const {error:profileError}=await admin.from("educator_profiles").update({verification_status:decision}).eq("user_id",submission.educator_user_id);if(profileError)throw profileError;
-   resourceType="educator_verification_submission";resourceId=submission.id;result={status:decision};
+   const submissionId=typeof body.submission_id==="string"?body.submission_id:"";if(!submissionId)return json(400,{error:"Verification submission ID is required"});
+   const {data:reviewResult,error:reviewError}=await admin.rpc("review_educator_verification",{p_submission_id:submissionId,p_decision:decision,p_reviewer_id:user.id,p_notes:notes});
+   if(reviewError?.code==="P0002")return json(404,{error:"Pending verification submission not found"});
+   if(reviewError)throw reviewError;
+   resourceType="educator_verification_submission";resourceId=submissionId;result=reviewResult;
   }else if(action==="publication_review"){
    const decision=body.decision;if(!["approved","changes_requested","rejected"].includes(decision))return json(400,{error:"Invalid publication decision"});
-   const {data:review,error}=await admin.from("publication_reviews").select("id,course_id").eq("id",body.review_id).eq("status","pending").maybeSingle();if(error||!review)return json(404,{error:"Pending publication review not found"});
-   if(decision==="approved"){
-    const {count:modules}=await admin.from("course_modules").select("id",{count:"exact",head:true}).eq("course_id",review.course_id);
-    const {data:moduleRows}=await admin.from("course_modules").select("id").eq("course_id",review.course_id);
-    const ids=(moduleRows??[]).map((x:any)=>x.id);
-    const {count:lessons}=ids.length?await admin.from("lessons").select("id",{count:"exact",head:true}).in("module_id",ids):{count:0};
-    if((modules??0)<1||(lessons??0)<1)return json(422,{error:"A course needs at least one module and one lesson before approval."});
-   }
-   const next=decision==="approved"?"published":decision==="changes_requested"?"draft":"archived";
-   const {error:courseError}=await admin.from("courses").update({publication_status:next,published_at:decision==="approved"?new Date().toISOString():null}).eq("id",review.course_id);if(courseError)throw courseError;
-   const {error:reviewError}=await admin.from("publication_reviews").update({status:decision,reviewer_user_id:user.id,reviewer_notes:notes,reviewed_at:new Date().toISOString()}).eq("id",review.id);if(reviewError)throw reviewError;
-   resourceType="publication_review";resourceId=review.id;result={status:decision};
+   const reviewId=typeof body.review_id==="string"?body.review_id:"";if(!reviewId)return json(400,{error:"Publication review ID is required"});
+   const {data:reviewResult,error:reviewError}=await admin.rpc("review_course_publication",{p_review_id:reviewId,p_decision:decision,p_reviewer_id:user.id,p_notes:notes});
+   if(reviewError?.code==="P0002")return json(404,{error:"Pending publication review not found"});
+   if(reviewError?.code==="23514")return json(422,{error:"A course needs at least one module and one lesson before approval."});
+   if(reviewError)throw reviewError;
+   resourceType="publication_review";resourceId=reviewId;result=reviewResult;
   }else if(action==="knowledge_publish"){
    const {data:source,error}=await admin.from("knowledge_sources").select("id").eq("id",body.source_id).eq("publication_status","draft").maybeSingle();if(error||!source)return json(404,{error:"Draft knowledge source not found"});
    const {count}=await admin.from("knowledge_chunks").select("id",{count:"exact",head:true}).eq("source_id",source.id);if((count??0)<1)return json(422,{error:"A source needs at least one chunk before publication."});
