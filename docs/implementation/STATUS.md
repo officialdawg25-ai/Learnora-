@@ -28,7 +28,7 @@ Updated: 22 November 2026
 - Learner order history, PayFast return-state verification and refund request submission.
 - Educator curriculum knowledge ingestion into private draft sources.
 - Educator profile, private credential evidence upload, verification submission metadata, academy team invitations, course publication review submission and descriptive course analytics.
-- Learnora AI navigation with Tutor and Teacher Intelligence modes.
+- Learnora AI navigation with Tutor and Teacher Intelligence modes; server-side access requires verified educator status for Teacher Intelligence and blocks under-18/unknown-age Tutor accounts until approved guardian consent is configured.
 - Family/guardian relationship request workspace with consent scopes and pending status.
 - Institution workspace for organisation setup, classes, class membership invitations, course allocation and aggregate class reporting.
 - Academic workspace for learner goals, credentials and opportunity discovery.
@@ -86,7 +86,7 @@ The deployed functions and their source files are versioned in the repository. N
 - Refund requests and approval are recorded; actual PayFast refund execution and provider-confirmed completion remain.
 - Settlement matching functions exist; statement import UI and batch operations runbook remain.
 - Educator payouts, marketplace settlement authority and recurring subscription lifecycle are not enabled. No third-party funds are represented as withdrawable.
-- AI model provider configuration, model evaluation datasets, language benchmarks, safety regression suite and measured cost controls are not configured.
+- AI model provider configuration, model evaluation datasets, language benchmarks, safety regression suite and measured cost controls are not configured. Under-18/unknown-age Tutor access remains blocked because the approved child-consent version and `ai_tutor` guardian scope are not configured.
 - Knowledge ingestion creates private drafts; source review/publishing is available to an authorised admin, but licensed curriculum corpus ingestion and content quality evaluation remain.
 - Guardian relationships remain pending until independent identity/authority review; legal consent wording and safeguarding operations require qualified South African legal review.
 - Institution workspace is a foundational class/organisation layer, not a replacement SIS; email-based invitation delivery, OneRoster/LTI integrations and broader reporting remain.
