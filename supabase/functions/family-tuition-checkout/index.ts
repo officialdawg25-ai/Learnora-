@@ -1,0 +1,42 @@
+import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import {createClient} from "npm:@supabase/supabase-js@2.58.0";
+import {createHash} from "node:crypto";
+const cors={"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"authorization, apikey, content-type","Access-Control-Allow-Methods":"POST, OPTIONS","Content-Type":"application/json"};
+const json=(status:number,body:unknown)=>new Response(JSON.stringify(body),{status,headers:cors});
+const env=(k:string)=>Deno.env.get(k)??"";
+const enc=(v:string)=>encodeURIComponent(v.trim()).replace(/%20/g,"+");
+function signature(params:URLSearchParams,passphrase:string){const parts:string[]=[];for(const [k,v] of params.entries()){if(k!=="signature")parts.push(`${k}=${enc(v)}`)}if(passphrase)parts.push(`passphrase=${enc(passphrase)}`);return createHash("md5").update(parts.join("&")).digest("hex")}
+Deno.serve(async(req:Request)=>{
+ if(req.method==="OPTIONS")return new Response("ok",{headers:cors});
+ if(req.method!=="POST")return json(405,{error:"Method not allowed"});
+ const auth=req.headers.get("Authorization");if(!auth?.startsWith("Bearer "))return json(401,{error:"Sign in required"});
+ const url=env("SUPABASE_URL"),anon=env("SUPABASE_ANON_KEY"),service=env("SUPABASE_SERVICE_ROLE_KEY");
+ if(!url||!anon||!service)return json(503,{error:"Tuition checkout is not configured"});
+ if((env("PAYFAST_MODE")||"sandbox")!=="sandbox")return json(503,{error:"Tuition checkout is sandbox-only until production payment approval is completed"});
+ const merchant=env("PAYFAST_MERCHANT_ID"),passphrase=env("PAYFAST_PASSPHRASE");
+ const returnUrl=env("PAYFAST_TUITION_RETURN_URL")||env("PAYFAST_RETURN_URL");
+ const cancelUrl=env("PAYFAST_TUITION_CANCEL_URL")||env("PAYFAST_CANCEL_URL");
+ const notifyUrl=env("PAYFAST_TUITION_NOTIFY_URL");
+ if(!merchant||!returnUrl||!cancelUrl||!notifyUrl)return json(503,{error:"Configure the PayFast tuition return, cancel and notification URLs"});
+ let body:any;try{body=await req.json()}catch{return json(400,{error:"Invalid request body"})}
+ const invoiceId=String(body.invoice_id??"");const amount=Number(body.amount_minor);
+ if(!invoiceId||!Number.isSafeInteger(amount)||amount<=0)return json(400,{error:"Select an invoice and a positive amount"});
+ const userClient=createClient(url,anon,{global:{headers:{Authorization:auth}}});
+ const admin=createClient(url,service,{auth:{persistSession:false,autoRefreshToken:false}});
+ const {data:{user},error:authError}=await userClient.auth.getUser();if(authError||!user)return json(401,{error:"Invalid session"});
+ const {data:invoice,error}=await admin.from("family_tuition_invoices").select("id,learner_user_id,invoice_number,description,total_minor,amount_paid_minor,currency,status").eq("id",invoiceId).maybeSingle();
+ if(error||!invoice||invoice.status==="draft"||invoice.status==="void")return json(404,{error:"Invoice not found or not payable"});
+ const {data:relationship}=await admin.from("guardian_relationships").select("id").eq("guardian_user_id",user.id).eq("learner_user_id",invoice.learner_user_id).eq("status","active").eq("learner_consent_status","approved").is("revoked_at",null).maybeSingle();
+ if(!relationship)return json(403,{error:"Verified guardian access is required to pay this invoice"});
+ const balance=Number(invoice.total_minor)-Number(invoice.amount_paid_minor);
+ if(invoice.currency!=="ZAR"||amount>balance)return json(400,{error:"Payment amount exceeds the outstanding ZAR balance"});
+ const paymentId=crypto.randomUUID(),merchantPaymentId=crypto.randomUUID();
+ const {error:insertError}=await admin.from("family_tuition_payments").insert({id:paymentId,invoice_id:invoice.id,payer_user_id:user.id,provider:"payfast",provider_reference:merchantPaymentId,amount_minor:amount,currency:"ZAR",status:"initiated"});
+ if(insertError)return json(500,{error:"Payment attempt could not be created"});
+ const success=new URL(returnUrl);success.searchParams.set("tuition_payment","return");success.searchParams.set("payment_id",paymentId);
+ const cancel=new URL(cancelUrl);cancel.searchParams.set("tuition_payment","cancel");cancel.searchParams.set("payment_id",paymentId);
+ const params=new URLSearchParams();params.set("merchant_id",merchant);params.set("return_url",success.toString());params.set("cancel_url",cancel.toString());params.set("notify_url",notifyUrl);
+ params.set("m_payment_id",merchantPaymentId);params.set("amount",(amount/100).toFixed(2));params.set("item_name",String(invoice.description||invoice.invoice_number).slice(0,100));params.set("email_address",user.email??"");
+ params.set("custom_str1",paymentId);params.set("custom_str2",invoice.id);params.set("signature",signature(params,passphrase));
+ return json(200,{payment_id:paymentId,checkout_url:`https://sandbox.payfast.co.za/eng/process?${params.toString()}`,mode:"sandbox",amount_minor:amount,currency:"ZAR"});
+});
