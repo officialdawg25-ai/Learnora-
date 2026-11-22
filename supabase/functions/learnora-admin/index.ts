@@ -25,7 +25,7 @@ Deno.serve(async(req:Request)=>{
   }
   if(administrator.permissions.includes("courses:review")){const {data}=await admin.from("publication_reviews").select("id,course_id,requested_by,requested_at,courses(title)").eq("status","pending").order("requested_at").limit(25);dashboard.publication_reviews=data??[];}
   if(administrator.permissions.includes("guardians:verify")){const {data}=await admin.from("guardian_relationships").select("id,guardian_user_id,learner_user_id,relationship_type,consent_scopes,consent_version,evidence_reference,created_at").eq("status","pending").order("created_at").limit(25);dashboard.guardian_requests=data??[];}
-  if(administrator.permissions.includes("institutions:verify")){const {data}=await admin.from("organisations").select("id,name,organisation_type,created_by,created_at").eq("status","pending").order("created_at").limit(25);dashboard.institutions=data??[];}
+  if(administrator.permissions.includes("institutions:verify")){const {data}=await admin.from("institution_verification_submissions").select("id,organisation_id,reference_type,evidence_reference,submitted_by,created_at,organisations(name,organisation_type)").eq("status","pending").order("created_at").limit(25);dashboard.institutions=data??[];}
   if(administrator.permissions.includes("finance:refund_approve")){const {data}=await admin.from("refunds").select("id,order_id,amount_minor,currency,reason,requested_at").eq("status","requested").order("requested_at").limit(25);dashboard.refunds=data??[];}
   if(administrator.permissions.includes("safeguarding:manage")){const {data}=await admin.from("safeguarding_cases").select("id,reporter_user_id,subject_user_id,category,severity,description,status,created_at").in("status",["open","triage","investigating"]).order("created_at").limit(25);dashboard.safeguarding_cases=data??[];}
   if(administrator.permissions.includes("competencies:verify")){const {data}=await admin.from("learner_competency_evidence").select("id,learner_user_id,competency_id,evidence_type,evidence_reference,created_at").eq("verification_status","pending_review").order("created_at").limit(25);dashboard.competency_evidence=data??[];}
@@ -69,9 +69,12 @@ Deno.serve(async(req:Request)=>{
    const {error:updateError}=await admin.from("guardian_relationships").update({status:decision,verified_by:user.id,verified_at:new Date().toISOString()}).eq("id",rel.id);if(updateError)throw updateError;
    resourceType="guardian_relationship";resourceId=rel.id;result={status:decision};
   }else if(action==="institution_verification"){
-   const decision=body.decision;if(!["active","suspended","archived"].includes(decision))return json(400,{error:"Invalid institution decision"});
-   const {data:org,error}=await admin.from("organisations").update({status:decision,updated_at:new Date().toISOString()}).eq("id",body.organisation_id).select("id").maybeSingle();if(error||!org)return json(404,{error:"Institution not found"});
-   resourceType="organisation";resourceId=org.id;result={status:decision};
+   const decision=body.decision;if(!["verified","more_information_required","rejected"].includes(decision))return json(400,{error:"Invalid institution verification decision"});
+   const {data:submission,error}=await admin.from("institution_verification_submissions").select("id,organisation_id").eq("id",body.submission_id).eq("status","pending").maybeSingle();if(error||!submission)return json(404,{error:"Pending institution verification not found"});
+   const {error:updateError}=await admin.from("institution_verification_submissions").update({status:decision,reviewer_user_id:user.id,reviewer_notes:notes,reviewed_at:new Date().toISOString()}).eq("id",submission.id);if(updateError)throw updateError;
+   const nextStatus=decision==="verified"?"active":decision==="rejected"?"suspended":"pending";
+   const {error:orgError}=await admin.from("organisations").update({status:nextStatus,updated_at:new Date().toISOString()}).eq("id",submission.organisation_id);if(orgError)throw orgError;
+   resourceType="institution_verification_submission";resourceId=submission.id;result={status:decision,organisation_status:nextStatus};
   }else if(action==="safeguarding_case"){
    const next=body.status;if(!["triage","investigating","resolved","closed"].includes(next))return json(400,{error:"Invalid safeguarding case status"});
    const {data:caseRow,error}=await admin.from("safeguarding_cases").update({status:next,assigned_to:user.id,resolution_notes:notes,resolved_at:["resolved","closed"].includes(next)?new Date().toISOString():null}).eq("id",body.case_id).select("id").maybeSingle();if(error||!caseRow)return json(404,{error:"Safeguarding case not found"});
