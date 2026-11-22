@@ -1,65 +1,98 @@
 # Learnora role-aware redesign — implementation audit
 
 Date: 2026-11-22
-Target branch: `staging/learnora-platform-v1`
+Integration target: `staging/learnora-platform-v1`
+Source implementation: `preview/role-aware-learner-ecosystem`
 Supabase project: `gkloowmlfxfrwcxggnzl`
-Scope: staging only. Do not merge to `main` or deploy production without explicit authorization.
+Scope: staging and isolated preview only. `main` and production deployment settings are not targeted.
 
-## Verified repository and platform state
+## Verified foundation
 
-- React 19, TypeScript 5.8 and Vite 6 application.
-- Supabase JS 2.58.
-- Existing public landing and authentication flow.
-- Existing learner, family, educator, institution, academic, invitation and platform-admin components.
-- Existing learning player, course builder, educator operations, Learnora AI and institution workspace.
-- Existing PayFast checkout and notification Edge Functions.
-- Existing learner discovery profile, educator public profile, institution directory, learning spaces, memberships, posts, live-class sessions, guardian relationships and guardian invitations.
-
-## Verified database state
-
-- Supabase project status: ACTIVE_HEALTHY.
-- PostgreSQL 17.
+- React 19, TypeScript 5.8, Vite 6 and Supabase JS 2.58.
+- Existing landing, email/password authentication, course enrolment, learning player, educator course builder, PayFast checkout and notification functions.
+- Supabase project is ACTIVE_HEALTHY on PostgreSQL 17.
 - 63 public base tables inspected; all 63 have RLS enabled.
-- Existing canonical role table: `public.user_roles`.
-- Existing platform administrator table: `public.platform_administrators`.
-- Existing discovery tables: `learner_discovery_profiles`, `educator_profiles`, `institution_directory_profiles`, `courses`, `learning_spaces`.
-- Existing live-class table: `live_class_sessions`; SELECT is restricted to class members, class staff or active platform administrators.
-- Existing guardian tables: `guardian_relationships`, `guardian_connection_invites`, and `guardian_relationship_events`.
-- Learner discovery policy permits self visibility and discoverable adult profiles; it does not expose all learners indiscriminately.
-- Educator public profiles are visible only when public and verified.
-- Institution directory rows require public listing and an active public organisation.
-- Learning-space membership and post policies restrict participation to members/owners.
-- Guardian relationship activation is constrained by verification and consent fields. Existing implementation notes that legal consent-version approval remains outstanding.
+- 48 migrations are recorded in the connected Supabase migration history at the time of inspection.
+- Canonical role records are in `public.user_roles`; platform administrator assignment is separately represented by `public.platform_administrators`.
+- Existing role, guardian, educator, institution, learner-discovery, community, live-class, course, academic and notification tables are reused rather than duplicated.
 
-## Verified gaps from the current learner UI
+## Implemented in the integrated staging source
 
-The current learner component exposes seven sections: Overview, My Learning, Study Plan, Practice & Tests, Resource Library, Opportunities, and Progress & Awards.
+### Role-aware application
+- Active roles are resolved from authenticated `user_roles` rows.
+- Platform administrator access is independently checked against `platform_administrators`.
+- Registration intent is used only to request an allowlisted role through `request_learnora_role`; it is not itself an authorization grant.
+- Learner and parent/guardian roles are self-requestable; educator and institution requests remain pending until review.
+- The application supports switching only between roles that are active for the signed-in identity.
+- Navigation and workspace rendering are constrained by the active role.
+- Platform administration remains separately assigned.
 
-The requested learner information architecture additionally requires dedicated destinations for Live Classes, Academic Record, Family Access, Invitations, Learnora AI, Communities & Study Groups, Learning Calendar, Notifications, and Profile & Settings. Discover is currently a general course catalogue in the top-level application rather than a personalized multi-category discovery workspace.
+### Learner information architecture
+The learner application now has dedicated destinations for Overview, Discover, My Learning, Study Plan, Practice & Tests, Resource Library, Live Classes, Opportunities, Progress & Awards, Academic Record, Family Access, Invitations, Learnora AI, Communities & Study Groups, Learning Calendar, Notifications, and Profile & Settings.
 
-The top-level authenticated navigation currently includes learner, parent, educator, institution and administrator destinations together. Frontend role separation therefore needs additional work; RLS remains the authoritative boundary.
+### Discover
+- Separate discovery rails for verified public educator profiles, publicly listed active institutions, published courses, public learning spaces and opted-in discoverable learner profiles.
+- Search and category filtering.
+- Learner recommendations use actual shared class/course signals and profile subjects/interests.
+- Database RLS limits learner discovery to self or discoverable adult profiles; the client does not download the full user directory.
+- Educator and institution directories use existing verification/public-listing controls.
 
-## Changes made in this staging commit
+### Family Access
+- Separate learner-side and parent/guardian-side experiences.
+- Learner-issued one-time invitation codes are hashed, scoped and expire after 72 hours.
+- Parent/guardian role is checked by the database workflow before redemption or direct requests.
+- Learner acknowledgement is distinct from independent guardian verification.
+- Protected access remains relationship- and consent-scoped.
+- Current staging database inspection found no guardian relationship or invitation records.
 
-- Removed external Google font imports from the portal stylesheet.
-- Set the global typeface and display typeface tokens to Arial/Helvetica/sans-serif.
-- No database schema, RLS policy, authentication metadata, production setting or live learner data was changed.
+### Live Classes
+- Learner class sessions are selected through existing class-membership RLS.
+- Educators can schedule and manage sessions through the educator workspace.
+- Session status and time windows are represented in the learner workspace.
+- Join action is shown only for a live session with a supplied HTTPS meeting URL.
+- This is not evidence of a secure LiveKit/token-based conferencing integration; that remains partial.
 
-## Required next implementation and validation
+### Other role workspaces
+- Educator application and credential submission.
+- Educator live-class scheduling.
+- Administrator role-application review.
+- Parent/guardian family workspace.
+- Institution workspace.
+- Learner calendar, notification and profile utility screens.
 
-1. Resolve active roles from `user_roles` and the dedicated administrator assignment table; do not authorize from browser-supplied signup metadata.
-2. Make navigation and direct-view rendering role-aware while retaining server/RLS checks.
-3. Expand the learner experience into the full requested screen map.
-4. Implement the Discover rails using existing verified/public profile policies and database-side pagination.
-5. Connect existing FamilyWorkspace and InvitationsWorkspace to learner-specific views without weakening guardian verification or consent.
-6. Add the learner live-class view using class membership and session RLS. Do not expose meeting credentials until a secure join-token flow is verified.
-7. Add calendar aggregation and profile/privacy controls.
-8. Run TypeScript/build, browser/device, role-isolation and adversarial RLS tests.
-9. Deploy only to an isolated Cloudflare preview.
+## Design
 
-## Evidence status
+- Global typeface and display typography token use Arial/Helvetica/sans-serif.
+- External Google font import removed.
+- Existing responsive styles and new learner/role workspaces are retained.
 
-- VERIFIED: repository metadata, branch existence, application files, Supabase project status, public table inventory, RLS-enabled state, selected policies and schema.
-- PARTIAL: current role-aware architecture and existing guardian/live-class workflows.
-- BLOCKED: full end-to-end verification without real-account browser tests, approved guardian consent language, and confirmed secure conferencing token issuance.
-- NOT CLAIMED: production readiness, complete role isolation, fully operational live conferencing, or legal approval.
+## Database and migration notes
+
+- Existing RLS policies inspected include verified educator profile visibility, adult opt-in learner discovery, public institution listing, member-only learning-space discussions, class-member live-session visibility, recipient-only notifications and relationship-participant guardian visibility.
+- Role request and discoverable-connection RPCs are present in the database; the public role-request function is SECURITY INVOKER, and the privileged connection aggregation is isolated behind a private function.
+- The preview branch includes two final guardian-role migration files. Equivalent role-checking guardian function definitions were already observed in the database; the parent-role backfill migration has not been separately validated as applied. No new migration was executed during this integration step.
+- Guardian activation still requires an approved consent version and independent authority verification. Legal approval and production configuration are not claimed.
+
+## Build and deployment evidence
+
+- Cloudflare Pages build for preview commit `dd4160b491a8f11608c51a5482c421f091c952c8` completed successfully: TypeScript check passed, Vite transformed 1,668 modules, and deployment completed.
+- Verified preview: https://025ca140.learnora-staging.pages.dev
+- Cloudflare Pages project `learnora-staging` has production deployments disabled.
+- The production-branch deployment trigger is skipped by configuration; no production deployment was performed.
+
+## Remaining validation
+
+- Real-account signup and role-application lifecycle tests.
+- Direct-route and adversarial role-isolation tests across all roles.
+- End-to-end guardian invite, learner consent, independent verification and revocation tests.
+- Live-class token issuance, video/audio and attendance integration.
+- Desktop, tablet and Android visual inspection, accessibility and reduced-motion checks.
+- Guardian consent language and POPIA/child-safeguarding review.
+- The Vite build reports a non-blocking bundle-size warning for the main JavaScript chunk.
+
+## Evidence labels
+
+- VERIFIED: repository files, role and navigation implementation, selected database schema/policies, migration inventory, Cloudflare build and deployment status.
+- PARTIAL: live-class joining, profile privacy controls, family verification and role-application lifecycle.
+- BLOCKED: legal approval for guardian consent activation; secure conferencing token integration; real-account and adversarial browser testing.
+- NOT CLAIMED: production readiness, full legal compliance, successful end-to-end signup, or tested real-user access.

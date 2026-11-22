@@ -1,55 +1,57 @@
 # Learnora role and permission matrix
 
-Status: implementation baseline, 2026-11-22
-Branch: `staging/learnora-platform-v1`
+Status: integrated implementation baseline, 2026-11-22
+Target branch: `staging/learnora-platform-v1`
 
-This matrix records the frontend workspace gates added in the current staging work and the existing database policy boundaries inspected. It is not a substitute for a complete route-by-route adversarial test.
+## Role resolution and account creation
 
-## Canonical role resolution
+| Role | Self-request | Initial status | Additional authorization |
+|---|---|---|---|
+| Learner | Yes | Active | Age-appropriate safeguards and privacy settings |
+| Parent / Guardian | Yes | Active account role only | Guardian relationship, learner consent and independent authority verification required for child records |
+| Educator | Yes | Pending | Educator profile and credential verification before activation |
+| Institution | Yes | Pending | Institution application and authorized review |
+| Platform administrator | No | Not self-requestable | Separate active administrator assignment |
 
-- Active roles are loaded from `public.user_roles` for the authenticated `auth.uid()`, filtered to `status = 'active'`.
-- Platform administration is independently resolved from an active row in `public.platform_administrators`.
-- Browser-supplied `signup_intent` / user metadata is not used to grant a workspace.
-- The frontend hides navigation and refuses to render a workspace unless the corresponding active role is present.
-- Supabase RLS and server-side checks remain authoritative. Frontend gates are not the security boundary.
+Registration metadata is an onboarding intent only. Authorization comes from the authenticated identity's active `user_roles` row and, for platform administration, the separate `platform_administrators` assignment. Multiple active roles are supported where explicitly granted.
 
 ## Workspace access
 
-| Workspace / view | Learner | Parent / Guardian | Educator | Institution | Platform administrator |
+| Workspace | Learner | Parent / Guardian | Educator | Institution | Platform administrator |
 |---|---:|---:|---:|---:|---:|
-| Course discovery | Yes | No | No | No | No |
-| My learning / study plan / practice / resources / opportunities / progress | Yes | No | No | No | No |
-| Learnora AI | Yes | No | No | No | No |
-| Academic record | Yes | No | Educator workspace only | No | No |
-| Family workspace | Yes (learner side) | Yes | No | No | No |
-| Invitations | Yes | Yes | Yes | Yes | No |
-| Educator studio | No | No | Yes | No | No |
-| Institution workspace | No | No | No | Yes | No |
-| Platform administration | No | No | No | No | Yes |
+| Overview / Discover / My Learning | Yes | No | No | No | No |
+| Study Plan / Practice / Resources | Yes | No | No | No | No |
+| Live Classes / Opportunities / Progress | Yes | No | No | No | No |
+| Academic Record | Yes | Relationship-scoped child records | Educator scope | Institution scope | Administrative scope |
+| Family Access | Learner-side connection controls | Guardian-side connection controls | No | No | Review only where separately authorized |
+| Invitations | Relevant invitations | Relevant invitations | Relevant invitations | Relevant invitations | Administrative review |
+| Communities & Study Groups | Yes | No | Role-specific spaces | No | Oversight |
+| Learning Calendar / Notifications / Profile Settings | Own records | Own records | Own records | Own records | Own records |
+| Learnora AI | Yes | No | Existing educator context only where enabled | No | No |
+| Educator Studio / Applications | No | No | Yes / pending application | No | Review |
+| Institution Workspace | No | No | No | Yes after approval | Review |
+| Platform Administration / Role Applications | No | No | No | No | Yes |
 
-Users with multiple active roles may see the corresponding workspaces. No role is inferred from a registration selection.
+The UI hides navigation and guards workspace rendering, but database RLS and server-side functions remain the authoritative security boundary.
 
-## Database security evidence inspected
+## Verified database controls
 
-| Data domain | Existing database control observed |
+| Domain | Observed control |
 |---|---|
-| User roles | User can select own role rows; active platform administrators can update role records. No ordinary self-service role elevation policy was observed. |
-| Platform administration | Dedicated `platform_administrators` table; active admin check is separate from ordinary role metadata. |
-| Educator directory | Public profile SELECT requires `public_profile = true` and `verification_status = 'verified'`; self profile remains visible to owner. |
-| Learner directory | SELECT allows self or discoverable adult profile according to `private.is_adult_discoverable`; minors are not indiscriminately exposed. |
-| Institution directory | Public SELECT requires `public_listing` and `private.is_active_public_org`; manager operations require organisation membership. |
-| Learning spaces | Active public spaces, owners and active members can read; joining is constrained to public active spaces and self-membership. |
-| Learning-space posts | Read and create require active membership or ownership; author/owner controls update/delete. |
-| Live classes | SELECT requires class membership, class staff or active platform administrator; create/update requires class staff and educator ownership. |
-| Guardian relationships | SELECT is limited to relationship participants; guardian-side creation is pending and consent/verification fields are required. |
-| Guardian invitations | Learner can read invitations they issued; secure invitation creation and redemption remain governed by the existing guardian workflow. |
-| Notifications | SELECT is restricted to the recipient user. |
+| `user_roles` | Users can read their own roles; active administrators can review/update role status; allowlisted role requests are server-validated |
+| Platform administration | Separate active assignment in `platform_administrators` |
+| Educator discovery | Public profile and verified status required |
+| Learner discovery | Self or opted-in discoverable adult profiles only |
+| Institution discovery | Public listing and active organisation required |
+| Learning spaces | Active public spaces, owners and active members |
+| Discussions | Posts restricted to members/owners; author/owner mutation controls |
+| Live classes | Class member/staff or active administrator SELECT; class-staff creation/update |
+| Guardian relationships | Participant visibility; role-checked requests; learner acknowledgement separate from verification |
+| Notifications | Recipient-only SELECT |
 
-## Known implementation gaps
+## Known limits
 
-- The learner navigation still exposes only the currently implemented learner destinations; the full requested 17-destination learner information architecture is not complete.
-- Discover remains primarily a published-course catalogue. Dedicated educator, institution, community, study-group and opted-in learner discovery rails are still required.
-- Live-class listing and a secure join-token/conferencing flow have not been end-to-end verified.
-- The registration flow currently stores account intent as user metadata; a secure, server-controlled role request / approval flow is still needed before new accounts can receive active learner, parent, educator or institution roles.
-- Parent/guardian relationship activation remains blocked until the approved consent version and verification process are configured and legally reviewed.
-- Direct-route and adversarial role-isolation tests have not yet been executed.
+- Live class join currently depends on a supplied HTTPS meeting URL; secure conferencing token issuance and full video integration are not verified.
+- Guardian activation remains dependent on approved consent configuration and independent evidence review.
+- Real-account, adversarial RLS, direct-route and Android browser testing remain outstanding.
+- Profile settings currently cover only implemented profile fields; full privacy and communication preference controls need further work.

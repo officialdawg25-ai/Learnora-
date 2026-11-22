@@ -7,7 +7,7 @@ import AssessmentBuilder from './AssessmentBuilder'
 type Props = { academyId: string; userId: string; onNotice: (message: string) => void }
 type Analytics = { course_id: string; title: string; publication_status: string; total_enrolments: number; active_learners: number; completed_learners: number; completion_rate_percent: number }
 type TeamMember = { id: string; user_id: string; role: string; status: string }
-type EducatorProfile = { professional_bio: string | null; teaching_experience_years: number | null; teaching_languages: string[]; subjects: string[]; verification_status: string }
+type EducatorProfile = { professional_bio: string | null; teaching_experience_years: number | null; teaching_languages: string[]; subjects: string[]; verification_status: string; public_display_name:string|null; teaching_levels:string[]; public_region:string|null; public_profile:boolean }
 
 export default function EducatorOperations({ academyId, userId, onNotice }: Props) {
   const [profile, setProfile] = useState<EducatorProfile | null>(null)
@@ -15,6 +15,10 @@ export default function EducatorOperations({ academyId, userId, onNotice }: Prop
   const [experience, setExperience] = useState('0')
   const [languages, setLanguages] = useState('en')
   const [subjects, setSubjects] = useState('')
+  const [publicName,setPublicName]=useState('')
+  const [teachingLevels,setTeachingLevels]=useState('')
+  const [publicRegion,setPublicRegion]=useState('')
+  const [publicProfile,setPublicProfile]=useState(false)
   const [credentialType, setCredentialType] = useState('teaching_qualification')
   const [issuer, setIssuer] = useState('')
   const [credentialReference, setCredentialReference] = useState('')
@@ -35,13 +39,13 @@ export default function EducatorOperations({ academyId, userId, onNotice }: Prop
     if (!supabase || !userId) return
     setLoading(true)
     const [p,t,a] = await Promise.all([
-      supabase.from('educator_profiles').select('professional_bio,teaching_experience_years,teaching_languages,subjects,verification_status').eq('user_id',userId).maybeSingle(),
+      supabase.from('educator_profiles').select('professional_bio,teaching_experience_years,teaching_languages,subjects,verification_status,public_display_name,teaching_levels,public_region,public_profile').eq('user_id',userId).maybeSingle(),
       academyId ? supabase.from('academy_memberships').select('id,user_id,role,status').eq('academy_id',academyId).order('created_at') : Promise.resolve({data:[],error:null}),
       academyId ? supabase.from('educator_course_analytics').select('*').eq('academy_id',academyId).order('created_at',{ascending:false}) : Promise.resolve({data:[],error:null})
     ])
     setLoading(false)
     if (p.error) onNotice('Educator profile: '+p.error.message)
-    else if (p.data) { const row=p.data as EducatorProfile; setProfile(row); setBio(row.professional_bio||''); setExperience(String(row.teaching_experience_years??0)); setLanguages(row.teaching_languages.join(', ')); setSubjects(row.subjects.join(', ')) }
+    else if (p.data) { const row=p.data as EducatorProfile; setProfile(row); setBio(row.professional_bio||''); setExperience(String(row.teaching_experience_years??0)); setLanguages(row.teaching_languages.join(', ')); setSubjects(row.subjects.join(', ')); setPublicName(row.public_display_name??''); setTeachingLevels((row.teaching_levels??[]).join(', ')); setPublicRegion(row.public_region??''); setPublicProfile(!!row.public_profile) }
     setTeam((t.data??[]) as TeamMember[])
     setAnalytics((a.data??[]) as Analytics[])
     if(a.data?.length)setKnowledgeCourseId(current=>a.data.some((x:any)=>x.course_id===current)?current:a.data[0].course_id)
@@ -54,7 +58,7 @@ export default function EducatorOperations({ academyId, userId, onNotice }: Prop
   async function saveProfile(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!supabase) return
-    const values={user_id:userId,professional_bio:bio.trim()||null,teaching_experience_years:Number(experience),teaching_languages:languages.split(',').map(x=>x.trim()).filter(Boolean),subjects:subjects.split(',').map(x=>x.trim()).filter(Boolean)}
+    const values={user_id:userId,professional_bio:bio.trim()||null,teaching_experience_years:Number(experience),teaching_languages:languages.split(',').map(x=>x.trim()).filter(Boolean),subjects:subjects.split(',').map(x=>x.trim()).filter(Boolean),public_display_name:publicName.trim()||null,teaching_levels:teachingLevels.split(',').map(x=>x.trim()).filter(Boolean),public_region:publicRegion.trim()||null,public_profile:profile?.verification_status==='verified'&&publicProfile}
     const result=profile
       ? await supabase.from('educator_profiles').update(values).eq('user_id',userId)
       : await supabase.from('educator_profiles').insert(values)
@@ -112,6 +116,10 @@ export default function EducatorOperations({ academyId, userId, onNotice }: Prop
           <label>Years of teaching experience<input type="number" min="0" max="80" value={experience} onChange={e=>setExperience(e.target.value)}/></label>
           <label>Teaching languages<input value={languages} onChange={e=>setLanguages(e.target.value)} placeholder="en, nso, ts, ve"/></label>
           <label>Subjects / specialisations<input value={subjects} onChange={e=>setSubjects(e.target.value)} placeholder="Mathematics, Physical Sciences"/></label>
+          <label>Public display name<input value={publicName} onChange={e=>setPublicName(e.target.value)} maxLength={100} placeholder="Name shown on your educator profile"/></label>
+          <label>Teaching levels<input value={teachingLevels} onChange={e=>setTeachingLevels(e.target.value)} placeholder="Primary, Secondary, University"/></label>
+          <label>Public region<input value={publicRegion} onChange={e=>setPublicRegion(e.target.value)} maxLength={100} placeholder="e.g. Limpopo, South Africa"/></label>
+          <label className="discover-optin"><input type="checkbox" checked={publicProfile} disabled={profile?.verification_status!=='verified'} onChange={e=>setPublicProfile(e.target.checked)}/> Publish my educator profile in Discover (available after verification)</label>
           <button className="button button-dark" type="submit">Save educator profile</button>
         </form>
       </div>

@@ -29,7 +29,7 @@ async function hashInviteCode(code:string){
  return Array.from(new Uint8Array(digest),b=>b.toString(16).padStart(2,'0')).join('')
 }
 
-export default function FamilyWorkspace({userId,onNotice}:{userId:string;onNotice:(s:string)=>void}){
+export default function FamilyWorkspace({userId,onNotice,mode='learner'}:{userId:string;onNotice:(s:string)=>void;mode?:'learner'|'guardian'}){
  const [connectionMode,setConnectionMode]=useState<'account'|'code'>('code')
  const [learnerId,setLearnerId]=useState('')
  const [inviteCode,setInviteCode]=useState('')
@@ -186,14 +186,14 @@ export default function FamilyWorkspace({userId,onNotice}:{userId:string;onNotic
  if(!userId)return <section className="family-workspace"><div className="page-intro"><p className="eyebrow">PARENT & GUARDIAN PORTAL</p><h1>Be part of<br/><em>their progress.</em></h1><p>Sign in to manage authorised learner connections and academic visibility.</p></div></section>
 
  return <section className="family-workspace">
-  <div className="page-intro family-intro"><p className="eyebrow">FAMILY CONNECTIONS · LEARNORA 360°</p><h1>Education moves<br/><em>together.</em></h1><p>Connect the right people to a learner's journey. Every request is scoped, visible to the learner and independently verified before academic access is enabled.</p></div>
-  <div className="family-overview">
+  <div className="page-intro family-intro"><p className="eyebrow">{mode==='learner'?'YOUR FAMILY · LEARNORA':'PARENT & GUARDIAN · LEARNORA'}</p><h1>{mode==='learner'?<>Bring your family <em>closer.</em></>:<>Education moves<br/><em>together.</em></>}</h1><p>{mode==='learner'?'Invite a parent or legal guardian to follow the parts of your learning journey you choose to share. You remain in control, and verification is required before access is enabled.':'Connect to a learner through a verified caregiving relationship. Every request is scoped, visible to the learner and independently verified before academic access is enabled.'}</p></div>
+  {mode==='guardian'&&<div className="family-overview">
    <article><span>VERIFIED CONNECTIONS</span><strong>{active.length.toString().padStart(2,'0')}</strong><small>Active, independently verified relationships</small></article>
    <article><span>REQUESTS IN REVIEW</span><strong>{pending.length.toString().padStart(2,'0')}</strong><small>Learner response or authority review outstanding</small></article>
    <article><span>AUTHORISED RECORDS</span><strong>{totalRecords.toString().padStart(2,'0')}</strong><small>Records available within approved scopes</small></article>
-  </div>
+  </div>}
   {notifications.length>0&&<section className="family-notifications"><div className="family-notifications-heading"><div><p className="eyebrow">LEARNORA NOTIFICATIONS</p><h2>Important family updates.</h2></div><span>{notifications.filter(n=>!n.read_at).length} unread</span></div><div className="family-notification-list">{notifications.map(n=><article className={n.read_at?'family-notification read':'family-notification'} key={n.id}><div><strong>{n.title}</strong><p>{n.body}</p><small>{new Date(n.created_at).toLocaleString()}</small></div>{!n.read_at&&<button type="button" className="text-button" onClick={()=>void markNotificationRead(n.id)}>Mark read</button>}</article>)}</div></section>}
-  <div className="family-grid">
+  {mode==='guardian'&&<div className="family-grid">
    <section className="studio-panel">
     <div className="panel-heading"><div><p className="eyebrow">PARENT / GUARDIAN</p><h2>Connect a learner.</h2></div><Users size={22}/></div>
     <p className="family-lead">Use a learner-issued code for the simplest private connection, or enter the learner's account ID if they have shared it with you.</p>
@@ -222,9 +222,8 @@ export default function FamilyWorkspace({userId,onNotice}:{userId:string;onNotic
      {['active','pending'].includes(r.status)&&<button className="text-button family-revoke" disabled={!!busy} onClick={()=>void revokeRelationship(r.id)}>Revoke connection</button>}
     </article>)}</div>}
    </section>
-  </div>
-
-  <div className="family-grid family-secondary-grid">
+  </div>}
+  {mode==='learner'&&<div className="family-grid family-secondary-grid">
    <section className="studio-panel">
     <div className="panel-heading"><div><p className="eyebrow">LEARNER ACCOUNT</p><h2>Issue a private invitation.</h2></div><KeyRound size={22}/></div>
     <p className="family-lead">If this is your learner account, create a temporary code for a parent or authorised guardian. You choose which academic categories may be requested.</p>
@@ -250,7 +249,7 @@ export default function FamilyWorkspace({userId,onNotice}:{userId:string;onNotic
      {r.status==='pending'&&r.learner_consent_status==='pending'&&<button className="text-button family-revoke" disabled={!!busy} onClick={()=>void revokeRelationship(r.id)}>Dismiss and revoke request</button>}
     </article>)}</div>}
    </section>
-  </div>
+  </div>}
   <div className="family-legal-note"><LockKeyhole size={16}/><p><strong>Safeguarding distinction.</strong> Learner acknowledgement is not proof of legal guardianship or a substitute for consent from a competent person where required by law. Learnora must independently review the guardian's authority and evidence before activating any relationship. Learners and guardians can revoke an active connection; revocation immediately removes the relationship-based academic access.</p></div>
  </section>
 }

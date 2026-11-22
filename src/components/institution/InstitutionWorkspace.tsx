@@ -23,6 +23,10 @@ export default function InstitutionWorkspace({userId,onNotice}:{userId:string;on
  const [classes,setClasses]=useState<ClassRow[]>([])
  const [courses,setCourses]=useState<{id:string;title:string}[]>([])
  const [reports,setReports]=useState<Report[]>([])
+ const [directoryName,setDirectoryName]=useState('')
+ const [directoryDescription,setDirectoryDescription]=useState('')
+ const [directoryRegion,setDirectoryRegion]=useState('')
+ const [directoryPublic,setDirectoryPublic]=useState(false)
  const [busy,setBusy]=useState(false)
 
  async function load(){
@@ -46,7 +50,13 @@ export default function InstitutionWorkspace({userId,onNotice}:{userId:string;on
  }
  useEffect(()=>{void load()},[userId])
  useEffect(()=>{if(organisationId)void loadOrganisation(organisationId);else{setClasses([]);setReports([])}},[organisationId])
+ useEffect(()=>{let active=true;if(!supabase||!organisationId)return()=>{active=false};supabase.from('institution_directory_profiles').select('display_name,description,region,public_listing').eq('organisation_id',organisationId).maybeSingle().then(({data,error})=>{if(!active)return;if(error){onNotice('Public institution profile: '+error.message);return}setDirectoryName(data?.display_name??organisations.find(x=>x.id===organisationId)?.name??'');setDirectoryDescription(data?.description??'');setDirectoryRegion(data?.region??'');setDirectoryPublic(!!data?.public_listing)});return()=>{active=false}},[organisationId,organisations])
 
+ async function saveDirectoryProfile(e:FormEvent<HTMLFormElement>){
+  e.preventDefault();if(!supabase||!organisationId)return;setBusy(true)
+  const {error}=await supabase.from('institution_directory_profiles').upsert({organisation_id:organisationId,display_name:directoryName.trim(),description:directoryDescription.trim()||null,region:directoryRegion.trim()||null,public_listing:directoryPublic,updated_at:new Date().toISOString()},{onConflict:'organisation_id'})
+  setBusy(false);if(error)onNotice('Institution directory profile was not saved: '+error.message);else onNotice('Institution directory profile saved. It becomes discoverable only after the organisation is active and public listing is enabled.')
+ }
  async function createOrganisation(e:FormEvent<HTMLFormElement>){
   e.preventDefault();if(!supabase)return;setBusy(true)
   const slug=organisationName.toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')
@@ -98,6 +108,7 @@ export default function InstitutionWorkspace({userId,onNotice}:{userId:string;on
     </>}
    </section>
   </div>
+  {organisationId&&<section className="studio-panel institution-directory-panel"><div className="panel-heading"><div><p className="eyebrow">PUBLIC DISCOVERY PROFILE</p><h2>How learners find you.</h2></div><Building2 size={22}/></div><form className="form-stack builder-form" onSubmit={saveDirectoryProfile}><label>Public institution name<input required maxLength={160} value={directoryName} onChange={e=>setDirectoryName(e.target.value)} placeholder="Name shown in Discover"/></label><label>Public description<textarea rows={3} maxLength={1200} value={directoryDescription} onChange={e=>setDirectoryDescription(e.target.value)} placeholder="Describe your institution, programmes and learning environment."/></label><label>Region<input maxLength={120} value={directoryRegion} onChange={e=>setDirectoryRegion(e.target.value)} placeholder="e.g. Limpopo, South Africa"/></label><label className="discover-optin"><input type="checkbox" checked={directoryPublic} onChange={e=>setDirectoryPublic(e.target.checked)}/> Allow this institution profile to appear in learner Discover</label><button className="button button-dark" disabled={busy}>Save public profile</button><p className="form-hint">A listing is visible only when the institution is active and public listing is enabled. Pending institutions remain hidden from learner discovery.</p></form></section>}
   {organisationId&&organisations.find(o=>o.id===organisationId)?.status!=='active'&&<section className="studio-panel institution-verification-panel"><div className="panel-heading"><div><p className="eyebrow">INSTITUTIONAL VERIFICATION</p><h2>Establish legitimacy.</h2></div><Building2 size={22}/></div><form className="form-stack builder-form" onSubmit={submitInstitutionVerification}><label>Verification authority<select value={verificationType} onChange={e=>setVerificationType(e.target.value)}><option value="cipc">CIPC</option><option value="dbe">Department of Basic Education</option><option value="dhet">Department of Higher Education and Training</option><option value="saqa">SAQA</option><option value="municipal">Municipal / public authority</option><option value="other">Other recognised source</option></select></label><label>Registration or verification reference<input required minLength={3} maxLength={200} value={verificationReference} onChange={e=>setVerificationReference(e.target.value)} placeholder="Public registration / reference number"/></label><button className="button button-dark" disabled={busy}>Submit verification reference</button><p className="form-hint">Submit a public institutional reference only. Do not enter personal identity numbers or upload confidential documents. Learnora must independently validate the reference; submission does not grant recognition or accreditation.</p></form></section>}
   <section className="studio-panel institution-reports"><div className="panel-heading"><div><p className="eyebrow">ACADEMIC INTELLIGENCE</p><h2>Institution reporting</h2></div><Users size={22}/></div>
    {reports.length===0?<p className="form-hint">Class-level reporting appears when classes and academic activity exist. No sample statistics are displayed.</p>:<div className="analytics-table"><div className="analytics-head institution-report-head"><span>CLASS</span><span>LEARNERS</span><span>EDUCATORS</span><span>COURSES</span><span>ATTEMPTS</span><span>AVG SCORE</span></div>{reports.map(r=><div className="analytics-row institution-report-row" key={r.class_id}><span>{r.name}<small>{r.grade_or_level??'—'} · {r.academic_year??'—'}</small></span><span>{r.active_learners}</span><span>{r.active_educators}</span><span>{r.assigned_courses}</span><span>{r.assessment_attempts}</span><span>{r.average_assessment_score??'—'}</span></div>)}</div>}
