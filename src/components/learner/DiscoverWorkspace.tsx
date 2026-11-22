@@ -30,7 +30,8 @@ export default function DiscoverWorkspace({userId,courses,onEnrol,onNotice}:{use
   if(e.error)onNotice('Educator directory is unavailable: '+e.error.message);else setEducators((e.data??[]) as Educator[])
   if(i.error)onNotice('Institution directory is unavailable: '+i.error.message);else setInstitutions((i.data??[]) as Institution[])
   if(l.error)onNotice('Learner discovery is unavailable: '+l.error.message);else setLearners(((l.data??[]) as Learner[]).filter(x=>x.user_id!==userId))
-  if(s.error)onNotice('Learning spaces are unavailable: '+s.error.message);else setSpaces((s.data??[]) as Space[])\n  if(connections.error)onNotice('Shared class and course recommendations are unavailable: '+connections.error.message);else setConnectionSignals(Object.fromEntries(((connections.data??[]) as ConnectionSignal[]).map(x=>[x.user_id,x])))
+  if(s.error)onNotice('Learning spaces are unavailable: '+s.error.message);else setSpaces((s.data??[]) as Space[])
+  if(connections.error)onNotice('Shared class and course recommendations are unavailable: '+connections.error.message);else setConnectionSignals(Object.fromEntries(((connections.data??[]) as ConnectionSignal[]).map(x=>[x.user_id,x])))
   if(m.error)onNotice('Your discovery profile could not be loaded: '+m.error.message)
   else if(m.data){const row=m.data as Learner & {discoverable:boolean};setOwn(row);setName(row.display_name);setSubjects(row.subjects.join(', '));setInterests(row.interests.join(', '));setLevel(row.education_level??'');setBio(row.bio??'');setDiscoverable(row.discoverable)}
   setLoading(false)
