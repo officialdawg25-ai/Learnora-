@@ -722,3 +722,18 @@ body{background:var(--paper);color:var(--ink)}
 @keyframes loading-travel{0%{transform:translateX(-110%)}100%{transform:translateX(290%)}}
 @media(max-width:600px){.splash-center{padding:20px}.splash-mark-wrap{margin:30px 0 28px}.splash-tagline{letter-spacing:.2em;font-size:12px}.splash-promise{font-size:9px;letter-spacing:.1em}.splash-skip{right:18px;bottom:18px}}
 @media(prefers-reduced-motion:reduce){.splash-screen:before,.splash-mark,.splash-brandline,.splash-mark-wrap:after,.splash-promise,.splash-caret,.splash-loading-mark,.splash-loading-track:after{animation:none!important}.splash-brandline,.splash-mark,.splash-promise{opacity:1;transform:none;clip-path:none}.splash-mark-wrap:after{transform:scaleX(1)}}
+
+/* Minimal white Learnora identity reveal: trace the exact official SVG path. */
+.splash-screen{background:#fff;color:#171817;cursor:pointer;outline:none}
+.splash-screen:before,.splash-screen:after{display:none}
+.splash-center,.splash-brandline,.splash-type-wrap,.splash-promise,.splash-skip{display:none!important}
+.splash-mark-wrap{width:clamp(150px,24vw,224px);height:auto;aspect-ratio:624/434;margin:0;perspective:none}
+.splash-mark-wrap:after{display:none}
+.splash-logo-trace{display:block;width:100%;height:100%;overflow:visible}
+.splash-logo-path{fill:transparent;stroke:#171817;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:2600;stroke-dashoffset:2600;animation:learnora-logo-trace 2.35s cubic-bezier(.55,.08,.25,1) forwards}
+@keyframes learnora-logo-trace{0%{stroke-dashoffset:2600;fill:transparent}78%{stroke-dashoffset:0;fill:transparent}100%{stroke-dashoffset:0;fill:#171817}}
+.splash-loading{background:#fff}
+.splash-loading-inner{gap:18px}
+.splash-loading-mark{color:#171817}
+.splash-loading-label{display:none}
+@media(prefers-reduced-motion:reduce){.splash-logo-path{animation:none;stroke-dashoffset:0;fill:#171817}}
