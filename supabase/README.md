@@ -31,6 +31,8 @@ The remote Supabase migration ledger was inspected directly. All 24 applied Lear
 - 20261122112914 — learnora_platform_governance
 - 20261122113628 — learnora_platform_admin_fk_index
 - 20261122113628 — learnora_platform_admin_fk_index
+- 20261122114018 — learnora_invitation_acceptance
+- 20261122114147 — learnora_invitation_discovery
 
 ## Security and operating notes
 
