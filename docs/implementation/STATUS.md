@@ -6,7 +6,7 @@ Updated: 2026-11-22
 
 - GitHub repository was initially README-only on main.
 - Supabase project is active, PostgreSQL 17, eu-west-1.
-- Remote migration ledger currently reports six applied Learnora migrations; see [Supabase project notes](../../supabase/README.md).
+- Remote migration ledger currently reports seven applied Learnora migrations; see [Supabase project notes](../../supabase/README.md).
 - No Edge Functions were present at the latest verified audit.
 - No application storage buckets were present at the initial audit.
 
@@ -17,13 +17,13 @@ Updated: 2026-11-22
 - Supabase email/password auth integration and auth profile bootstrap trigger.
 - Published course discovery, subject filtering, free enrolment, academy creation and draft course creation.
 - Core database domains for profiles, organisations, memberships, academies, courses, modules, lessons, enrolments, objectives, progress, assessments, attempts, assessment answer keys, AI usage metering and audit events.
-- RLS enabled for all 16 current public tables.
+- RLS enabled for all 16 current public tables. Anonymous grants are limited to academy/course discovery; privileged table operations and client lifecycle mutations have been revoked where no audited workflow exists.
 - Private helper functions for organisation membership, academy management and paid/free course content access.
 - Anonymous course/academy discovery limited to published records.
 - Client update privileges removed from memberships, enrolments, progress and assessment attempts until server-controlled workflows are implemented.
 - Assessment answer keys are stored separately from learner-visible question options and are educator-manager-only.
 - Academy association requires appropriate organisation membership.
-- Six remote migrations are recorded. The first two remote migrations still require exact source reconciliation into version control before this repository is the canonical migration source.
+- Seven remote migrations are recorded. The first two remote migrations still require exact source reconciliation into version control before this repository is the canonical migration source. Migrations 3–7 are versioned with exact remote IDs.
 
 ## Explicitly not implemented
 
