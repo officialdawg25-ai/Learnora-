@@ -57,14 +57,15 @@ Deno.serve(async(req:Request)=>{
    resourceType="knowledge_source";resourceId=source.id;result={status:"published",chunks:count};
   }else if(action==="guardian_review"){
    const decision=body.decision;if(!["active","rejected"].includes(decision))return json(400,{error:"Invalid guardian decision"});
-   const {data:rel,error}=await admin.from("guardian_relationships").select("id,consent_version,evidence_reference,learner_consent_status,learner_consent_at,learner_consent_version").eq("id",body.relationship_id).eq("status","pending").maybeSingle();if(error||!rel)return json(404,{error:"Pending guardian request not found"});
-   const approvedVersion=Deno.env.get("LEARNORA_GUARDIAN_CONSENT_VERSION");
-   if(decision==="active"&&(!rel.evidence_reference||!approvedVersion||rel.consent_version!==approvedVersion||rel.learner_consent_status!=="approved"||!rel.learner_consent_at||rel.learner_consent_version!=="learnora-learner-connection-v1"))return json(422,{error:"Activation requires a learner acknowledgement, the approved guardian consent version, and independently reviewed evidence of legal authority. A reference entered by the requester is not proof by itself."});
-   const reviewedAt=new Date().toISOString();
-   const {data:updated,error:updateError}=await admin.from("guardian_relationships").update({status:decision,verified_by:user.id,verified_at:reviewedAt}).eq("id",rel.id).eq("status","pending").select("id").maybeSingle();if(updateError)throw updateError;if(!updated)return json(409,{error:"This guardian request changed before the review could be completed."});
-   const {error:eventError}=await admin.from("guardian_relationship_events").insert({relationship_id:rel.id,actor_user_id:user.id,event_type:decision==="active"?"admin_activated":"admin_rejected",metadata:{decision,learner_consent_version:rel.learner_consent_version}});
-   if(eventError)throw eventError;
-   resourceType="guardian_relationship";resourceId=rel.id;result={status:decision,learner_acknowledgement:rel.learner_consent_status,authority_evidence_reviewed:decision==="active"};
+   const relationshipId=typeof body.relationship_id==="string"?body.relationship_id:"";if(!relationshipId)return json(400,{error:"Guardian relationship ID is required"});
+   const approvedVersion=Deno.env.get("LEARNORA_GUARDIAN_CONSENT_VERSION")??"";
+   const {data:review,error:reviewError}=await admin.rpc("review_guardian_relationship",{
+    p_relationship_id:relationshipId,p_decision:decision,p_reviewer_id:user.id,p_approved_consent_version:approvedVersion
+   });
+   if(reviewError?.code==="P0002")return json(404,{error:"Pending guardian request not found"});
+   if(reviewError?.code==="23514")return json(422,{error:reviewError.message});
+   if(reviewError)throw reviewError;
+   resourceType="guardian_relationship";resourceId=relationshipId;result=review;
   }else if(action==="institution_verification"){
    const decision=body.decision;if(!["verified","more_information_required","rejected"].includes(decision))return json(400,{error:"Invalid institution verification decision"});
    const submissionId=typeof body.submission_id==="string"?body.submission_id:"";
