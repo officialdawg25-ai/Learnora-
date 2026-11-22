@@ -2,7 +2,7 @@
 
 Project reference: `gkloowmlfxfrwcxggnzl` (Learnora).
 
-The remote Supabase migration ledger was inspected directly. All 24 applied Learnora migrations now have corresponding SQL files in this repository using the exact remote version and migration name. The first two migrations, which predated repository bootstrap, were recovered from `supabase_migrations.schema_migrations.statements` and committed rather than recreated.
+The remote Supabase migration ledger was inspected directly. All 31 applied Learnora migrations now have corresponding SQL files in this repository using the exact remote version and migration name. The first two migrations, which predated repository bootstrap, were recovered from `supabase_migrations.schema_migrations.statements` and committed rather than recreated.
 
 ## Applied migration history
 
@@ -32,6 +32,11 @@ The remote Supabase migration ledger was inspected directly. All 24 applied Lear
 - 20261122113628 — learnora_platform_admin_fk_index
 - 20261122114018 — learnora_invitation_acceptance
 - 20261122114147 — learnora_invitation_discovery
+- 20261122114827 — learnora_learning_progress_assessment_engine
+- 20261122114955 — 20261122120000_learnora_anonymous_grant_hardening
+- 20261122115156 — learnora_assessment_submission_key_validation
+- 20261122115411 — learnora_assessment_null_payload_guard
+- 20261122115759 — learnora_private_learning_workflows
 - 20261122114827 — learnora_learning_progress_assessment_engine
 - 20261122114955 — 20261122120000_learnora_anonymous_grant_hardening
 - 20261122115156 — learnora_assessment_submission_key_validation
