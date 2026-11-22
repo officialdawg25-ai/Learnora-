@@ -1,32 +1,38 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
-type Props={loading?:boolean;onComplete?:()=>void};
+type Props = { loading?: boolean; onComplete?: () => void };
 
-export default function SplashExperience({loading=false,onComplete}:Props){
- const [typed,setTyped]=useState('');
- useEffect(()=>{
-  if(loading)return;
-  let timer=0;
-  let cancelled=false;
-  const pause=(ms:number,fn:()=>void)=>{timer=window.setTimeout(()=>{if(!cancelled)fn();},ms);};
-  let current='';
-  const type=(value:string,index:number,done:()=>void)=>{
-   if(cancelled)return;
-   if(index>=value.length){done();return;}
-   current+=value[index];
-   setTyped(current);
-   pause(78,()=>type(value,index+1,done));
-  };
-  const erase=(targetLength:number,done:()=>void)=>{
-   if(cancelled)return;
-   if(current.length<=targetLength){pause(180,done);return;}
-   current=current.slice(0,-1);
-   setTyped(current);
-   pause(92,()=>erase(targetLength,done));
-  };
-  type('THE FUTRUE',0,()=>pause(760,()=>erase('THE FUT'.length,()=>type('URE OF LEARNING',0,()=>{}))));
-  return()=>{cancelled=true;window.clearTimeout(timer);};
- },[loading]);
- if(loading)return <main className="splash-loading" role="status" aria-label="Loading Learnora"><div className="splash-loading-inner"><div className="splash-loading-mark"><img src="/brand/learnora-mark.svg" alt=""/></div><span className="splash-loading-label">PREPARING YOUR LEARNING SPACE</span><span className="splash-loading-track"/></div></main>;
- return <main className="splash-screen" aria-label="Learnora — The Future of Learning"><div className="splash-center"><div className="splash-brandline">LEARNORA / EDUCATION, INTELLIGENCE &amp; LEARNING</div><div className="splash-mark-wrap"><div className="splash-mark"><img src="/brand/learnora-mark.svg" alt="Learnora symbol"/></div></div><div className="splash-type-wrap" aria-live="polite"><span className="splash-tagline">{typed}</span><span className="splash-caret" aria-hidden="true"/></div><div className="splash-promise">WHERE POTENTIAL BECOMES POSSIBILITY</div></div><button className="splash-skip" onClick={onComplete}>Skip intro</button></main>;
+const logoPath = "M0 0 C64.02 0 128.04 0 194 0 C194 142.89 194 285.78 194 433 C271.22 433 348.44 433 428 433 C428 373.27 428 313.54 428 252 C492.68 252 557.36 252 624 252 C624 312.06 624 372.12 624 434 C560 434.25 560 434.25 539.88 434.3 C533.86 434.33 533.86 434.33 527.85 434.37 C525.2 434.38 522.54 434.39 519.89 434.39 C492.16 434.29 492.16 434.29 467 445 C466.01 445.65 465.03 446.3 464.01 446.96 C451.21 455.96 440.57 468.85 436 484 C435.73 484.86 435.47 485.72 435.19 486.6 C424.17 525.72 431.11 615.58 431 628 C352.46 628 273.92 628 193 628 C192.75 562.88 192.75 562.88 192.7 542.38 C192.67 536.27 192.67 536.27 192.63 530.16 C192.62 527.46 192.61 524.75 192.61 522.05 C192.61 517.94 192.58 513.82 192.55 509.71 C192.55 507.93 192.55 507.93 192.56 506.11 C192.39 492.1 187.86 480.04 181 468 C180.46 467.05 179.92 466.11 179.37 465.13 C170.17 450.91 152.92 439.75 136.56 436.19 C91.81 427.79 45.53 433.39 0 433 C0 290.11 0 147.22 0 0 Z";
+
+export default function SplashExperience({ loading = false, onComplete }: Props) {
+  useEffect(() => {
+    if (loading || !onComplete) return;
+    const timer = window.setTimeout(onComplete, 3600);
+    return () => window.clearTimeout(timer);
+  }, [loading, onComplete]);
+
+  if (loading) return <main className="splash-loading" role="status" aria-label="Loading Learnora"><div className="splash-loading-inner"><div className="splash-loading-mark"><img src="/brand/learnora-mark.svg" alt="" /></div><span className="splash-loading-track" /></div></main>;
+
+  const skip = () => onComplete?.();
+  return (
+    <main
+      className="splash-screen"
+      aria-label="Learnora"
+      role="button"
+      tabIndex={0}
+      onClick={skip}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          skip();
+        }
+      }}
+    >
+      <div className="splash-mark-wrap" aria-hidden="true">
+        <svg className="splash-logo-trace" viewBox="0 0 624 434" xmlns="http://www.w3.org/2000/svg">
+          <path className="splash-logo-path" d={logoPath} />
+        </svg>
+      </div>
+    </main>
+  );
 }
