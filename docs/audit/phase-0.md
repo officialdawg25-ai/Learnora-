@@ -34,7 +34,7 @@ The application and schema are materially more capable than the original audit b
 ## Implemented systems
 
 ### Learning and educator operations
-- Published course discovery and free enrolment.
+- Published course discovery and free enrolment.\n- Learner lesson player and server-controlled progress recording.\n- Objective assessment submission/marking, written response submission and educator grading RPC.\n- Course version snapshot preview, academy/class invitation acceptance and private knowledge source ingestion.
 - Academy creation and draft course authoring.
 - Module and lesson authoring.
 - Educator profiles and verification submission metadata.
