@@ -60,7 +60,6 @@ export default function DiscoverWorkspace({userId,courses,onEnrol,onNotice}:{use
   if(error&&!error.message.toLowerCase().includes('duplicate'))onNotice('Could not join this learning space: '+error.message)
   else onNotice('You joined the learning space.')
  }
- const profileName=name||'Your learning profile'
  return <section className="discover-workspace">
   <header className="discover-intro"><div><p className="eyebrow"><span className="eyebrow-line"/>A MORE CONNECTED WAY TO LEARN</p><h1>Find your <em>people.</em><br/>Follow your curiosity.</h1><p>Discover verified educators, learning programmes, institutions and communities shaped around the subjects that matter to you.</p></div><button className="button button-outline" onClick={()=>setProfileOpen(v=>!v)}>{profileOpen?'Close preferences':'Personalise discovery'} <ArrowRight size={14}/></button></header>
   <div className="discover-controls"><div className="discover-search"><Compass size={17}/><input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search educators, courses, subjects, groups…"/></div><div className="discover-filters">{['All','Educators','Institutions','Courses','Communities','Study groups','Learners'].map(x=><button key={x} className={category===x?'selected':''} onClick={()=>setCategory(x)}>{x}</button>)}</div></div>
