@@ -113,3 +113,9 @@
 .version-preview details{border-top:1px solid var(--line);padding-top:10px;font-size:11px}
 .version-preview pre{max-height:300px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;font-size:10px;line-height:1.5}
 @media(max-width:760px){.version-history-layout{grid-template-columns:1fr}}
+
+.learner-orders{margin:20px 0}
+.order-row{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:14px 0;border-bottom:1px solid var(--line)}
+.order-row strong{font-size:12px}
+.order-row small{display:block;margin-top:5px;color:var(--muted);font-size:10px}
+@media(max-width:600px){.order-row{align-items:flex-start;flex-direction:column}}
