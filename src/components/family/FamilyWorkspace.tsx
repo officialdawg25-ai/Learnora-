@@ -11,6 +11,7 @@ type Relationship={
 type Invite={id:string;consent_scopes:string[];expires_at:string;redeemed_at:string|null;revoked_at:string|null;created_at:string}
 type Summary={progress:number;assessments:number}
 type NewCode={code:string;inviteId:string;expiresAt:string}
+type UserNotification={id:string;notification_type:string;title:string;body:string;created_at:string;read_at:string|null;resource_id:string}
 
 const GUARDIAN_CONSENT_VERSION='learnora-guardian-connection-v1'
 const LEARNER_CONSENT_VERSION='learnora-learner-connection-v1'
@@ -43,6 +44,7 @@ export default function FamilyWorkspace({userId,onNotice}:{userId:string;onNotic
  const [outgoing,setOutgoing]=useState<Relationship[]>([])
  const [incoming,setIncoming]=useState<Relationship[]>([])
  const [invites,setInvites]=useState<Invite[]>([])
+ const [notifications,setNotifications]=useState<UserNotification[]>([])
  const [summary,setSummary]=useState<Record<string,Summary>>({})
  const [newCode,setNewCode]=useState<NewCode|null>(null)
  const [busy,setBusy]=useState('')
@@ -51,17 +53,19 @@ export default function FamilyWorkspace({userId,onNotice}:{userId:string;onNotic
  async function load(){
   if(!supabase||!userId){setLoading(false);return}
   setLoading(true)
-  const [sent,received,issued]=await Promise.all([
+  const [sent,received,issued,notificationsResult]=await Promise.all([
    supabase.from('guardian_relationships').select('id,guardian_user_id,learner_user_id,relationship_type,status,consent_scopes,consent_version,created_at,learner_consent_status,learner_consent_at,learner_consent_version,revoked_at').eq('guardian_user_id',userId).order('created_at',{ascending:false}),
    supabase.from('guardian_relationships').select('id,guardian_user_id,learner_user_id,relationship_type,status,consent_scopes,consent_version,created_at,learner_consent_status,learner_consent_at,learner_consent_version,revoked_at').eq('learner_user_id',userId).order('created_at',{ascending:false}),
-   supabase.from('guardian_connection_invites').select('id,consent_scopes,expires_at,redeemed_at,revoked_at,created_at').eq('learner_user_id',userId).order('created_at',{ascending:false}).limit(10)
+   supabase.from('guardian_connection_invites').select('id,consent_scopes,expires_at,redeemed_at,revoked_at,created_at').eq('learner_user_id',userId).order('created_at',{ascending:false}).limit(10),
+   supabase.from('user_notifications').select('id,notification_type,title,body,created_at,read_at,resource_id').eq('recipient_user_id',userId).order('created_at',{ascending:false}).limit(8)
   ])
   if(sent.error)onNotice('Your outgoing family connections could not be loaded: '+sent.error.message)
   if(received.error)onNotice('Incoming connection requests could not be loaded: '+received.error.message)
   if(issued.error)onNotice('Your learner invitations could not be loaded: '+issued.error.message)
+  if(notificationsResult.error)onNotice('Your notifications could not be loaded: '+notificationsResult.error.message)
   const sentRows=(sent.data??[]) as Relationship[]
   const receivedRows=(received.data??[]) as Relationship[]
-  setOutgoing(sentRows);setIncoming(receivedRows);setInvites((issued.data??[]) as Invite[])
+  setOutgoing(sentRows);setIncoming(receivedRows);setInvites((issued.data??[]) as Invite[]);setNotifications((notificationsResult.data??[]) as UserNotification[])
   const active=sentRows.filter(x=>x.status==='active')
   const counts:Record<string,Summary>={}
   for(const r of active){
@@ -151,6 +155,13 @@ export default function FamilyWorkspace({userId,onNotice}:{userId:string;onNotic
   await load()
  }
 
+ async function markNotificationRead(id:string){
+  if(!supabase)return
+  const {error}=await supabase.rpc('mark_user_notification_read',{p_notification_id:id})
+  if(error){onNotice('Notification could not be marked as read: '+error.message);return}
+  setNotifications(rows=>rows.map(n=>n.id===id?{...n,read_at:new Date().toISOString()}:n))
+ }
+
  async function revokeInvite(id:string){
   if(!supabase)return
   setBusy('revoke-invite-'+id)
@@ -181,6 +192,7 @@ export default function FamilyWorkspace({userId,onNotice}:{userId:string;onNotic
    <article><span>REQUESTS IN REVIEW</span><strong>{pending.length.toString().padStart(2,'0')}</strong><small>Learner response or authority review outstanding</small></article>
    <article><span>AUTHORISED RECORDS</span><strong>{totalRecords.toString().padStart(2,'0')}</strong><small>Records available within approved scopes</small></article>
   </div>
+  {notifications.length>0&&<section className="family-notifications"><div className="family-notifications-heading"><div><p className="eyebrow">LEARNORA NOTIFICATIONS</p><h2>Important family updates.</h2></div><span>{notifications.filter(n=>!n.read_at).length} unread</span></div><div className="family-notification-list">{notifications.map(n=><article className={n.read_at?'family-notification read':'family-notification'} key={n.id}><div><strong>{n.title}</strong><p>{n.body}</p><small>{new Date(n.created_at).toLocaleString()}</small></div>{!n.read_at&&<button type="button" className="text-button" onClick={()=>void markNotificationRead(n.id)}>Mark read</button>}</article>)}</div></section>}
   <div className="family-grid">
    <section className="studio-panel">
     <div className="panel-heading"><div><p className="eyebrow">PARENT / GUARDIAN</p><h2>Connect a learner.</h2></div><Users size={22}/></div>
