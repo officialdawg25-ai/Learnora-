@@ -37,6 +37,8 @@ The remote Supabase migration ledger was inspected directly. All 31 applied Lear
 - 20261122115156 — learnora_assessment_submission_key_validation
 - 20261122115411 — learnora_assessment_null_payload_guard
 - 20261122115759 — learnora_private_learning_workflows
+- 20261122120542 — learnora_institution_verification_review
+- 20261122120613 — learnora_checkout_concurrency_guards
 
 ## Security and operating notes
 
@@ -44,6 +46,7 @@ The remote Supabase migration ledger was inspected directly. All 31 applied Lear
 - Anonymous access is limited to explicitly public discovery and the minimal public credential verification index.
 - Financial journals, webhook events, settlement imports, safeguarding cases and credential verification index writes are server-controlled.
 - Payment callbacks are not treated as proof of bank settlement. PayFast payment confirmation and statement reconciliation are separate states.
+- Pending orders are unique per learner/course, and each order can have only one active payment attempt. Checkout reuses an existing pending order/payment attempt under concurrent requests.
 - The PayFast Edge Functions are sandbox-only; production checkout is deliberately disabled. The `learnora-admin` function is JWT-protected and requires an explicit active permission record; no platform administrator has been assigned.
 - Five Edge Functions are deployed: Learnora AI, knowledge ingestion, PayFast checkout, PayFast notification and platform administration. Their source files are versioned under `supabase/functions`.
 - AI is provider-independent at the application gateway, but a provider/model/key must be configured before responses can be generated.
