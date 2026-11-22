@@ -73,7 +73,7 @@ The deployed functions and their source files are versioned in the repository. N
 
 - No platform administrator has been assigned because there are no Auth users. The admin dashboard and Edge Function are implemented but cannot be exercised until an approved administrator is bootstrapped.
 - Educator evidence upload is private and reviewer queues exist; real reviewer testing and appeals/suspension procedures remain.
-- Academy team and institution class invitations can now be accepted by the invited authenticated user without changing their assigned role or tenant. Email-based invitation discovery and acceptance UX still needs implementation and end-to-end validation.
+- Academy team and institution class invitations can be accepted by the invited authenticated user without changing their assigned role or tenant. Email delivery and invitations for people who have not registered remain incomplete.
 - Course version snapshots are recorded automatically, but a restore/diff UI is not complete.
 - Publication review requests and admin decisions are stored; real reviewer testing remains.
 - Educator analytics are descriptive enrolment/completion counts; no verified revenue or teaching-effectiveness score is displayed.
@@ -84,11 +84,11 @@ The deployed functions and their source files are versioned in the repository. N
 - AI model provider configuration, model evaluation datasets, language benchmarks, safety regression suite and measured cost controls are not configured.
 - Knowledge ingestion creates private drafts; source review/publishing is available to an authorised admin, but licensed curriculum corpus ingestion and content quality evaluation remain.
 - Guardian relationships remain pending until independent identity/authority review; legal consent wording and safeguarding operations require qualified South African legal review.
-- Institution workspace is a foundational class/organisation layer, not a replacement SIS; invitation acceptance, OneRoster/LTI integrations and broader reporting remain.
+- Institution workspace is a foundational class/organisation layer, not a replacement SIS; email-based invitation delivery, OneRoster/LTI integrations and broader reporting remain.
 - Competency evidence review is implemented, but automated evidence processing/mastery calculation and educator feedback loops are not complete.
 - Credential issuance and opportunity publication require an authorised admin; no credentials or opportunities have been seeded.
 - Communities, messaging, live classrooms, offline sync, SCORM/xAPI/LTI, backup restore testing and full POPIA operational controls remain future work.
-- A learner lesson player, lesson completion recording, multiple-choice assessment attempts, deterministic objective marking and educator grading RPCs are implemented. Learner-facing attempt history and review screens, essay/file/rubric assessment authoring and marking, and richer mastery/progress feedback remain incomplete.
+- A learner lesson player, lesson completion recording, multiple-choice assessment attempts, deterministic objective marking and educator grading RPCs are implemented. Learner-facing attempt history is now displayed. Educator-facing review/marking screens for subjective responses, essay/file/rubric authoring, and richer mastery/progress feedback remain incomplete.
 
 ## Next execution sequence
 
