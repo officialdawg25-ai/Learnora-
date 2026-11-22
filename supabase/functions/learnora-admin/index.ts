@@ -70,11 +70,12 @@ Deno.serve(async(req:Request)=>{
    resourceType="guardian_relationship";resourceId=rel.id;result={status:decision};
   }else if(action==="institution_verification"){
    const decision=body.decision;if(!["verified","more_information_required","rejected"].includes(decision))return json(400,{error:"Invalid institution verification decision"});
-   const {data:submission,error}=await admin.from("institution_verification_submissions").select("id,organisation_id").eq("id",body.submission_id).eq("status","pending").maybeSingle();if(error||!submission)return json(404,{error:"Pending institution verification not found"});
-   const {error:updateError}=await admin.from("institution_verification_submissions").update({status:decision,reviewer_user_id:user.id,reviewer_notes:notes,reviewed_at:new Date().toISOString()}).eq("id",submission.id);if(updateError)throw updateError;
-   const nextStatus=decision==="verified"?"active":decision==="rejected"?"suspended":"pending";
-   const {error:orgError}=await admin.from("organisations").update({status:nextStatus,updated_at:new Date().toISOString()}).eq("id",submission.organisation_id);if(orgError)throw orgError;
-   resourceType="institution_verification_submission";resourceId=submission.id;result={status:decision,organisation_status:nextStatus};
+   const submissionId=typeof body.submission_id==="string"?body.submission_id:"";
+   if(!submissionId)return json(400,{error:"Institution verification submission ID is required"});
+   const {data:reviewResult,error:reviewError}=await admin.rpc("review_institution_verification",{p_submission_id:submissionId,p_decision:decision,p_reviewer_id:user.id,p_notes:notes});
+   if(reviewError?.code==="P0002")return json(404,{error:"Pending institution verification not found"});
+   if(reviewError)throw reviewError;
+   resourceType="institution_verification_submission";resourceId=submissionId;result=reviewResult;
   }else if(action==="safeguarding_case"){
    const next=body.status;if(!["triage","investigating","resolved","closed"].includes(next))return json(400,{error:"Invalid safeguarding case status"});
    const {data:caseRow,error}=await admin.from("safeguarding_cases").update({status:next,assigned_to:user.id,resolution_notes:notes,resolved_at:["resolved","closed"].includes(next)?new Date().toISOString():null}).eq("id",body.case_id).select("id").maybeSingle();if(error||!caseRow)return json(404,{error:"Safeguarding case not found"});
