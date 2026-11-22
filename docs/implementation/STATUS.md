@@ -7,7 +7,7 @@ Updated: 22 November 2026
 - Repository: `officialdawg25-ai/Learnora-`
 - Working branch: `foundation/learnora-platform-v1`
 - Supabase project: `gkloowmlfxfrwcxggnzl`, PostgreSQL 17, eu-west-1
-- Remote migration ledger: 26 applied migrations; every migration source is versioned under its exact remote ID.
+- Remote migration ledger: 30 applied migrations; every migration source is versioned under its exact remote ID.
 - Public application schema: 55 tables; all 55 have RLS enabled.
 - Authentication users: 0. No synthetic accounts or learner records were inserted.
 - Storage: one private `learnora-verification` bucket; no public Learnora bucket.
@@ -34,6 +34,7 @@ Updated: 22 November 2026
 - Educator profiles and private evidence-submission metadata; verification decisions remain server-controlled.
 - Academy team memberships and expanded academy authorisation.
 - Immutable course snapshots, publication review records and educator analytics view.
+- Learner lesson-progress RPC, assessment attempt submission, deterministic objective auto-marking and educator grading RPCs. Learner answer submissions are checked against the published assessment's question identifiers; answer keys remain private.
 - Orders, PayFast payment transactions, webhook idempotency records, refunds, double-entry ledger, educator earnings, payout records and subscription records.
 - Settlement batches/lines and server-only reconciliation functions.
 - AI conversations/messages, curriculum knowledge sources/chunks, full-text retrieval and scoped RLS. Learners may only append user-role messages; assistant messages are written server-side.
@@ -57,14 +58,14 @@ The deployed functions and their source files are versioned in the repository. N
 
 ## Security and verification
 
-- Supabase security advisor: no findings.
 - Supabase health advisor: no findings.
-- All 55 public tables have RLS enabled.
+- Supabase security advisor: three warnings for authenticated-executable `SECURITY DEFINER` RPCs (`record_lesson_progress`, `submit_assessment_attempt`, `grade_assessment_attempt`). These are intentionally callable transactional endpoints with explicit authentication, enrolment or academy-manager checks and an empty search path. The warnings remain visible and require adversarial testing before production.
+- All 55 public tables have RLS enabled. Anonymous table privileges are restricted to `SELECT` on `academies`, `courses` and `credential_verification_index` only.
 - Private verification storage allows an authenticated educator to upload/read only within their own user-ID folder; no public object access.
 - Platform administrator records cannot be created or edited by ordinary client roles. The first administrator must be assigned by an authorised project operator using the documented bootstrap process.
 - Guardian activation requires a verified authority reference and an exact server-configured approved consent version. The current UI submits a draft consent version, so activation remains blocked pending legal approval.
 - Performance advisor: remaining notices are unused-index informational findings on a mostly empty database. Unindexed foreign keys and multiple-permissive-policy findings were addressed; no workload-unjustified indexes were removed.
-- GitHub Actions production build and dependency advisory gate passed on commit `c4f407cb8fc87c44b3a35a8492bb52607e0c984a` after correcting escaped line-break characters in educator studio source. A new CI run will validate the documentation and subsequent commits.
+- GitHub Actions build and dependency advisory gate passed on commit `94e95c4ac5dadcf7024002f1ab6ae883201bee7b`. Subsequent migration and documentation commits require a fresh CI result before being treated as verified.
 - Browser/device, real-account, adversarial RLS and provider sandbox end-to-end tests have not yet been performed.
 - No production deployment, merge or launch is claimed.
 
@@ -87,7 +88,7 @@ The deployed functions and their source files are versioned in the repository. N
 - Competency evidence review is implemented, but automated evidence processing/mastery calculation and educator feedback loops are not complete.
 - Credential issuance and opportunity publication require an authorised admin; no credentials or opportunities have been seeded.
 - Communities, messaging, live classrooms, offline sync, SCORM/xAPI/LTI, backup restore testing and full POPIA operational controls remain future work.
-- Assessment attempt/marking workflows and lesson player remain incomplete.
+- A learner lesson player, lesson completion recording, multiple-choice assessment attempts, deterministic objective marking and educator grading RPCs are implemented. Learner-facing attempt history and review screens, essay/file/rubric assessment authoring and marking, and richer mastery/progress feedback remain incomplete.
 
 ## Next execution sequence
 
