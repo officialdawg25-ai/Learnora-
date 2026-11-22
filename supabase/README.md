@@ -37,10 +37,6 @@ The remote Supabase migration ledger was inspected directly. All 31 applied Lear
 - 20261122115156 — learnora_assessment_submission_key_validation
 - 20261122115411 — learnora_assessment_null_payload_guard
 - 20261122115759 — learnora_private_learning_workflows
-- 20261122114827 — learnora_learning_progress_assessment_engine
-- 20261122114955 — 20261122120000_learnora_anonymous_grant_hardening
-- 20261122115156 — learnora_assessment_submission_key_validation
-- 20261122115411 — learnora_assessment_null_payload_guard
 
 ## Security and operating notes
 
