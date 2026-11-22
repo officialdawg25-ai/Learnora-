@@ -219,7 +219,6 @@ end;
 $function$;
 
 revoke all on function private.snapshot_course(uuid) from public, anon, authenticated;
-revoke all on function private.capture_course_version_from_content() from public, anon, authenticated;
 grant execute on function private.can_admin_academy(uuid) to authenticated;
 
 create or replace function public.submit_course_for_review(p_course_id uuid)
@@ -270,6 +269,7 @@ begin
   if tg_op='DELETE' then return old; else return new; end if;
 end;
 $function$;
+revoke all on function private.capture_course_version_from_content() from public, anon, authenticated;
 
 drop trigger if exists courses_snapshot_after_change on public.courses;
 create trigger courses_snapshot_after_change
