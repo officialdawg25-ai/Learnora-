@@ -24,7 +24,8 @@ const tabs:{id:Tab;label:string;icon:typeof Users}[]=[
  {id:'profile',label:'My profile',icon:UserRound},{id:'privacy',label:'Privacy & security',icon:ShieldCheck},
  {id:'support',label:'Help & support',icon:HeartHandshake}
 ]
-const dateLabel=(value:string|null|undefined)=>value?new Date(value).toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'}):'—'\nconst moneyLabel=(minor:number)=>new Intl.NumberFormat('en-ZA',{style:'currency',currency:'ZAR'}).format(minor/100)
+const dateLabel=(value:string|null|undefined)=>value?new Date(value).toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'}):'—'
+const moneyLabel=(minor:number)=>new Intl.NumberFormat('en-ZA',{style:'currency',currency:'ZAR'}).format(minor/100)
 function EmptyFeature({title,description}:{title:string;description:string}){return <section className="parent-feature-empty"><div className="parent-empty-icon"><LockKeyhole size={20}/></div><p className="eyebrow">PLATFORM INTEGRATION REQUIRED</p><h2>{title}</h2><p>{description}</p><small>Learnora will only display this information once the relevant institution or platform workflow is configured. No sample or invented records are shown.</small></section>}
 export default function ParentPortal({userId,onNotice}:{userId:string;onNotice:(message:string)=>void}){
  const [tab,setTab]=useState<Tab>('overview'),[children,setChildren]=useState<Child[]>([]),[selectedId,setSelectedId]=useState(''),[notifications,setNotifications]=useState<Notice[]>([]),[profile,setProfile]=useState<ParentProfile>({display_name:'',preferred_language:'en'}),[loading,setLoading]=useState(true),[error,setError]=useState('')
