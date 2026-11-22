@@ -7,7 +7,7 @@ Updated: 22 November 2026
 - Repository: `officialdawg25-ai/Learnora-`
 - Staging branch: `staging/learnora-platform-v1`
 - Supabase project: `gkloowmlfxfrwcxggnzl`, PostgreSQL 17, eu-west-1
-- Remote migration ledger: 36 applied migrations; every migration source is versioned under its exact remote ID.
+- Remote migration ledger: 37 applied migrations; every migration source is versioned under its exact remote ID.
 - Public application schema: 56 tables; all 56 have RLS enabled.
 - Authentication users: 0. No synthetic accounts or learner records were inserted.
 - Storage: one private `learnora-verification` bucket; no public Learnora bucket.
@@ -63,7 +63,8 @@ The deployed functions and their source files are versioned in the repository. N
 
 ## Security and verification
 
-- Supabase security and health advisors: no findings. Privileged learning-write routines were moved into the non-exposed `private` schema; public RPC entry points now use `SECURITY INVOKER`. The private routines retain explicit authentication, enrolment or academy-manager checks and an empty search path. Adversarial tests remain required before production.
+- Supabase security and health advisors: no findings.
+- Anonymous academy discovery now has a dedicated published-only policy; member/owner academy visibility is restricted to authenticated users. This removed the public landing-page `academy_memberships` permission error. Privileged learning-write routines were moved into the non-exposed `private` schema; public RPC entry points now use `SECURITY INVOKER`. The private routines retain explicit authentication, enrolment or academy-manager checks and an empty search path. Adversarial tests remain required before production.
 - All 56 public tables have RLS enabled. Anonymous table privileges are restricted to `SELECT` on `academies`, `courses` and `credential_verification_index` only.
 - Private verification storage allows an authenticated educator to upload/read only within their own user-ID folder; no public object access.
 - Platform administrator records cannot be created or edited by ordinary client roles. The first administrator must be assigned by an authorised project operator using the documented bootstrap process.
@@ -72,7 +73,7 @@ The deployed functions and their source files are versioned in the repository. N
 - GitHub Actions build and dependency advisory gate passed on staging merge commit `24d612229a7cdf52b3a8f848545bf06b16595daf` (run `45021733458`). The Cloudflare Pages preview build also passed and deployed successfully.
 - Browser/device, real-account, adversarial RLS and provider sandbox end-to-end tests have not yet been performed.
 - Staging merge completed via PR #1 into `staging/learnora-platform-v1`; `main` remains unchanged at `028ae23ea6f33403152bee2fe4cd1bcb6da86041`.
-- Cloudflare Pages staging preview: `https://20b8d484.learnora-staging.pages.dev` (deployment `20b8d484-0f21-4b5d-bfec-bb29d0680b9b`, all stages successful). The `learnora-staging` project has `production_deployments_enabled=false`; its only preview branch is `staging/learnora-platform-v1`; no production deployment exists.
+- Cloudflare Pages staging preview: `https://e58692cd.learnora-staging.pages.dev` (deployment `e58692cd-829b-403b-8ad4-64d37a348985`, all stages successful). The `learnora-staging` project has `production_deployments_enabled=false`; its only preview branch is `staging/learnora-platform-v1`; no production deployment exists.
 - The staging frontend currently points to the primary Learnora Supabase project. No separate Supabase development branch was created because Supabase requires explicit cost approval for branch creation. Staging sign-ups and test records therefore write to the shared project; avoid real learner/student data until an isolated staging database is approved.
 - No production merge, production deployment, live payment processing or public launch has occurred.
 
