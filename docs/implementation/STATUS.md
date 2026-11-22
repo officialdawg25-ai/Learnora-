@@ -15,10 +15,10 @@ Updated: 2026-11-22
 - Supabase email/password auth integration and auth profile bootstrap trigger.
 - Published course discovery, free enrolment, academy creation and draft course creation.
 - Core database domains for profiles, organisations, memberships, academies, courses, modules, lessons, enrolments, objectives, progress, assessments, attempts, AI usage metering and audit events.
-- RLS enabled for every current public table.
+- RLS enabled for all 16 current public tables.
 - Private helper functions for organisation membership, academy management and paid/free course content access.
 - Anonymous course/academy discovery limited to published records.
-- Client update privileges removed from memberships, progress and assessment attempts until server-controlled workflows are implemented.
+- Client update privileges removed from memberships, enrolments, progress and assessment attempts until server-controlled workflows are implemented. Assessment answer keys are stored separately from learner-visible question options and are educator-manager-only.
 - Academy association requires appropriate organisation membership.
 
 ## Explicitly not implemented
