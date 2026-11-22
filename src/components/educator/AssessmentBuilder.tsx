@@ -36,8 +36,12 @@ export default function AssessmentBuilder({academyId,userId,onNotice}:{academyId
  }
  async function loadQuestions(){
   if(!supabase||!assessmentId){setQuestions([]);return}
-  const {data,error}=await supabase.from('assessment_questions').select('id,prompt,points').eq('assessment_id',assessmentId).order('position')
-  if(error)onNotice('Assessment questions: '+error.message);else setQuestions((data??[]) as Question[])
+  const [q,a]=await Promise.all([
+   supabase.from('assessment_questions').select('id,prompt,points,question_type,options').eq('assessment_id',assessmentId).order('position'),
+   supabase.from('assessment_attempts').select('id,learner_id,attempt_number,answers,submitted_at').eq('assessment_id',assessmentId).eq('status','submitted').order('submitted_at')
+  ])
+  if(q.error)onNotice('Assessment questions: '+q.error.message);else setQuestions((q.data??[]) as Question[])
+  if(a.error)onNotice('Pending submissions: '+a.error.message);else{const rows=(a.data??[]) as Attempt[];setPendingAttempts(rows);setGrades(current=>{const next={...current};rows.forEach(x=>{if(!next[x.id])next[x.id]={score:'0',feedback:''}});return next})}
  }
  useEffect(()=>{void loadCourses()},[academyId])
  useEffect(()=>{void loadAssessments()},[courseId])
