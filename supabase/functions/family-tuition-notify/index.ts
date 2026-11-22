@@ -29,7 +29,7 @@ Deno.serve(async(req:Request)=>{
   return json(200,{received:true,processed:false,status});
  }
  const digest=createHash("sha256").update(raw).digest("hex");
- const {data,resultError}=await admin.rpc("process_verified_tuition_payment",{p_payment_id:paymentId,p_provider_reference:providerRef,p_amount_minor:gross,p_event_id:providerRef,p_payload_hash:digest});
+ const {data,error:resultError}=await admin.rpc("process_verified_tuition_payment",{p_payment_id:paymentId,p_provider_reference:providerRef,p_amount_minor:gross,p_event_id:providerRef,p_payload_hash:digest});
  if(resultError)return json(500,{error:"Verified tuition payment could not be posted. PayFast may retry"});
  return json(200,{received:true,result:data});
 });
