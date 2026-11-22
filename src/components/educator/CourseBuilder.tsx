@@ -5,7 +5,8 @@ import { supabase } from '../../lib/supabase'
 
 type CourseOption = { id: string; title: string; publication_status: string }
 type ModuleOption = { id: string; title: string; position: number; description: string | null }
-type LessonOption = { id: string; title: string; lesson_type: string; position: number }\ntype VersionOption = { id: string; version_number: number; created_at: string; created_by: string | null; snapshot: any }
+type LessonOption = { id: string; title: string; lesson_type: string; position: number }
+type VersionOption = { id: string; version_number: number; created_at: string; created_by: string | null; snapshot: any }
 
 type Props = {
   academyId: string
