@@ -17,7 +17,7 @@ export default function SplashExperience({loading=false,onComplete}:Props){
   };
   type('THE FUTRUE',0,()=>{
    pause(760,()=>{
-    setTyped('THE FUTR');
+    setTyped('THE FUT');
     pause(220,()=>type('URE OF LEARNING',0,()=>{}));
    });
   });
