@@ -16,5 +16,6 @@ jobs:
       - name: Report dependency advisories
         run: |
           npm audit --json > /tmp/npm-audit.json || true
+          npm audit --audit-level=high
           node -e "const a=require('/tmp/npm-audit.json'); for (const [name,v] of Object.entries(a.vulnerabilities||{})) console.log(JSON.stringify({name,severity:v.severity,isDirect:v.isDirect,range:v.range,fixAvailable:v.fixAvailable,via:v.via.map(x=>typeof x==='string'?x:x.title)}))"
       - run: npm run build
