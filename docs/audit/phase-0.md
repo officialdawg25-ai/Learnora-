@@ -38,9 +38,9 @@ The remote migration ledger reports:
 3. `20261122104247 learnora_public_discovery_and_privilege_restrictions`
 4. `20261122104407 learnora_academy_tenancy_and_index_fix`
 5. `20261122104911 learnora_assessment_key_and_progress_integrity`
-6. `20261122104924 learnora_course_visibility_and_assessment_key_grants`
+6. `20261122104924 learnora_course_visibility_and_assessment_key_grants`\n7. `20261122105740 learnora_least_privilege_grants`
 
-The repository's Supabase notes identify the first two as remotely applied before the repository was populated. Confirm that the exact SQL for every remote version is present and byte-for-byte/semantically reconciled before any migration deployment. A migration ledger entry alone is not the migration source.
+The repository's Supabase notes identify the first two as remotely applied before the repository was populated. Migrations 3–7 are tracked with their exact remote version IDs. Confirm the exact SQL for every remote version before any CLI migration deployment. A migration ledger entry alone is not the migration source.
 
 ## Current public database domains
 
@@ -63,7 +63,7 @@ All 16 have RLS enabled. The question-key table is separate from learner-visible
 - Free self-enrolment is limited to published courses and active academies.
 - Learner progress and assessment attempt updates are restricted; client-side attempts are constrained to enrolled learners and published assessments.
 - Assessment answer keys are stored separately and only accessible to authorised academy managers.
-- The Supabase security advisor returned no findings.
+- The Supabase security advisor returned no findings. Anonymous table privileges were reduced to SELECT on academies/courses; authenticated TRUNCATE/MAINTAIN/REFERENCES/TRIGGER were revoked, and client UPDATE/DELETE was removed from memberships, enrolments, progress and assessment attempts.
 
 These controls are not a substitute for adversarial RLS tests. Test anonymous, learner A vs learner B, educator A vs academy B, institution A vs institution B, revoked membership, guardian scope, and direct REST/RPC access.
 
