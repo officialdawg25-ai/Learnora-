@@ -616,3 +616,36 @@ body{background:var(--paper);color:var(--ink)}
 .settings-form{max-width:560px;display:grid;gap:16px;padding-top:28px}
 @media(max-width:850px){.community-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.live-session{grid-template-columns:60px minmax(0,1fr)}.live-session-time{grid-column:2}.discover-card{flex-basis:235px}}
 @media(max-width:620px){.discover-workspace,.live-classes-workspace,.community-workspace,.learner-utility{padding:24px 0 60px}.discover-intro,.live-classes-intro,.community-intro{align-items:flex-start;flex-direction:column}.discover-intro h1,.live-classes-intro h1,.community-intro h1,.learner-utility header h1{font-size:39px}.discover-profile-editor,.community-create{grid-template-columns:1fr}.discover-profile-editor>div{grid-column:auto}.community-grid{grid-template-columns:1fr}.live-session{grid-template-columns:48px minmax(0,1fr);gap:12px}.live-session-date{width:44px;height:55px}.live-session-date strong{font-size:21px}.live-session-time{grid-column:2}.live-class-mark,.community-mark{width:66px;height:66px}.discover-rail-heading{align-items:flex-start;flex-direction:column}.discover-rail-heading h2{font-size:20px}.utility-list article{align-items:flex-start;flex-wrap:wrap}}
+
+.role-switcher{max-width:170px;border:1px solid var(--line);background:#fbfaf7;color:var(--ink);padding:9px 11px;font:10px Arial,Helvetica,sans-serif}
+.role-applications{padding:42px 0 80px}
+.role-applications>header{padding:10px 0 30px;border-bottom:1px solid var(--line)}
+.role-applications>header h1{font:600 clamp(36px,5vw,58px)/1.08 Arial,Helvetica,sans-serif;letter-spacing:-2px;margin:15px 0}
+.role-applications>header h1 em{font-style:normal;color:#77709e}
+.role-applications>header p:not(.eyebrow){max-width:680px;color:var(--muted);font-size:12px;line-height:1.8}
+.role-application-list{display:flex;flex-direction:column}
+.role-application-list article{display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:18px;align-items:center;padding:22px 0;border-bottom:1px solid var(--line)}
+.role-application-icon{width:42px;height:42px;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;color:#77709e}
+.role-application-main h2{font:600 17px Arial,Helvetica,sans-serif;margin:7px 0}
+.role-application-main p,.role-application-main small{font-size:10px;color:var(--muted);line-height:1.6}
+.role-application-main code{font-size:9px;overflow-wrap:anywhere}
+.role-application-actions{display:flex;gap:8px;flex-wrap:wrap}
+.role-application-actions .button{font-size:10px;padding:9px 12px}
+.educator-session-list{margin-top:24px;border-top:1px solid var(--line)}
+.educator-session-list article{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:15px 0;border-bottom:1px solid var(--line)}
+.educator-session-list article>div:first-child{display:grid;gap:7px}
+.educator-session-list strong{font-size:12px}
+.educator-session-list small,.educator-session-list a{font-size:9px;color:var(--muted)}
+.educator-session-list a{display:flex;align-items:center;gap:5px}
+.educator-session-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.educator-session-actions .button{padding:8px 10px;font-size:9px}
+.community-room{padding-top:35px}
+.community-posts{display:grid;gap:10px}
+.community-posts article{padding:17px 19px;background:#fbfaf7;border:1px solid var(--line)}
+.community-posts article p{font-size:12px;line-height:1.8;white-space:pre-wrap;margin:0 0 10px}
+.community-posts article small{font-size:9px;color:var(--muted)}
+.community-post-form{display:grid;gap:10px;margin-top:15px}
+.community-post-form textarea{width:100%;padding:13px;border:1px solid var(--line);background:#fbfaf7;font:12px Arial,Helvetica,sans-serif}
+.community-post-form .button{justify-self:start}
+.institution-directory-panel{margin-top:20px}
+@media(max-width:620px){.role-application-list article{grid-template-columns:38px minmax(0,1fr)}.role-application-actions{grid-column:2}.role-switcher{max-width:130px}.educator-session-list article{align-items:flex-start;flex-direction:column}}
