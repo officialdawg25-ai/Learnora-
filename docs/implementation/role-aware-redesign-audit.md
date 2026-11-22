@@ -12,7 +12,7 @@ Scope: staging and isolated preview only. Production deployments remain disabled
 - Existing landing, authentication, course enrolment, learning player, educator course builder, PayFast checkout and notification functions.
 - Supabase project ACTIVE_HEALTHY on PostgreSQL 17.
 - 63 public base tables inspected; all 63 have RLS enabled.
-- 52 migration records currently appear in the connected Supabase migration history. The migration history contains duplicate `learner_discovery_role_gate` names under different version IDs; reconcile migration history before the next CLI-based migration push.
+- 55 migration records are currently present in the connected Supabase migration history. Two records share the name `learner_discovery_role_gate` under different version IDs; reconcile migration history before the next CLI-based migration push. Do not reset or delete history blindly.
 - Canonical roles are stored in `public.user_roles`; platform administrator assignment remains separate in `public.platform_administrators`.
 - Existing course, academic, educator, institution, learner-discovery, community, live-class, guardian and notification structures are reused.
 
@@ -41,6 +41,7 @@ Dedicated learner destinations are implemented for Overview, Discover, My Learni
 - Separate learner-side and parent/guardian-side experiences.
 - Learner-issued invitation codes are one-time, hashed, scoped and expire after 72 hours.
 - Parent/guardian role is checked in database functions before redemption or direct connection requests.
+- Guardian relationship INSERT is restricted to active parent/guardian roles and pending, unverified relationship state.
 - Learner acknowledgement is distinct from independent guardian-authority verification.
 - Access is relationship- and consent-scoped, with revocation controls.
 - Current database inspection found no guardian relationship or invitation rows.
@@ -58,7 +59,7 @@ Dedicated learner destinations are implemented for Overview, Discover, My Learni
 - Administrator role-application review.
 - Parent/guardian family workspace.
 - Institution workspace.
-- Learner calendar, notifications and profile utility screens.
+- Learner calendar, notification and profile utility screens.
 
 ## Design
 
@@ -66,23 +67,23 @@ Dedicated learner destinations are implemented for Overview, Discover, My Learni
 - External Google font import has been removed from the integrated stylesheet.
 - Existing responsive styles and role-specific workspaces are retained.
 
-## Database security
+## Database security and performance
 
-Observed controls include verified educator public profiles, public institution listings, adult opt-in learner discovery, active-learner discovery role gates, member-only learning-space discussions, class-member live-session visibility, recipient-only notifications and relationship-participant guardian visibility.
+- Verified controls include educator verification, public institution listing, active-learner adult opt-in discovery, role-gated academy/class management, member-only learning-space discussions, class-member live-session visibility, recipient-only notifications and role-checked guardian requests.
+- The public role-request RPC is SECURITY INVOKER. Privileged shared-class/course recommendation aggregation is isolated behind a private SECURITY DEFINER function and exposed through a restricted invoker wrapper.
+- Institution directory public and manager SELECT access has been consolidated into one policy.
+- Eight previously unindexed foreign keys now have covering indexes.
+- Supabase security advisor still reports one warning: leaked-password protection is disabled. Enable it in Supabase Auth settings after reviewing sign-in impact: https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection
+- Supabase performance advisor no longer reports unindexed foreign keys or multiple permissive policies. It reports 105 unused indexes; do not remove them without production workload evidence.
+- Health advisor returned no findings.
 
-The public role-request RPC is SECURITY INVOKER. Privileged shared-class/course recommendation aggregation is isolated behind a private SECURITY DEFINER function and exposed through a restricted invoker wrapper. Guardian request/response functions check active parent/guardian or learner roles.
+## Build and deployment evidence
 
-No production schema or production deployment setting was changed. The role-aware and discovery migrations are present in the repository and the connected staging database has corresponding role/discovery/guardian migration records.
-
-## Build, deployment and advisory evidence
-
-- Cloudflare Pages build for integrated staging commit `e5dd4e1ab645fa5874675e49d455e3c61c1fbc78` passed `tsc --noEmit` and `vite build`; 1,668 modules transformed and assets deployed successfully.
-- Verified isolated preview: https://05f1f6d6.learnora-staging.pages.dev
-- Cloudflare Pages project `learnora-staging` has production deployments disabled; the staging-branch production trigger was skipped and no production deployment was performed.
+- Cloudflare Pages build for integrated application commit `e5dd4e1ab645fa5874675e49d455e3c61c1fbc78` passed `tsc --noEmit` and `vite build`; 1,668 modules transformed and assets deployed successfully.
+- Verified isolated preview of that application build: https://05f1f6d6.learnora-staging.pages.dev
+- Subsequent branch changes include database-only policy/index migrations; the next isolated preview build will validate the final integrated commit.
+- Cloudflare Pages project `learnora-staging` has production deployments disabled; no production deployment was performed.
 - The build reports a non-blocking main JavaScript chunk warning (548.46 kB minified).
-- Supabase security advisor: one warning — leaked-password protection is disabled. Enable it in Supabase Auth settings after reviewing sign-in impact: https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection
-- Supabase performance advisor: eight unindexed foreign keys, 97 currently unused indexes and one multiple-permissive-SELECT-policy warning on `institution_directory_profiles`. No health advisories were returned.
-- Migration history currently contains 52 records and two entries named `learner_discovery_role_gate` under different version IDs. Reconcile this history before the next CLI-based migration push; do not blindly reset or delete migration records.
 
 ## Remaining validation
 
@@ -96,7 +97,7 @@ No production schema or production deployment setting was changed. The role-awar
 
 ## Evidence labels
 
-- VERIFIED: repository implementation, selected RLS policies, 63-table RLS state, migration inventory, successful Cloudflare build and preview deployment.
+- VERIFIED: repository implementation, selected RLS policies, 63-table RLS state, migration inventory, security/performance/health advisories, successful Cloudflare build and preview deployment.
 - PARTIAL: live-class joining, family verification lifecycle, role approval lifecycle, full profile privacy controls.
 - BLOCKED: legal approval for guardian consent activation; secure conferencing token integration; real-account and adversarial browser tests.
 - NOT CLAIMED: production readiness, full legal compliance, or end-to-end tested real-user access.
