@@ -64,7 +64,12 @@ Deno.serve(async (req: Request) => {
   const {count}=await admin.from("ai_activity").select("id",{count:"exact",head:true}).eq("user_id",user.id).gte("created_at",since);
   if((count??0)>=20) return json(429,{error:"Learnora AI request limit reached. Try again shortly."});
   const {data:profile}=await userClient.from("profiles").select("date_of_birth").eq("id",user.id).maybeSingle();
-  const minor=!!profile?.date_of_birth && (Date.now()-new Date(profile.date_of_birth).getTime())/31557600000<18;
+  const minor=!profile?.date_of_birth || (Date.now()-new Date(profile.date_of_birth).getTime())/31557600000<18;
+  if(capability==="teacher"){
+    if(minor) return json(403,{error:"Teacher Intelligence is restricted to adult educator accounts."});
+    const {data:educator}=await userClient.from("educator_profiles").select("verification_status").eq("user_id",user.id).maybeSingle();
+    if(!educator || ["suspended","rejected"].includes(educator.verification_status)) return json(403,{error:"Create an educator profile before using Teacher Intelligence."});
+  }
   const level=typeof input?.learning_level==="string"?input.learning_level.slice(0,80):"";
   let conversationId=typeof input?.conversation_id==="string"?input.conversation_id:null;
   if(conversationId){
