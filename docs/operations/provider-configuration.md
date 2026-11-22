@@ -16,8 +16,9 @@ Configure secrets through the Supabase project secret manager. Do not commit val
 - `LEARNORA_AI_MODEL`: provider model identifier
 - `OPENAI_API_KEY`, or `ANTHROPIC_API_KEY`, or `GEMINI_API_KEY` as appropriate
 - `LEARNORA_AI_BASE_URL`: optional OpenAI-compatible API base URL; defaults to OpenAI's API.
+- `LEARNORA_CHILD_AI_CONSENT_VERSION`: exact, legally approved consent version required before an under-18 or unknown-age account can use Learnora Tutor. Leave unset until South African legal/safeguarding review is complete. When set, the learner must also have an active guardian relationship with the same consent version and the `ai_tutor` consent scope.
 
-AI is unavailable until one provider and model are configured. The function returns a clear 503 response rather than silently substituting a fake answer. The AI gateway currently supports tutor and teacher capabilities, scoped full-text retrieval, user-owned conversations and a basic per-user request limit. It does not yet have a validated CAPS corpus, model evaluation benchmark or measured provider pricing.
+AI is unavailable until one provider and model are configured. The function returns a clear 503 response rather than silently substituting a fake answer. The AI gateway currently supports tutor and teacher capabilities, scoped full-text retrieval, user-owned conversations and a basic per-user request limit. Unknown-age accounts are treated as minors. Under-18 Tutor access is denied unless the approved consent version and active guardian scope are present; the current guardian request UI does not yet request `ai_tutor`, so child AI remains blocked. Teacher Intelligence requires an adult account with verified educator status. The gateway does not yet have a validated CAPS corpus, model evaluation benchmark or measured provider pricing.
 
 ### PayFast sandbox only
 - `PAYFAST_MODE=sandbox` — any other value is rejected by the current checkout and notification functions.
@@ -49,7 +50,7 @@ The `learnora-admin` function requires a valid user JWT and an active permission
 
 The ingestion endpoint accepts text content (maximum 200,000 characters per request), splits it into chunks and stores a draft source. Draft content is not available to learner AI retrieval. A trusted source-review/publishing workflow is still required. Only ingest material Learnora or the submitting institution is authorised to use.
 
-There is no private Learnora storage bucket yet. The current educator verification form accepts evidence metadata only; it does not upload identity documents.
+A private `learnora-verification` storage bucket is configured. Educator evidence uploads are path-scoped and not publicly accessible. The retention schedule, reviewer operating procedure and legal basis for retaining credential evidence still require approval; do not use this bucket for general learner identity documents.
 
 ## Financial state definitions
 
