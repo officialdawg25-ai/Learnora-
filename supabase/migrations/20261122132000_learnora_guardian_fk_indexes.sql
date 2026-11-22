@@ -1,0 +1,4 @@
+create index guardian_connection_invites_redeemed_by_idx on public.guardian_connection_invites(redeemed_by);
+create index guardian_relationship_events_actor_idx on public.guardian_relationship_events(actor_user_id);
+create index guardian_relationships_invite_idx on public.guardian_relationships(guardian_invite_id);
+create index guardian_relationships_revoked_by_idx on public.guardian_relationships(revoked_by);
