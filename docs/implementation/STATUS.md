@@ -7,7 +7,7 @@ Updated: 22 November 2026
 - Repository: `officialdawg25-ai/Learnora-`
 - Working branch: `foundation/learnora-platform-v1`
 - Supabase project: `gkloowmlfxfrwcxggnzl`, PostgreSQL 17, eu-west-1
-- Remote migration ledger: 30 applied migrations; every migration source is versioned under its exact remote ID.
+- Remote migration ledger: 31 applied migrations; every migration source is versioned under its exact remote ID.
 - Public application schema: 55 tables; all 55 have RLS enabled.
 - Authentication users: 0. No synthetic accounts or learner records were inserted.
 - Storage: one private `learnora-verification` bucket; no public Learnora bucket.
@@ -64,13 +64,13 @@ The deployed functions and their source files are versioned in the repository. N
 ## Security and verification
 
 - Supabase health advisor: no findings.
-- Supabase security advisor: three warnings for authenticated-executable `SECURITY DEFINER` RPCs (`record_lesson_progress`, `submit_assessment_attempt`, `grade_assessment_attempt`). These are intentionally callable transactional endpoints with explicit authentication, enrolment or academy-manager checks and an empty search path. The warnings remain visible and require adversarial testing before production.
+- Supabase security and health advisors: no findings. Privileged learning-write routines were moved into the non-exposed `private` schema; public RPC entry points now use `SECURITY INVOKER`. The private routines retain explicit authentication, enrolment or academy-manager checks and an empty search path. Adversarial tests remain required before production.
 - All 55 public tables have RLS enabled. Anonymous table privileges are restricted to `SELECT` on `academies`, `courses` and `credential_verification_index` only.
 - Private verification storage allows an authenticated educator to upload/read only within their own user-ID folder; no public object access.
 - Platform administrator records cannot be created or edited by ordinary client roles. The first administrator must be assigned by an authorised project operator using the documented bootstrap process.
 - Guardian activation requires a verified authority reference and an exact server-configured approved consent version. The current UI submits a draft consent version, so activation remains blocked pending legal approval.
 - Performance advisor: remaining notices are unused-index informational findings on a mostly empty database. Unindexed foreign keys and multiple-permissive-policy findings were addressed; no workload-unjustified indexes were removed.
-- GitHub Actions build and dependency advisory gate passed on commit `123538997fc0d7ddb33a81a53ec5b8da2ca80314`. Subsequent migration and documentation commits require a fresh CI result before being treated as verified.
+- GitHub Actions build and dependency advisory gate passed on commit `49ca145cef8b33528cc1a7d436801717882b93a7`. Subsequent migration and documentation commits require a fresh CI result before being treated as verified.
 - Browser/device, real-account, adversarial RLS and provider sandbox end-to-end tests have not yet been performed.
 - No production deployment, merge or launch is claimed.
 
