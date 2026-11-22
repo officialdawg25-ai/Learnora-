@@ -669,3 +669,20 @@ body{background:var(--paper);color:var(--ink)}
 .role-pending-workspace{max-width:760px;margin:55px auto;padding:35px;background:#f0efe9;border:1px solid var(--line)}
 .role-pending-status{display:inline-block;margin-top:20px;padding:8px 11px;background:#e8e4d5;color:#766b42;font-size:9px;letter-spacing:1.2px}
 @media(max-width:620px){.educator-application-form,.educator-evidence-form{grid-template-columns:1fr}.educator-application-form button,.educator-evidence-form button{justify-self:stretch}}
+
+.institution-application{padding:44px 0 80px}
+.institution-application>header{padding:10px 0 30px;border-bottom:1px solid var(--line)}
+.institution-application>header h1{font:600 clamp(36px,5vw,58px)/1.08 Arial,Helvetica,sans-serif;letter-spacing:-2px;margin:15px 0}
+.institution-application>header h1 em{font-style:normal;color:#77709e}
+.institution-application>header p:not(.eyebrow){max-width:700px;font-size:12px;line-height:1.85;color:var(--muted)}
+.institution-application-status{display:flex;align-items:center;gap:14px;padding:18px 0;border-bottom:1px solid var(--line);color:#77709e}
+.institution-application-status>div{display:grid;gap:5px}.institution-application-status strong{font-size:13px}.institution-application-status small{font-size:10px;color:var(--muted)}
+.institution-application form{max-width:760px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px;padding:28px 0}
+.institution-application form label{display:grid;gap:7px;font-size:10px;color:#68685f}
+.institution-application input,.institution-application select,.institution-application textarea{width:100%;padding:12px;border:1px solid var(--line);background:#fbfaf7;font:12px Arial,Helvetica,sans-serif}
+.institution-application form label:last-of-type{grid-column:1/-1}
+.institution-application form button{justify-self:start}
+.institution-review-details{display:grid;gap:5px;margin:12px 0;padding:12px;background:#f0efe9}
+.institution-review-details strong{font-size:12px}.institution-review-details small,.institution-review-details a{font-size:9px;color:var(--muted)}
+.institution-review-details p{font-size:10px;line-height:1.6;margin:5px 0}
+@media(max-width:620px){.institution-application form{grid-template-columns:1fr}.institution-application form label:last-of-type{grid-column:auto}.institution-application form button{justify-self:stretch}}
