@@ -1,6 +1,6 @@
 import {useEffect,useMemo,useState} from 'react';
 import type {FormEvent} from 'react';
-import {ArrowUpRight,BookOpen,CalendarDays,CheckCircle2,Download,FileText,MessageCircle,RefreshCw,Send,ShieldCheck,Wallet,Clock3,AlertCircle} from 'lucide-react';
+import {ArrowUpRight,Download,FileText,RefreshCw,Send,ShieldCheck,Wallet,AlertCircle} from 'lucide-react';
 import {supabase} from '../../lib/supabase';
 
 type Tab='attendance'|'educators'|'messages'|'finance'|'calendar'|'documents'|'support';
