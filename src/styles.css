@@ -80,3 +80,18 @@
 .family-workspace .family-grid{align-items:start}
 @media(max-width:850px){.institution-grid,.family-grid{grid-template-columns:1fr}.institution-report-head,.institution-report-row{grid-template-columns:minmax(110px,1.5fr) repeat(5,minmax(52px,1fr));gap:5px;font-size:9px}.institution-report-head{font-size:7px}}
 @media(max-width:700px){.institution-form{grid-template-columns:1fr}.institution-report-head,.institution-report-row{overflow:auto;min-width:650px}.institution-reports{overflow-x:auto}}
+
+/* Longitudinal academic record and opportunities */
+.academic-workspace{max-width:1100px;margin:0 auto}
+.academic-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+.opportunity-panel{margin-top:22px}
+.opportunity-list{display:grid}
+.opportunity-row{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:20px 0;border-bottom:1px solid var(--line)}
+.opportunity-row h3{font-size:17px;margin:8px 0}
+.opportunity-row p{font-size:12px;color:var(--muted);line-height:1.6;max-width:620px}
+.opportunity-row small,.opportunity-row a{display:inline-block;font-size:10px;color:var(--muted);margin:6px 12px 0 0}
+.opportunity-row a{color:#5b5e99;text-decoration:underline}
+.credential-result{display:grid;gap:6px;padding:14px;margin-top:12px;border:1px solid var(--line);background:#f8f8f5;font-size:12px}
+.credential-result small{color:var(--muted)}
+.credential-status{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:#347455;font-weight:700}
+@media(max-width:800px){.academic-grid{grid-template-columns:1fr}.opportunity-row{align-items:flex-start;flex-direction:column}}
