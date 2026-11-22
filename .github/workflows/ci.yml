@@ -1,9 +1,9 @@
 name: Learnora CI
 on:
   push:
-    branches: [main, 'foundation/**']
+    branches: [main, 'foundation/**', 'staging/**']
   pull_request:
-    branches: [main]
+    branches: [main, 'staging/**']
 jobs:
   build:
     runs-on: ubuntu-latest
