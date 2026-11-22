@@ -80,7 +80,7 @@ export default function EducatorOperations({ academyId, userId, onNotice }: Prop
     if (!supabase || !academyId) return
     const {error}=await supabase.from('academy_memberships').insert({academy_id:academyId,user_id:inviteUserId.trim(),role:inviteRole,status:'invited',invited_by:userId})
     if (error) onNotice('Team invitation was not created: '+error.message)
-    else { setInviteUserId(''); onNotice('Team invitation recorded for the Learnora user. The recipient must accept through a future invitation workflow.'); await load() }
+    else { setInviteUserId(''); onNotice('Team invitation created. The recipient can review and accept it from the Invitations workspace.'); await load() }
   }
 
   async function requestReview(courseId: string) {
@@ -134,7 +134,7 @@ export default function EducatorOperations({ academyId, userId, onNotice }: Prop
         <label>Role<select value={inviteRole} onChange={e=>setInviteRole(e.target.value)}><option value="instructor">Instructor</option><option value="editor">Editor</option><option value="analyst">Analyst</option><option value="admin">Administrator</option></select></label>
         <button className="button button-dark" type="submit">Invite team member</button>
       </form>
-      <p className="form-hint">Invitations currently target an existing Learnora user ID. Email invitations and acceptance flow are not yet enabled.</p>
+      <p className="form-hint">Invitations target an existing Learnora account and can be accepted in the Invitations workspace. Email delivery and invitations for people without an account are not enabled.</p>
     </div>
     <div className="operations-block">
       <div className="builder-subheading"><strong><BarChart3 size={15}/> Course performance</strong><span>{analytics.length} courses</span></div>
