@@ -649,3 +649,24 @@ body{background:var(--paper);color:var(--ink)}
 .community-post-form .button{justify-self:start}
 .institution-directory-panel{margin-top:20px}
 @media(max-width:620px){.role-application-list article{grid-template-columns:38px minmax(0,1fr)}.role-application-actions{grid-column:2}.role-switcher{max-width:130px}.educator-session-list article{align-items:flex-start;flex-direction:column}}
+
+.educator-application,.role-pending-workspace{padding:44px 0 80px}
+.educator-application>header,.role-pending-workspace{border-bottom:1px solid var(--line);padding-bottom:30px}
+.educator-application>header h1,.role-pending-workspace h1{font:600 clamp(36px,5vw,58px)/1.08 Arial,Helvetica,sans-serif;letter-spacing:-2px;margin:15px 0}
+.educator-application>header h1 em,.role-pending-workspace h1 em{font-style:normal;color:#77709e}
+.educator-application>header p:not(.eyebrow),.role-pending-workspace p:not(.eyebrow){max-width:700px;font-size:12px;line-height:1.85;color:var(--muted)}
+.educator-application-status{display:flex;align-items:center;gap:14px;padding:18px 0;border-bottom:1px solid var(--line);color:#77709e}
+.educator-application-status>div{display:grid;gap:5px}.educator-application-status strong{font-size:13px;color:var(--ink);text-transform:capitalize}.educator-application-status small{font-size:10px;color:var(--muted)}
+.educator-application-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px;padding:28px 0;border-bottom:1px solid var(--line)}
+.educator-application-form label{display:grid;gap:7px;font-size:10px;color:#68685f}
+.educator-application-form input,.educator-application-form textarea{width:100%;padding:12px;border:1px solid var(--line);background:#fbfaf7;font:12px Arial,Helvetica,sans-serif}
+.educator-application-form button{justify-self:start;align-self:end}
+.educator-evidence-form{display:grid;grid-template-columns:1fr 1fr;gap:15px;align-items:end;padding:28px 0}
+.educator-evidence-form h2{font:600 23px Arial,Helvetica,sans-serif;margin:7px 0}
+.educator-evidence-form p:not(.eyebrow){font-size:11px;line-height:1.7;color:var(--muted)}
+.educator-evidence-form label{display:flex;align-items:center;gap:10px;padding:14px;border:1px dashed #c9c5d5;color:#77709e;font-size:11px;position:relative}
+.educator-evidence-form input{position:absolute;inset:0;opacity:0;width:100%;cursor:pointer}
+.educator-evidence-form button{justify-self:start}
+.role-pending-workspace{max-width:760px;margin:55px auto;padding:35px;background:#f0efe9;border:1px solid var(--line)}
+.role-pending-status{display:inline-block;margin-top:20px;padding:8px 11px;background:#e8e4d5;color:#766b42;font-size:9px;letter-spacing:1.2px}
+@media(max-width:620px){.educator-application-form,.educator-evidence-form{grid-template-columns:1fr}.educator-application-form button,.educator-evidence-form button{justify-self:stretch}}
