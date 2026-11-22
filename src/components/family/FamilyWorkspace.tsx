@@ -37,6 +37,7 @@ export default function FamilyWorkspace({userId,onNotice}:{userId:string;onNotic
   if(error)onNotice('Guardian relationship request was not submitted: '+error.message)
   else{setLearnerId('');onNotice('Guardian relationship request submitted. Access remains blocked until identity, authority and consent are independently verified.');await load()}
  }
+ if(!userId)return <section className="family-workspace"><div className="page-intro"><p className="eyebrow">FAMILY AND GUARDIAN ACCESS</p><h1>Support their<br/><em>next steps.</em></h1><p>Sign in to submit a guardian relationship request.</p></div></section>;
  return <section className="family-workspace">
   <div className="page-intro"><p className="eyebrow">FAMILY AND GUARDIAN ACCESS</p><h1>Support their<br/><em>next steps.</em></h1><p>Guardian access is limited, purpose-based and independently verified before any learner information is disclosed.</p></div>
   <div className="family-grid">
