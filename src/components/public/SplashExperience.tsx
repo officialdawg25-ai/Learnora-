@@ -9,12 +9,6 @@ export default function SplashExperience({loading=false,onComplete}:Props){
   let timer=0;
   let cancelled=false;
   const pause=(ms:number,fn:()=>void)=>{timer=window.setTimeout(()=>{if(!cancelled)fn();},ms);};
-  const type=(value:string,index:number,done:()=>void)=>{
-   if(cancelled)return;
-   if(index>=value.length){done();return;}
-   setTyped(current=>current+value[index]);
-   pause(78,()=>type(value,index+1,done));
-  };
   let current='';
   const type=(value:string,index:number,done:()=>void)=>{
    if(cancelled)return;
