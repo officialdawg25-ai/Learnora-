@@ -55,14 +55,21 @@ export default function AssessmentBuilder({academyId,userId,onNotice}:{academyId
  }
  async function addQuestion(e:FormEvent<HTMLFormElement>){
   e.preventDefault();if(!supabase||!assessmentId)return
-  if(options.some(x=>!x.trim())){onNotice('Complete all four answer options.');return}
+  if(questionType==='multiple_choice'&&options.some(x=>!x.trim())){onNotice('Complete all four answer options.');return}
+  if(questionType==='numeric'&&!Number.isFinite(Number(numericAnswer))){onNotice('Enter a valid numeric answer.');return}
   setBusy(true)
-  const {data,error}=await supabase.from('assessment_questions').insert({assessment_id:assessmentId,question_type:'multiple_choice',prompt:question.trim(),options:options.map((text,index)=>({id:String.fromCharCode(65+index),text:text.trim()})),points:Number(points),position:questions.length}).select('id,prompt,points').single()
+  const questionOptions=questionType==='multiple_choice'?options.map((text,index)=>({id:String.fromCharCode(65+index),text:text.trim()})):[]
+  const {data,error}=await supabase.from('assessment_questions').insert({assessment_id:assessmentId,question_type:questionType,prompt:question.trim(),options:questionOptions,points:Number(points),position:questions.length}).select('id,prompt,points,question_type,options').single()
   if(error||!data){setBusy(false);onNotice('Question was not saved: '+(error?.message??'Unknown error'));return}
-  const {error:keyError}=await supabase.from('assessment_question_keys').insert({question_id:data.id,correct_answer:correct})
+  let keyError:any=null
+  if(questionType==='multiple_choice'||questionType==='numeric'){
+   const correctAnswer=questionType==='multiple_choice'?correct:Number(numericAnswer)
+   const keyResult=await supabase.from('assessment_question_keys').insert({question_id:data.id,correct_answer:correctAnswer})
+   keyError=keyResult.error
+  }
   setBusy(false)
   if(keyError){onNotice('Question was saved, but the answer key could not be stored: '+keyError.message);return}
-  setQuestions(rows=>[...rows,data as Question]);setQuestion('');setOptions(['','','','']);onNotice('Objective question and private answer key saved.')
+  setQuestions(rows=>[...rows,data as Question]);setQuestion('');setOptions(['','','','']);setNumericAnswer('');onNotice(questionType==='short_answer'||questionType==='long_answer'?'Question saved for educator marking.':'Objective question and private answer key saved.')
  }
  async function publish(){
   if(!supabase||!assessmentId)return
