@@ -5,7 +5,7 @@ Updated: 22 November 2026
 ## Verified environment
 
 - Repository: `officialdawg25-ai/Learnora-`
-- Working branch: `foundation/learnora-platform-v1`
+- Staging branch: `staging/learnora-platform-v1`
 - Supabase project: `gkloowmlfxfrwcxggnzl`, PostgreSQL 17, eu-west-1
 - Remote migration ledger: 36 applied migrations; every migration source is versioned under its exact remote ID.
 - Public application schema: 56 tables; all 56 have RLS enabled.
@@ -69,9 +69,12 @@ The deployed functions and their source files are versioned in the repository. N
 - Platform administrator records cannot be created or edited by ordinary client roles. The first administrator must be assigned by an authorised project operator using the documented bootstrap process.
 - Guardian activation requires a verified authority reference and an exact server-configured approved consent version. The current UI submits a draft consent version, so activation remains blocked pending legal approval.
 - Performance advisor: remaining notices are unused-index informational findings on a mostly empty database. Unindexed foreign keys and multiple-permissive-policy findings were addressed; no workload-unjustified indexes were removed.
-- GitHub Actions build and dependency advisory gate passed on commit `596a743a2357d063670be8beb52839656ce13f2e`. Subsequent migration and documentation commits require a fresh CI result before being treated as verified.
+- GitHub Actions build and dependency advisory gate passed on staging merge commit `24d612229a7cdf52b3a8f848545bf06b16595daf` (run `45021733458`). The Cloudflare Pages preview build also passed and deployed successfully.
 - Browser/device, real-account, adversarial RLS and provider sandbox end-to-end tests have not yet been performed.
-- No production deployment, merge or launch is claimed.
+- Staging merge completed via PR #1 into `staging/learnora-platform-v1`; `main` remains unchanged at `028ae23ea6f33403152bee2fe4cd1bcb6da86041`.
+- Cloudflare Pages staging preview: `https://20b8d484.learnora-staging.pages.dev` (deployment `20b8d484-0f21-4b5d-bfec-bb29d0680b9b`, all stages successful). The `learnora-staging` project has `production_deployments_enabled=false`; its only preview branch is `staging/learnora-platform-v1`; no production deployment exists.
+- The staging frontend currently points to the primary Learnora Supabase project. No separate Supabase development branch was created because Supabase requires explicit cost approval for branch creation. Staging sign-ups and test records therefore write to the shared project; avoid real learner/student data until an isolated staging database is approved.
+- No production merge, production deployment, live payment processing or public launch has occurred.
 
 ## Explicit limitations / blocked items
 
