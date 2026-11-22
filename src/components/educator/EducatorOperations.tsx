@@ -17,7 +17,7 @@ export default function EducatorOperations({ academyId, userId, onNotice }: Prop
   const [credentialType, setCredentialType] = useState('teaching_qualification')
   const [issuer, setIssuer] = useState('')
   const [credentialReference, setCredentialReference] = useState('')
-  const [evidencePath, setEvidencePath] = useState('')
+  const [evidenceFile, setEvidenceFile] = useState<File | null>(null)
   const [team, setTeam] = useState<TeamMember[]>([])
   const [inviteUserId, setInviteUserId] = useState('')
   const [inviteRole, setInviteRole] = useState('instructor')
@@ -57,9 +57,15 @@ export default function EducatorOperations({ academyId, userId, onNotice }: Prop
   async function submitVerification(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!supabase) return
-    const {error}=await supabase.from('educator_verification_submissions').insert({educator_user_id:userId,credential_type:credentialType,issuer:issuer.trim()||null,credential_reference:credentialReference.trim()||null,document_storage_path:evidencePath.trim()||null,status:'pending'})
-    if (error) onNotice('Verification submission was not saved: '+error.message)
-    else onNotice('Verification evidence metadata submitted. A reviewer must verify the evidence before your profile can be marked verified.')
+    if (!evidenceFile) { onNotice('Attach a PDF, JPEG or PNG credential document before submitting.'); return }
+    if (evidenceFile.size > 10 * 1024 * 1024 || !['application/pdf','image/jpeg','image/png'].includes(evidenceFile.type)) { onNotice('Evidence must be a PDF, JPEG or PNG no larger than 10 MB.'); return }
+    const safeName=evidenceFile.name.replace(/[^a-zA-Z0-9._-]/g,'_').slice(-100)
+    const storagePath=`${userId}/${crypto.randomUUID()}-${safeName}`
+    const {error:uploadError}=await supabase.storage.from('learnora-verification').upload(storagePath,evidenceFile,{contentType:evidenceFile.type,upsert:false})
+    if(uploadError){onNotice('Private evidence upload failed: '+uploadError.message);return}
+    const {error}=await supabase.from('educator_verification_submissions').insert({educator_user_id:userId,credential_type:credentialType,issuer:issuer.trim()||null,credential_reference:credentialReference.trim()||null,document_storage_path:storagePath,status:'pending'})
+    if (error) onNotice('Evidence uploaded privately, but the submission record was not saved: '+error.message)
+    else { setEvidenceFile(null); onNotice('Verification evidence submitted to private storage. A reviewer must verify it before your profile can be marked verified.') }
   }
 
   async function inviteMember(event: FormEvent<HTMLFormElement>) {
@@ -96,9 +102,9 @@ export default function EducatorOperations({ academyId, userId, onNotice }: Prop
           <label>Credential type<select value={credentialType} onChange={e=>setCredentialType(e.target.value)}><option value="teaching_qualification">Teaching qualification</option><option value="academic_qualification">Academic qualification</option><option value="professional_registration">Professional registration</option><option value="experience_reference">Experience reference</option></select></label>
           <label>Issuing institution<input value={issuer} onChange={e=>setIssuer(e.target.value)} placeholder="Institution or professional body"/></label>
           <label>Credential reference<input value={credentialReference} onChange={e=>setCredentialReference(e.target.value)} placeholder="Reference number (if applicable)"/></label>
-          <label>Private evidence storage path (optional)<input value={evidencePath} onChange={e=>setEvidencePath(e.target.value)} placeholder="Reserved until secure document upload is enabled"/></label>
+          <label>Credential evidence document<input type="file" accept="application/pdf,image/jpeg,image/png" onChange={e=>setEvidenceFile(e.target.files?.[0]??null)}/></label>{evidenceFile&&<p className="form-hint">Selected: {evidenceFile.name}</p>}
           <button className="button button-dark" type="submit">Submit for verification <ClipboardCheck size={15}/></button>
-          <p className="form-hint">Do not enter identity numbers or sensitive details in this form. Secure document upload and reviewer tooling are still required before verification can be completed.</p>
+          <p className="form-hint">Documents are private and limited to PDF/JPEG/PNG files up to 10 MB. Only the submitting educator can read their upload through the application. Reviewer tooling is still required before verification can be completed.</p>
         </form>
       </div>
     </div>
