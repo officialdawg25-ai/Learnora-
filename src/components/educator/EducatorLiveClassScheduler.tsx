@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
-import { CalendarDays, Clock3, ExternalLink, Video } from 'lucide-react'
+import { CalendarDays, ExternalLink, Video } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 type ClassRow={id:string;name:string;grade_or_level:string|null}
 type SessionRow={id:string;class_id:string;title:string;scheduled_start:string;scheduled_end:string;status:string;meeting_url:string|null}
