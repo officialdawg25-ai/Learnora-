@@ -95,3 +95,11 @@
 .credential-result small{color:var(--muted)}
 .credential-status{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:#347455;font-weight:700}
 @media(max-width:800px){.academic-grid{grid-template-columns:1fr}.opportunity-row{align-items:flex-start;flex-direction:column}}
+
+/* Invitation inbox */
+.invitation-workspace{max-width:1000px;margin:0 auto}
+.invitation-panel{margin-top:20px}
+.invitation-row{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:15px 0;border-bottom:1px solid var(--line)}
+.invitation-row strong{font-size:13px}
+.invitation-row small{display:block;margin-top:5px;font-size:10px;color:var(--muted)}
+@media(max-width:600px){.invitation-row{align-items:flex-start;flex-direction:column}}
