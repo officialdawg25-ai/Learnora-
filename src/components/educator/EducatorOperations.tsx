@@ -21,7 +21,7 @@ export default function EducatorOperations({ academyId, userId, onNotice }: Prop
   const [team, setTeam] = useState<TeamMember[]>([])
   const [inviteUserId, setInviteUserId] = useState('')
   const [inviteRole, setInviteRole] = useState('instructor')
-  const [analytics, setAnalytics] = useState<Analytics[]>([])
+  const [analytics, setAnalytics] = useState<Analytics[]>([])\n  const [knowledgeCourseId,setKnowledgeCourseId]=useState('')\n  const [knowledgeTitle,setKnowledgeTitle]=useState('')\n  const [knowledgeContent,setKnowledgeContent]=useState('')\n  const [knowledgeType,setKnowledgeType]=useState('educator_resource')\n  const [knowledgeUrl,setKnowledgeUrl]=useState('')\n  const [ingesting,setIngesting]=useState(false)
   const [loading, setLoading] = useState(false)
 
   async function load() {
@@ -36,7 +36,7 @@ export default function EducatorOperations({ academyId, userId, onNotice }: Prop
     if (p.error) onNotice('Educator profile: '+p.error.message)
     else if (p.data) { const row=p.data as EducatorProfile; setProfile(row); setBio(row.professional_bio||''); setExperience(String(row.teaching_experience_years??0)); setLanguages(row.teaching_languages.join(', ')); setSubjects(row.subjects.join(', ')) }
     setTeam((t.data??[]) as TeamMember[])
-    setAnalytics((a.data??[]) as Analytics[])
+    setAnalytics((a.data??[]) as Analytics[])\n    if(a.data?.length)setKnowledgeCourseId(current=>a.data.some((x:any)=>x.course_id===current)?current:a.data[0].course_id)
     if (t.error) onNotice('Academy team: '+t.error.message)
     if (a.error) onNotice('Educator analytics: '+a.error.message)
   }
@@ -83,6 +83,17 @@ export default function EducatorOperations({ academyId, userId, onNotice }: Prop
     else { onNotice('Course submitted to the publication review queue. Publication is not automatic.'); await load() }
   }
 
+  async function ingestKnowledge(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if(!supabase||!knowledgeCourseId)return
+    if(knowledgeContent.trim().length>200000){onNotice('Learning material must be no longer than 200,000 characters.');return}
+    setIngesting(true)
+    const {data,error}=await supabase.functions.invoke('learnora-knowledge-ingest',{body:{title:knowledgeTitle.trim(),content:knowledgeContent.trim(),course_id:knowledgeCourseId,source_type:knowledgeType,access_scope:'enrolled',source_url:knowledgeUrl.trim()||null,language_code:'en'}})
+    setIngesting(false)
+    if(error||data?.error)onNotice('Knowledge source was not ingested: '+(data?.error||error?.message||'Unknown error'))
+    else{setKnowledgeTitle('');setKnowledgeContent('');setKnowledgeUrl('');onNotice('Learning material saved as a private draft. It becomes available to Learnora AI only after authorised source review.')}
+  }
+
   return <section className="studio-panel educator-operations">
     <div className="panel-heading"><div><p className="eyebrow">EDUCATOR OPERATIONS</p><h2>Build with credibility.</h2></div><ShieldCheck size={22}/></div>
     <div className="operations-grid">
@@ -121,6 +132,18 @@ export default function EducatorOperations({ academyId, userId, onNotice }: Prop
     <div className="operations-block">
       <div className="builder-subheading"><strong><BarChart3 size={15}/> Course performance</strong><span>{analytics.length} courses</span></div>
       {loading?<p className="form-hint">Loading performance data…</p>:analytics.length===0?<p className="form-hint">Course analytics will appear as real learners enrol and complete programmes. No sample metrics are generated.</p>:<div className="analytics-table"><div className="analytics-head"><span>COURSE</span><span>ENROLLED</span><span>ACTIVE</span><span>COMPLETED</span></div>{analytics.map(row=><div className="analytics-row" key={row.course_id}><span>{row.title}<small>{row.publication_status}</small></span><span>{row.total_enrolments}</span><span>{row.active_learners}</span><span>{row.completed_learners} <small>{row.completion_rate_percent}%</small></span></div>)}</div>}
+    </div>
+    <div className="operations-block">
+      <div className="builder-subheading"><strong>Curriculum knowledge ingestion</strong><span>Private draft</span></div>
+      {analytics.length===0?<p className="form-hint">Create a course first to attach authorised learning material.</p>:<form className="form-stack builder-form" onSubmit={ingestKnowledge}>
+        <label>Course<select required value={knowledgeCourseId} onChange={e=>setKnowledgeCourseId(e.target.value)}>{analytics.map(x=><option key={x.course_id} value={x.course_id}>{x.title}</option>)}</select></label>
+        <label>Source title<input required maxLength={200} value={knowledgeTitle} onChange={e=>setKnowledgeTitle(e.target.value)} placeholder="Curriculum topic or learning resource"/></label>
+        <label>Source type<select value={knowledgeType} onChange={e=>setKnowledgeType(e.target.value)}><option value="educator_resource">Educator resource</option><option value="course_lesson">Course lesson</option><option value="curriculum">Curriculum reference</option></select></label>
+        <label>Authorised source URL (optional)<input type="url" value={knowledgeUrl} onChange={e=>setKnowledgeUrl(e.target.value)} placeholder="https://"/></label>
+        <label>Learning material<textarea required rows={6} maxLength={200000} value={knowledgeContent} onChange={e=>setKnowledgeContent(e.target.value)} placeholder="Paste learning material you own or are authorised to use…"/></label>
+        <button className="button button-dark" disabled={ingesting||!knowledgeCourseId}>{ingesting?'Saving source…':'Ingest as private draft'}</button>
+        <p className="form-hint">Maximum 200,000 characters. Material remains private and is not used by learner AI until an authorised reviewer publishes it.</p>
+      </form>}
     </div>
     <div className="operations-block">
       <div className="builder-subheading"><strong>Publication review</strong><span>Educator submission</span></div>
