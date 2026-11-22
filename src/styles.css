@@ -165,3 +165,66 @@
 .assessment-attempt-history>strong{font-size:11px}
 .assessment-attempt-history>div{display:flex;justify-content:space-between;gap:12px;font-size:11px;color:var(--muted)}
 .assessment-attempt-history>div span:last-child{text-transform:capitalize;color:var(--ink)}
+
+
+/* Learnora premium ecosystem refresh — restrained institutional palette */
+:root{--ink:#172433;--muted:#687582;--paper:#f7f7f4;--line:#e1e5e7;--serif:'Playfair Display',Georgia,serif}
+body{background:var(--paper);color:var(--ink)}
+.brand-mark{border-color:#9eacb6;color:#29445b}
+.brand strong,.footer-brand strong{color:#172433}
+.brand span,.footer-brand span{color:#7b8791}
+.sidebar{background:#f0f1ee;border-right-color:#dfe4e6}
+.nav-item{color:#5e6a74;border-radius:3px}
+.nav-item:hover,.nav-item.active{background:#e2e7e8;color:#172433}
+.nav-item.active{box-shadow:inset 2px 0 #45647b}
+.sidebar-note{background:#e5e9e8;color:#45647b;border-radius:3px}
+.sidebar-note strong{color:#172433}
+.main{background:#f7f7f4}
+.topbar{border-bottom-color:#e1e5e7}
+.breadcrumb span{color:#263b4d}
+.avatar{background:#e2e9ed;color:#294b63}
+.eyebrow-line{background:#5d778b}
+.hero h1 em,.intro-row h2 em,.page-intro h1 em,.section-heading h2 em{color:#526f83}
+.button{border-radius:2px;letter-spacing:.01em}
+.button-dark{background:#1d3041}
+.button-dark:hover{background:#344f64}
+.hero-art{opacity:.72}
+.orbit{border-color:#cbd5da}
+.orbit-core{background:#e4eaeb;box-shadow:none}
+.orbit-core span{color:#425f73}
+.orbit-dot{background:#647f91}
+.course-card,.studio-panel{background:#fcfcfa;border-color:#e1e5e7;border-radius:2px;box-shadow:none}
+.course-visual{background:#e7ecec;color:#4e6b7d}
+.visual-1{background:#e9ece7;color:#627565}
+.visual-2{background:#eeebe5;color:#877967}
+.course-body h3,.panel-heading h2,.empty-state h3{color:#172433}
+.course-footer button,.text-button,.switch-auth{color:#42637b}
+.search-box,.filters select,.form-stack input,.form-stack textarea,.form-stack select{background:#fff;border-color:#dce2e5;border-radius:2px}
+.notice{border-color:#d7e0e4;background:#edf2f3;color:#304d61;border-radius:2px}
+.auth-modal{background:#fbfcfa;border:1px solid #dce2e5;box-shadow:0 24px 80px #0e23301c;border-radius:2px}
+.auth-modal h2{color:#172433}
+.auth-modal .brand-mark{border-radius:2px}
+.account-type-field{border:0;padding:0;margin:0 0 3px;min-width:0}
+.account-type-field legend{font-size:11px;font-weight:700;color:#354b5b;margin-bottom:10px}
+.account-type-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.account-type{display:grid;grid-template-columns:22px 1fr;align-items:center;column-gap:8px;text-align:left;padding:12px;border:1px solid #dce2e5;background:#fff;color:#344b5d;border-radius:2px;min-width:0}
+.account-type svg{grid-row:span 2;color:#6c8494}
+.account-type strong{font-size:11px;font-weight:700}
+.account-type small{grid-column:2;font-size:9px;color:#78858e;line-height:1.4;margin-top:3px}
+.account-type.selected{border-color:#58768b;background:#edf2f3;box-shadow:inset 0 0 0 1px #58768b}
+.account-type:focus-visible,.button:focus-visible,.nav-item:focus-visible{outline:3px solid #9bb6c7;outline-offset:2px}
+.ecosystem-section{padding:6px 0 78px;border-bottom:1px solid var(--line)}
+.role-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.role-grid article{padding:23px 20px 25px 0;border-right:1px solid var(--line);min-height:210px;display:flex;flex-direction:column;align-items:flex-start}
+.role-grid article+article{padding-left:20px}
+.role-grid article:last-child{border-right:0}
+.role-number{font-size:8px;letter-spacing:1.3px;color:#718391;font-weight:700}
+.role-grid h3{font:500 20px/1.2 var(--serif);margin:20px 0 9px;color:#1b2b39}
+.role-grid p{font-size:10px;line-height:1.8;color:#6d7982;margin:0 0 18px;flex:1}
+.role-grid .text-button{font-size:9px;text-align:left;padding:0;line-height:1.6}
+.trust-section{display:grid;grid-template-columns:1.15fr .85fr;gap:55px;padding:64px 0 82px;border-bottom:1px solid var(--line);align-items:end}
+.trust-section h2{font:500 clamp(28px,3.5vw,42px)/1.2 var(--serif);letter-spacing:-.8px;margin:15px 0 0;color:#1b2b39}
+.trust-section h2 em{color:#526f83;font-weight:500}
+.trust-section>p{font-size:11px;line-height:1.9;color:#6d7982;margin:0 0 5px;max-width:420px}
+@media(max-width:1000px){.role-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.role-grid article:nth-child(2){border-right:0;padding-right:0}.role-grid article:nth-child(3){padding-left:0}.role-grid article:nth-child(3),.role-grid article:nth-child(4){border-top:1px solid var(--line)}}
+@media(max-width:760px){.account-type-grid{grid-template-columns:1fr 1fr}.role-grid{grid-template-columns:1fr}.role-grid article,.role-grid article+article{padding:20px 0;border-right:0;border-top:1px solid var(--line);min-height:0}.role-grid article:first-child{border-top:0}.trust-section{grid-template-columns:1fr;gap:18px;padding:45px 0 55px}.ecosystem-section{padding-bottom:55px}.auth-modal{padding:25px 20px}}
