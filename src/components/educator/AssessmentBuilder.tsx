@@ -71,6 +71,15 @@ export default function AssessmentBuilder({academyId,userId,onNotice}:{academyId
   if(keyError){onNotice('Question was saved, but the answer key could not be stored: '+keyError.message);return}
   setQuestions(rows=>[...rows,data as Question]);setQuestion('');setOptions(['','','','']);setNumericAnswer('');onNotice(questionType==='short_answer'||questionType==='long_answer'?'Question saved for educator marking.':'Objective question and private answer key saved.')
  }
+ async function gradeAttempt(id:string){
+  if(!supabase)return
+  const value=grades[id]
+  if(!value||!Number.isFinite(Number(value.score))||Number(value.score)<0||Number(value.score)>100){onNotice('Enter a score between 0 and 100.');return}
+  setBusy(true)
+  const {error}=await supabase.rpc('grade_assessment_attempt',{p_attempt_id:id,p_score:Number(value.score),p_feedback:{educator_feedback:value.feedback}})
+  setBusy(false)
+  if(error)onNotice('Assessment grade could not be saved: '+error.message);else{onNotice('Assessment marked and feedback saved.');await loadQuestions()}
+ }
  async function publish(){
   if(!supabase||!assessmentId)return
   const course=courses.find(x=>x.id===courseId)
