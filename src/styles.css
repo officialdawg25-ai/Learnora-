@@ -167,7 +167,7 @@
 
 
 /* Learnora premium ecosystem refresh — restrained institutional palette */
-:root{--ink:#172433;--muted:#687582;--paper:#f7f7f4;--line:#e1e5e7;--serif:Arial,Georgia,serif}
+:root{--ink:#172433;--muted:#687582;--paper:#f7f7f4;--line:#e1e5e7;--serif:Arial,Helvetica,sans-serif}
 body{background:var(--paper);color:var(--ink)}
 .brand-mark{border-color:#9eacb6;color:#29445b}
 .brand strong,.footer-brand strong{color:#172433}
