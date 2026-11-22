@@ -7,7 +7,7 @@ Updated: 22 November 2026
 - Repository: `officialdawg25-ai/Learnora-`
 - Working branch: `foundation/learnora-platform-v1`
 - Supabase project: `gkloowmlfxfrwcxggnzl`, PostgreSQL 17, eu-west-1
-- Remote migration ledger: 31 applied migrations; every migration source is versioned under its exact remote ID.
+- Remote migration ledger: 33 applied migrations; every migration source is versioned under its exact remote ID.
 - Public application schema: 55 tables; all 55 have RLS enabled.
 - Authentication users: 0. No synthetic accounts or learner records were inserted.
 - Storage: one private `learnora-verification` bucket; no public Learnora bucket.
@@ -40,7 +40,7 @@ Updated: 22 November 2026
 - Academy team memberships and expanded academy authorisation.
 - Immutable course snapshots, publication review records and educator analytics view.
 - Learner lesson-progress RPC, assessment attempt submission, deterministic objective auto-marking and educator grading RPCs. Learner answer submissions are checked against the published assessment's question identifiers; answer keys remain private.
-- Orders, PayFast payment transactions, webhook idempotency records, refunds, double-entry ledger, educator earnings, payout records and subscription records.
+- Orders, PayFast payment transactions, webhook idempotency records, refunds, double-entry ledger, educator earnings, payout records and subscription records. Pending orders are unique per learner/course, and each order can have only one active payment attempt.
 - Settlement batches/lines and server-only reconciliation functions.
 - AI conversations/messages, curriculum knowledge sources/chunks, full-text retrieval and scoped RLS. Learners may only append user-role messages; assistant messages are written server-side.
 - Institution campuses, departments, classes, class memberships and course assignments.
