@@ -1,17 +1,40 @@
 # Supabase project notes
 
-Project reference: gkloowmlfxfrwcxggnzl.
+Project reference: `gkloowmlfxfrwcxggnzl` (Learnora).
 
-Remote migration history verified through Supabase management tools:
+The remote Supabase migration ledger was inspected directly. All 19 applied Learnora migrations now have corresponding SQL files in this repository using the exact remote version and migration name. The first two migrations, which predated repository bootstrap, were recovered from `supabase_migrations.schema_migrations.statements` and committed rather than recreated.
+
+## Applied migration history
 
 - 20261122103407 — learnora_core_learning_foundation
 - 20261122103505 — learnora_rls_hardening_and_auth_profiles
 - 20261122104247 — learnora_public_discovery_and_privilege_restrictions
-- 20261122104407 — learnora_index_and_academy_tenancy_fix
+- 20261122104407 — learnora_academy_tenancy_and_index_fix
 - 20261122104911 — learnora_assessment_key_and_progress_integrity
 - 20261122104924 — learnora_course_visibility_and_assessment_key_grants
 - 20261122105740 — learnora_least_privilege_grants
+- 20261122110656 — learnora_educator_operations
+- 20261122110918 — learnora_commercial_ledger
+- 20261122110947 — learnora_ai_knowledge
+- 20261122111114 — learnora_payfast_verification
+- 20261122111343 — learnora_institutions_safeguarding
+- 20261122111422 — learnora_academic_intelligence
+- 20261122111459 — learnora_refunds_reconciliation
+- 20261122111558 — learnora_public_api_hardening
+- 20261122111620 — learnora_knowledge_ingestion
+- 20261122111813 — learnora_credential_public_verification
+- 20261122111925 — learnora_academy_team_analytics_rls
+- 20261122112132 — learnora_performance_policy_consolidation
 
-The first two migrations were applied remotely before the repository was populated and are not yet checked into this branch. Migrations 3–7 are tracked using their exact remote version numbers. Before running Supabase CLI push or treating this repository as canonical, pull and reconcile the exact first two remote migrations; do not recreate or reapply them blindly.
+## Security and operating notes
 
-Anonymous table privileges are limited to published academy/course discovery. Authenticated users no longer have TRUNCATE/MAINTAIN/REFERENCES/TRIGGER privileges, and client updates/deletes are removed from enrolment, membership, progress and attempt records until audited server workflows exist. All current public tables have RLS enabled. The Supabase security advisor returned no findings after the latest hardening. The performance advisor reports only unused-index informational findings expected on a new, empty schema.
+- RLS is enabled on all 54 current public application tables.
+- Anonymous access is limited to explicitly public discovery and the minimal public credential verification index.
+- Financial journals, webhook events, settlement imports, safeguarding cases and credential verification index writes are server-controlled.
+- Payment callbacks are not treated as proof of bank settlement. PayFast payment confirmation and statement reconciliation are separate states.
+- The PayFast Edge Functions are sandbox-only; production checkout is deliberately disabled.
+- AI is provider-independent at the application gateway, but a provider/model/key must be configured before responses can be generated.
+- No Learnora storage buckets, test users or demo records have been created.
+- Security and health advisors returned no findings at the latest verification. Performance advisor findings are informational unused-index notices on a largely empty database; indexes were not removed without workload evidence.
+
+Before using Supabase CLI against another environment, compare `supabase migration list --remote` with these files. Do not blindly reapply migrations already present remotely.
