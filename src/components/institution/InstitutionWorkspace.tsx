@@ -11,6 +11,8 @@ export default function InstitutionWorkspace({userId,onNotice}:{userId:string;on
  const [organisationId,setOrganisationId]=useState('')
  const [organisationName,setOrganisationName]=useState('')
  const [organisationType,setOrganisationType]=useState('school')
+ const [verificationType,setVerificationType]=useState('other')
+ const [verificationReference,setVerificationReference]=useState('')
  const [className,setClassName]=useState('')
  const [grade,setGrade]=useState('')
  const [year,setYear]=useState(String(new Date().getFullYear()))
@@ -55,6 +57,13 @@ export default function InstitutionWorkspace({userId,onNotice}:{userId:string;on
   if(membership.error){onNotice('Institution was created but owner membership could not be established: '+membership.error.message);return}
   setOrganisations(rows=>[data as Organisation,...rows]);setOrganisationId(data.id);setOrganisationName('');onNotice('Institution workspace created. Institutional verification remains pending.')
  }
+ async function submitInstitutionVerification(e:FormEvent<HTMLFormElement>){
+  e.preventDefault();if(!supabase||!organisationId)return;setBusy(true)
+  const {error}=await supabase.from('institution_verification_submissions').insert({organisation_id:organisationId,submitted_by:userId,reference_type:verificationType,evidence_reference:verificationReference.trim(),status:'pending'})
+  setBusy(false)
+  if(error)onNotice('Institution verification reference was not submitted: '+error.message)
+  else{setVerificationReference('');onNotice('Institution verification reference submitted. An authorised reviewer must validate it before the organisation becomes active.')}
+ }
  async function createClass(e:FormEvent<HTMLFormElement>){
   e.preventDefault();if(!supabase||!organisationId)return;setBusy(true)
   const {data,error}=await supabase.from('institution_classes').insert({organisation_id:organisationId,name:className.trim(),grade_or_level:grade.trim()||null,academic_year:Number(year),created_by:userId}).select('id,name,grade_or_level,academic_year').single()
@@ -89,6 +98,7 @@ export default function InstitutionWorkspace({userId,onNotice}:{userId:string;on
     </>}
    </section>
   </div>
+  {organisationId&&organisations.find(o=>o.id===organisationId)?.status!=='active'&&<section className="studio-panel institution-verification-panel"><div className="panel-heading"><div><p className="eyebrow">INSTITUTIONAL VERIFICATION</p><h2>Establish legitimacy.</h2></div><Building2 size={22}/></div><form className="form-stack builder-form" onSubmit={submitInstitutionVerification}><label>Verification authority<select value={verificationType} onChange={e=>setVerificationType(e.target.value)}><option value="cipc">CIPC</option><option value="dbe">Department of Basic Education</option><option value="dhet">Department of Higher Education and Training</option><option value="saqa">SAQA</option><option value="municipal">Municipal / public authority</option><option value="other">Other recognised source</option></select></label><label>Registration or verification reference<input required minLength={3} maxLength={200} value={verificationReference} onChange={e=>setVerificationReference(e.target.value)} placeholder="Public registration / reference number"/></label><button className="button button-dark" disabled={busy}>Submit verification reference</button><p className="form-hint">Submit a public institutional reference only. Do not enter personal identity numbers or upload confidential documents. Learnora must independently validate the reference; submission does not grant recognition or accreditation.</p></form></section>}
   <section className="studio-panel institution-reports"><div className="panel-heading"><div><p className="eyebrow">ACADEMIC INTELLIGENCE</p><h2>Institution reporting</h2></div><Users size={22}/></div>
    {reports.length===0?<p className="form-hint">Class-level reporting appears when classes and academic activity exist. No sample statistics are displayed.</p>:<div className="analytics-table"><div className="analytics-head institution-report-head"><span>CLASS</span><span>LEARNERS</span><span>EDUCATORS</span><span>COURSES</span><span>ATTEMPTS</span><span>AVG SCORE</span></div>{reports.map(r=><div className="analytics-row institution-report-row" key={r.class_id}><span>{r.name}<small>{r.grade_or_level??'—'} · {r.academic_year??'—'}</small></span><span>{r.active_learners}</span><span>{r.active_educators}</span><span>{r.assigned_courses}</span><span>{r.assessment_attempts}</span><span>{r.average_assessment_score??'—'}</span></div>)}</div>}
   </section>
