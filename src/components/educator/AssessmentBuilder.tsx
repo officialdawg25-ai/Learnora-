@@ -5,7 +5,7 @@ import { supabase } from '../../lib/supabase'
 type Course={id:string;title:string;publication_status:string}
 type Assessment={id:string;title:string;publication_status:string;assessment_type:string}
 type Question={id:string;prompt:string;points:number}
-export default function AssessmentBuilder({academyId,onNotice}:{academyId:string;onNotice:(s:string)=>void}){
+export default function AssessmentBuilder({academyId,userId,onNotice}:{academyId:string;userId:string;onNotice:(s:string)=>void}){
  const [courses,setCourses]=useState<Course[]>([])
  const [courseId,setCourseId]=useState('')
  const [assessments,setAssessments]=useState<Assessment[]>([])
@@ -41,7 +41,7 @@ export default function AssessmentBuilder({academyId,onNotice}:{academyId:string
  async function createAssessment(e:FormEvent<HTMLFormElement>){
   e.preventDefault();if(!supabase||!courseId)return
   setBusy(true)
-  const {data,error}=await supabase.from('assessments').insert({course_id:courseId,title:title.trim(),instructions:instructions.trim()||null,assessment_type:'practice',settings:{attempt_limit:3,marking:'deterministic_objective'},publication_status:'draft'}).select('id,title,publication_status,assessment_type').single()
+  const {data,error}=await supabase.from('assessments').insert({course_id:courseId,created_by:userId,title:title.trim(),instructions:instructions.trim()||null,assessment_type:'practice',settings:{attempt_limit:3,marking:'deterministic_objective'},publication_status:'draft'}).select('id,title,publication_status,assessment_type').single()
   setBusy(false);if(error||!data){onNotice('Assessment was not created: '+(error?.message??'Unknown error'));return}
   setAssessments(rows=>[data as Assessment,...rows]);setAssessmentId(data.id);setTitle('');setInstructions('');onNotice('Assessment draft created.')
  }
