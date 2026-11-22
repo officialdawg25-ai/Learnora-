@@ -7,7 +7,7 @@ Updated: 22 November 2026
 - Repository: `officialdawg25-ai/Learnora-`
 - Working branch: `foundation/learnora-platform-v1`
 - Supabase project: `gkloowmlfxfrwcxggnzl`, PostgreSQL 17, eu-west-1
-- Remote migration ledger: 24 applied migrations; every migration source is versioned under its exact remote ID.
+- Remote migration ledger: 26 applied migrations; every migration source is versioned under its exact remote ID.
 - Public application schema: 55 tables; all 55 have RLS enabled.
 - Authentication users: 0. No synthetic accounts or learner records were inserted.
 - Storage: one private `learnora-verification` bucket; no public Learnora bucket.
@@ -64,7 +64,7 @@ The deployed functions and their source files are versioned in the repository. N
 - Platform administrator records cannot be created or edited by ordinary client roles. The first administrator must be assigned by an authorised project operator using the documented bootstrap process.
 - Guardian activation requires a verified authority reference and an exact server-configured approved consent version. The current UI submits a draft consent version, so activation remains blocked pending legal approval.
 - Performance advisor: remaining notices are unused-index informational findings on a mostly empty database. Unindexed foreign keys and multiple-permissive-policy findings were addressed; no workload-unjustified indexes were removed.
-- GitHub Actions production build and dependency advisory gate passed on the current application implementation lineage; CI is rerunning on the latest branch head after source reconciliation and governance UI changes.
+- GitHub Actions production build and dependency advisory gate passed on commit `c4f407cb8fc87c44b3a35a8492bb52607e0c984a` after correcting escaped line-break characters in educator studio source. A new CI run will validate the documentation and subsequent commits.
 - Browser/device, real-account, adversarial RLS and provider sandbox end-to-end tests have not yet been performed.
 - No production deployment, merge or launch is claimed.
 
@@ -72,7 +72,7 @@ The deployed functions and their source files are versioned in the repository. N
 
 - No platform administrator has been assigned because there are no Auth users. The admin dashboard and Edge Function are implemented but cannot be exercised until an approved administrator is bootstrapped.
 - Educator evidence upload is private and reviewer queues exist; real reviewer testing and appeals/suspension procedures remain.
-- Academy team invitations currently target existing Learnora user UUIDs; email invitation acceptance is not complete.
+- Academy team and institution class invitations can now be accepted by the invited authenticated user without changing their assigned role or tenant. Email-based invitation discovery and acceptance UX still needs implementation and end-to-end validation.
 - Course version snapshots are recorded automatically, but a restore/diff UI is not complete.
 - Publication review requests and admin decisions are stored; real reviewer testing remains.
 - Educator analytics are descriptive enrolment/completion counts; no verified revenue or teaching-effectiveness score is displayed.
