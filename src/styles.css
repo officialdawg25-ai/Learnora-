@@ -66,3 +66,17 @@
 .ai-error{color:#a43d35;font-size:12px;padding:10px 0}
 .ai-disclaimer{font-size:10px;line-height:1.7;color:var(--muted);max-width:700px;margin-top:13px}
 @media(max-width:700px){.ai-workspace{padding:28px 0 50px}.ai-chat{padding:14px;min-height:320px}.ai-message{max-width:96%}.ai-mode-switch{flex-wrap:wrap}.ai-heading h1{letter-spacing:-1px}}
+
+/* Institutional and family workspaces */
+.institution-workspace,.family-workspace{max-width:1100px;margin:0 auto}
+.institution-grid,.family-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.institution-reports{margin-top:22px}
+.institution-report-head,.institution-report-row{grid-template-columns:minmax(140px,1.6fr) repeat(5,minmax(65px,1fr));gap:9px}
+.institution-form{grid-template-columns:minmax(0,2fr) minmax(120px,1fr) auto;margin:16px 0}
+.consent-scope{display:grid;gap:11px;padding:14px;border:1px solid var(--line);font-size:12px}
+.consent-scope>strong{font-size:11px}
+.consent-scope label{display:flex;align-items:center;gap:9px}
+.consent-scope input{accent-color:#7779ad}
+.family-workspace .family-grid{align-items:start}
+@media(max-width:850px){.institution-grid,.family-grid{grid-template-columns:1fr}.institution-report-head,.institution-report-row{grid-template-columns:minmax(110px,1.5fr) repeat(5,minmax(52px,1fr));gap:5px;font-size:9px}.institution-report-head{font-size:7px}}
+@media(max-width:700px){.institution-form{grid-template-columns:1fr}.institution-report-head,.institution-report-row{overflow:auto;min-width:650px}.institution-reports{overflow-x:auto}}
