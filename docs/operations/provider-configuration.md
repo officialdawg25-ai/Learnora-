@@ -39,6 +39,7 @@ Do not switch to production mode. Production payments require explicit approval,
 | `learnora-knowledge-ingest` | Required | Ingest authorised learning material as a private draft |
 | `payfast-checkout` | Required | Create a pending course order and sandbox checkout URL |
 | `payfast-notify` | Disabled at gateway | Verify PayFast server notifications itself; never trust the caller |
+| `learnora-admin` | Required | Permission-scoped platform review and governance workflows |
 
 The webhook endpoint has JWT verification disabled because PayFast cannot supply a Learnora user JWT. Its own signature and server-validation checks are mandatory.
 
@@ -65,3 +66,7 @@ There is no private Learnora storage bucket yet. The current educator verificati
 5. Verify no secrets appear in frontend bundles, logs or client network responses.
 6. Confirm a payment failure never grants paid course access.
 7. Keep educator payout and recurring subscriptions disabled until provider and legal arrangements are approved.
+
+## Platform administrator bootstrap
+
+The admin Edge Function is active, but the platform administrator table is intentionally empty. No account is automatically promoted. Follow [the platform administrator bootstrap procedure](./platform-admin-bootstrap.md) only after an approved account exists and its authority is independently verified.
