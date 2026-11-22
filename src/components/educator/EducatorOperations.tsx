@@ -21,7 +21,13 @@ export default function EducatorOperations({ academyId, userId, onNotice }: Prop
   const [team, setTeam] = useState<TeamMember[]>([])
   const [inviteUserId, setInviteUserId] = useState('')
   const [inviteRole, setInviteRole] = useState('instructor')
-  const [analytics, setAnalytics] = useState<Analytics[]>([])\n  const [knowledgeCourseId,setKnowledgeCourseId]=useState('')\n  const [knowledgeTitle,setKnowledgeTitle]=useState('')\n  const [knowledgeContent,setKnowledgeContent]=useState('')\n  const [knowledgeType,setKnowledgeType]=useState('educator_resource')\n  const [knowledgeUrl,setKnowledgeUrl]=useState('')\n  const [ingesting,setIngesting]=useState(false)
+  const [analytics, setAnalytics] = useState<Analytics[]>([])
+  const [knowledgeCourseId,setKnowledgeCourseId]=useState('')
+  const [knowledgeTitle,setKnowledgeTitle]=useState('')
+  const [knowledgeContent,setKnowledgeContent]=useState('')
+  const [knowledgeType,setKnowledgeType]=useState('educator_resource')
+  const [knowledgeUrl,setKnowledgeUrl]=useState('')
+  const [ingesting,setIngesting]=useState(false)
   const [loading, setLoading] = useState(false)
 
   async function load() {
@@ -36,7 +42,8 @@ export default function EducatorOperations({ academyId, userId, onNotice }: Prop
     if (p.error) onNotice('Educator profile: '+p.error.message)
     else if (p.data) { const row=p.data as EducatorProfile; setProfile(row); setBio(row.professional_bio||''); setExperience(String(row.teaching_experience_years??0)); setLanguages(row.teaching_languages.join(', ')); setSubjects(row.subjects.join(', ')) }
     setTeam((t.data??[]) as TeamMember[])
-    setAnalytics((a.data??[]) as Analytics[])\n    if(a.data?.length)setKnowledgeCourseId(current=>a.data.some((x:any)=>x.course_id===current)?current:a.data[0].course_id)
+    setAnalytics((a.data??[]) as Analytics[])
+    if(a.data?.length)setKnowledgeCourseId(current=>a.data.some((x:any)=>x.course_id===current)?current:a.data[0].course_id)
     if (t.error) onNotice('Academy team: '+t.error.message)
     if (a.error) onNotice('Educator analytics: '+a.error.message)
   }
