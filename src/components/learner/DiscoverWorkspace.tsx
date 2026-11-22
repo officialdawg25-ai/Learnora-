@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import type { FormEvent, ReactNode } from 'react'
 import { ArrowRight, BookOpen, Building2, Check, Compass, GraduationCap, Users } from 'lucide-react'
 import { supabase, type Course } from '../../lib/supabase'
 
@@ -9,7 +10,7 @@ type ConnectionSignal={user_id:string;shared_class_count:number;shared_course_co
 type Space={id:string;space_type:'community'|'study_group';title:string;description:string|null;subject:string|null;education_level:string|null}
 const parseList=(v:string)=>v.split(',').map(x=>x.trim()).filter(Boolean).slice(0,20)
 const overlap=(a:string[],b:string[])=>a.filter(x=>b.some(y=>y.toLowerCase()===x.toLowerCase()))
-function Rail({title,description,count,children}:{title:string;description:string;count:number;children:React.ReactNode}){
+function Rail({title,description,count,children}:{title:string;description:string;count:number;children:ReactNode}){
  return <section className="discover-rail"><div className="discover-rail-heading"><div><p className="eyebrow">LEARNORA DISCOVERY</p><h2>{title}</h2><p>{description}</p></div><span>{String(count).padStart(2,'0')} RESULTS</span></div>{count?<div className="discover-rail-track">{children}</div>:<div className="discover-empty">Nothing published here yet. Your discovery space will grow as verified educators, institutions and learning communities join Learnora.</div>}</section>
 }
 export default function DiscoverWorkspace({userId,courses,onEnrol,onNotice}:{userId:string;courses:Course[];onEnrol:(course:Course)=>void;onNotice:(s:string)=>void}){
@@ -43,7 +44,7 @@ export default function DiscoverWorkspace({userId,courses,onEnrol,onNotice}:{use
  const visibleInstitutions=useMemo(()=>institutions.filter(x=>(category==='All'||category==='Institutions')&&[x.display_name,x.description,x.region].join(' ').toLowerCase().includes(query)),[institutions,category,query])
  const visibleSpaces=useMemo(()=>spaces.filter(x=>(category==='All'||category===(x.space_type==='community'?'Communities':'Study groups'))&&[x.title,x.description,x.subject].join(' ').toLowerCase().includes(query)),[spaces,category,query])
  const recommendedLearners=useMemo(()=>learners.map(x=>({...x,sharedSubjects:overlap(own?.subjects??[],x.subjects),sharedInterests:overlap(own?.interests??[],x.interests),sharedClassCount:connectionSignals[x.user_id]?.shared_class_count??0,sharedCourseCount:connectionSignals[x.user_id]?.shared_course_count??0})).filter(x=>(category==='All'||category==='Learners')&&[x.display_name,x.bio,...x.subjects,...x.interests].join(' ').toLowerCase().includes(query)).sort((a,b)=>(b.sharedClassCount*5+b.sharedCourseCount*4+b.sharedSubjects.length*3+b.sharedInterests.length)-(a.sharedClassCount*5+a.sharedCourseCount*4+a.sharedSubjects.length*3+a.sharedInterests.length)),[learners,own,connectionSignals,category,query])
- async function saveProfile(e:React.FormEvent){
+ async function saveProfile(e:FormEvent){
   e.preventDefault();if(!supabase||!userId||!name.trim())return
   setSaving(true)
   const payload={user_id:userId,display_name:name.trim(),bio:bio.trim()||null,subjects:parseList(subjects),interests:parseList(interests),education_level:level.trim()||null,discoverable}
