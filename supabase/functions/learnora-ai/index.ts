@@ -10,6 +10,18 @@ const cors = {
 const json = (status: number, body: unknown) => new Response(JSON.stringify(body), { status, headers: cors });
 const env = (name: string) => Deno.env.get(name) ?? "";
 
+function isUnder18(dateOfBirth?: string | null) {
+  if (!dateOfBirth) return true;
+  const birth = new Date(dateOfBirth + "T00:00:00Z");
+  if (Number.isNaN(birth.getTime())) return true;
+  const today = new Date();
+  let age = today.getUTCFullYear() - birth.getUTCFullYear();
+  const beforeBirthday = today.getUTCMonth() < birth.getUTCMonth()
+    || (today.getUTCMonth() === birth.getUTCMonth() && today.getUTCDate() < birth.getUTCDate());
+  if (beforeBirthday) age -= 1;
+  return age < 18;
+}
+
 function tutorPrompt(level: string, minor: boolean, sources: string) {
   return `You are Learnora Tutor, an educational learning companion. Your purpose is understanding and measurable learning, not answer dumping.
 Adapt language and complexity to this learner's stated level: ${level || "not specified"}.
@@ -64,11 +76,18 @@ Deno.serve(async (req: Request) => {
   const {count}=await admin.from("ai_activity").select("id",{count:"exact",head:true}).eq("user_id",user.id).gte("created_at",since);
   if((count??0)>=20) return json(429,{error:"Learnora AI request limit reached. Try again shortly."});
   const {data:profile}=await userClient.from("profiles").select("date_of_birth").eq("id",user.id).maybeSingle();
-  const minor=!profile?.date_of_birth || (Date.now()-new Date(profile.date_of_birth).getTime())/31557600000<18;
+  const minor=isUnder18(profile?.date_of_birth);
+  if(minor){
+    const approvedConsentVersion=env("LEARNORA_CHILD_AI_CONSENT_VERSION");
+    if(!approvedConsentVersion) return json(403,{error:"Learnora Tutor is unavailable for accounts under 18 until guardian consent and child-safety requirements have been approved."});
+    const {data:childConsent,error:consentError}=await admin.from("guardian_relationships").select("id")
+      .eq("learner_user_id",user.id).eq("status","active").eq("consent_version",approvedConsentVersion)
+      .contains("consent_scopes",["ai_tutor"]).limit(1).maybeSingle();
+    if(consentError || !childConsent) return json(403,{error:"A verified guardian relationship with current AI learning consent is required."});
+  }
   if(capability==="teacher"){
-    if(minor) return json(403,{error:"Teacher Intelligence is restricted to adult educator accounts."});
     const {data:educator}=await userClient.from("educator_profiles").select("verification_status").eq("user_id",user.id).maybeSingle();
-    if(!educator || ["suspended","rejected"].includes(educator.verification_status)) return json(403,{error:"Create an educator profile before using Teacher Intelligence."});
+    if(!educator || educator.verification_status!=="verified") return json(403,{error:"Teacher Intelligence requires an adult account with verified educator status."});
   }
   const level=typeof input?.learning_level==="string"?input.learning_level.slice(0,80):"";
   let conversationId=typeof input?.conversation_id==="string"?input.conversation_id:null;
