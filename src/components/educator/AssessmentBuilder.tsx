@@ -4,7 +4,7 @@ import { ClipboardList, Plus, Send } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 type Course={id:string;title:string;publication_status:string}
 type Assessment={id:string;title:string;publication_status:string;assessment_type:string}
-type Question={id:string;prompt:string;points:number}
+type Question={id:string;prompt:string;points:number;question_type:string;options:{id:string;text:string}[]};type Attempt={id:string;learner_id:string;attempt_number:number;answers:Record<string,any>;submitted_at:string}
 export default function AssessmentBuilder({academyId,userId,onNotice}:{academyId:string;userId:string;onNotice:(s:string)=>void}){
  const [courses,setCourses]=useState<Course[]>([])
  const [courseId,setCourseId]=useState('')
@@ -15,6 +15,10 @@ export default function AssessmentBuilder({academyId,userId,onNotice}:{academyId
  const [question,setQuestion]=useState('')
  const [options,setOptions]=useState(['','','',''])
  const [correct,setCorrect]=useState('A')
+ const [questionType,setQuestionType]=useState('multiple_choice')
+ const [numericAnswer,setNumericAnswer]=useState('')
+ const [pendingAttempts,setPendingAttempts]=useState<Attempt[]>([])
+ const [grades,setGrades]=useState<Record<string,{score:string;feedback:string}>>({})
  const [points,setPoints]=useState('1')
  const [questions,setQuestions]=useState<Question[]>([])
  const [busy,setBusy]=useState(false)
