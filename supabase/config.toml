@@ -14,3 +14,12 @@ verify_jwt = true
 
 [functions.learnora-admin]
 verify_jwt = true
+
+[functions.family-identity]
+verify_jwt = false
+
+[functions.family-tuition-checkout]
+verify_jwt = true
+
+[functions.family-tuition-notify]
+verify_jwt = false
