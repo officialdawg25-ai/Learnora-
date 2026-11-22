@@ -27,7 +27,6 @@ type Role='learner'|'parent_guardian'|'educator'|'institution'|'platform_admin';
 type View='overview'|'discover'|'my-learning'|'study-plan'|'practice'|'resources'|'live-classes'|'opportunities'|'progress'|'communities'|'calendar'|'notifications'|'settings'|'teach'|'educator-application'|'ai'|'institution'|'family'|'academic'|'admin'|'role-applications'|'role-pending'|'invitations';
 const roleHome=(role:Role):View=>role==='learner'?'overview':role==='parent_guardian'?'family':role==='educator'?'teach':role==='institution'?'institution':'admin';
 const roleLabel=(role:Role)=>role==='parent_guardian'?'Parent / Guardian':role==='platform_admin'?'Platform administrator':role[0].toUpperCase()+role.slice(1);
-const money=(minor:number,currency:string)=>new Intl.NumberFormat('en-ZA',{style:'currency',currency}).format(minor/100);
 export default function App(){
  const [session,setSession]=useState<Session|null>(null),[isPlatformAdmin,setIsPlatformAdmin]=useState(false),[accountRoles,setAccountRoles]=useState<Role[]>([]),[pendingRoles,setPendingRoles]=useState<string[]>([]),[activeRole,setActiveRole]=useState<Role>('learner'),[courses,setCourses]=useState<Course[]>([]),[enrolled,setEnrolled]=useState<string[]>([]),[selectedCourseId,setSelectedCourseId]=useState(''),[orders,setOrders]=useState<OrderRow[]>([]),[refunds,setRefunds]=useState<RefundRow[]>([]),[refundOrderId,setRefundOrderId]=useState(''),[refundReason,setRefundReason]=useState('');
  const [view,setView]=useState<View>('overview'),[busy,setBusy]=useState(false),[notice,setNotice]=useState('');
@@ -36,12 +35,12 @@ export default function App(){
  const [academyId,setAcademyId]=useState(''),[myAcademies,setMyAcademies]=useState<{id:string;name:string}[]>([]),[mobileNav,setMobileNav]=useState(false),[contentRefresh,setContentRefresh]=useState(0);
  useEffect(()=>{if(!supabase)return;supabase.auth.getSession().then(({data})=>setSession(data.session));const {data:l}=supabase.auth.onAuthStateChange((_e,s)=>setSession(s));return()=>l.subscription.unsubscribe();},[]);
  useEffect(()=>{let active=true;if(!supabase||!session?.user.id){setIsPlatformAdmin(false);return()=>{active=false;};}supabase.from('platform_administrators').select('user_id').eq('user_id',session.user.id).eq('status','active').maybeSingle().then(({data})=>{if(active)setIsPlatformAdmin(!!data);});return()=>{active=false;};},[session?.user.id]);
- useEffect(()=>{let alive=true;if(!supabase||!session?.user.id){setAccountRoles([]);setPendingRoles([]);setActiveRole('learner');return()=>{alive=false;};}
+ useEffect(()=>{let alive=true;const client=supabase;if(!client||!session?.user.id){setAccountRoles([]);setPendingRoles([]);setActiveRole('learner');return()=>{alive=false;};}
   const loadRoles=async()=>{const uid=session.user.id;const metadataRole=String(session.user.user_metadata?.signup_intent??'learner');const requested:Record<string,string>={learner:'learner',parent:'parent_guardian',educator:'educator',institution:'institution'};
-   let {data,error}=await supabase.from('user_roles').select('role,status').eq('user_id',uid);
+   let {data,error}=await client.from('user_roles').select('role,status').eq('user_id',uid);
    if(error){if(alive)setNotice('Account permissions could not be loaded. Restricted workspaces remain unavailable: '+error.message);return;}
    const wanted=requested[metadataRole]??'learner';
-   if(!(data??[]).some((x:{role:string})=>x.role===wanted)){const {error:requestError}=await supabase.rpc('request_learnora_role',{p_role:wanted});if(requestError&&alive)setNotice('Your account role request could not be recorded: '+requestError.message);const refreshed=await supabase.from('user_roles').select('role,status').eq('user_id',uid);data=refreshed.data;error=refreshed.error;}
+   if(!(data??[]).some((x:{role:string})=>x.role===wanted)){const {error:requestError}=await client.rpc('request_learnora_role',{p_role:wanted});if(requestError&&alive)setNotice('Your account role request could not be recorded: '+requestError.message);const refreshed=await client.from('user_roles').select('role,status').eq('user_id',uid);data=refreshed.data;error=refreshed.error;}
    if(!alive)return;
    const rows=(data??[]) as {role:string;status:string}[];
    const active=rows.filter(x=>x.status==='active').map(x=>x.role).filter((x):x is Role=>['learner','parent_guardian','educator','institution','platform_admin'].includes(x));
