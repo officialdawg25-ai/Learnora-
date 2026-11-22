@@ -81,7 +81,8 @@ export default function LearningPlayer({courseId,userId,onBack,onNotice}:{course
  }
  function retryAssessment(){setResult(null);setAnswers({})}
  const questionSupported=questions.length>0&&questions.every(q=>['multiple_choice','numeric','short_answer','long_answer'].includes(q.question_type))
- const attemptLimit=Math.max(1,Number(assessments.find(x=>x.id===selectedAssessment)?.settings?.attempt_limit??3))
+ const configuredAttemptLimit=Number(assessments.find(x=>x.id===selectedAssessment)?.settings?.attempt_limit??3)
+ const attemptLimit=Number.isInteger(configuredAttemptLimit)&&configuredAttemptLimit>0?Math.min(configuredAttemptLimit,100):3
  const canRetry=attempts.length<attemptLimit
  const lessonContent=useMemo(()=>{const c=activeLesson?.content;if(!c)return '';if(typeof c==='string')return c;if(typeof c.body==='string')return c.body;return JSON.stringify(c,null,2)},[activeLesson])
  return <section className="learning-player">
