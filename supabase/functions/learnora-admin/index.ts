@@ -24,7 +24,7 @@ Deno.serve(async(req:Request)=>{
    dashboard.educator_verifications=await Promise.all((data??[]).map(async(row:any)=>{const signed=row.document_storage_path?await admin.storage.from("learnora-verification").createSignedUrl(row.document_storage_path,120):{data:null};return {...row,evidence_url:signed.data?.signedUrl??null};}));
   }
   if(administrator.permissions.includes("courses:review")){const {data}=await admin.from("publication_reviews").select("id,course_id,requested_by,requested_at,courses(title)").eq("status","pending").order("requested_at").limit(25);dashboard.publication_reviews=data??[];}
-  if(administrator.permissions.includes("guardians:verify")){const {data}=await admin.from("guardian_relationships").select("id,guardian_user_id,learner_user_id,relationship_type,consent_scopes,consent_version,evidence_reference,created_at").eq("status","pending").order("created_at").limit(25);dashboard.guardian_requests=data??[];}
+  if(administrator.permissions.includes("guardians:verify")){const {data}=await admin.from("guardian_relationships").select("id,guardian_user_id,learner_user_id,relationship_type,consent_scopes,consent_version,evidence_reference,learner_consent_status,learner_consent_at,learner_consent_version,created_at").eq("status","pending").order("created_at").limit(25);dashboard.guardian_requests=data??[];}
   if(administrator.permissions.includes("institutions:verify")){const {data}=await admin.from("institution_verification_submissions").select("id,organisation_id,reference_type,evidence_reference,submitted_by,created_at,organisations(name,organisation_type)").eq("status","pending").order("created_at").limit(25);dashboard.institutions=data??[];}
   if(administrator.permissions.includes("finance:refund_approve")){const {data}=await admin.from("refunds").select("id,order_id,amount_minor,currency,reason,requested_at").eq("status","requested").order("requested_at").limit(25);dashboard.refunds=data??[];}
   if(administrator.permissions.includes("safeguarding:manage")){const {data}=await admin.from("safeguarding_cases").select("id,reporter_user_id,subject_user_id,category,severity,description,status,created_at").in("status",["open","triage","investigating"]).order("created_at").limit(25);dashboard.safeguarding_cases=data??[];}
@@ -57,11 +57,14 @@ Deno.serve(async(req:Request)=>{
    resourceType="knowledge_source";resourceId=source.id;result={status:"published",chunks:count};
   }else if(action==="guardian_review"){
    const decision=body.decision;if(!["active","rejected"].includes(decision))return json(400,{error:"Invalid guardian decision"});
-   const {data:rel,error}=await admin.from("guardian_relationships").select("id,consent_version,evidence_reference").eq("id",body.relationship_id).eq("status","pending").maybeSingle();if(error||!rel)return json(404,{error:"Pending guardian request not found"});
+   const {data:rel,error}=await admin.from("guardian_relationships").select("id,consent_version,evidence_reference,learner_consent_status,learner_consent_at,learner_consent_version").eq("id",body.relationship_id).eq("status","pending").maybeSingle();if(error||!rel)return json(404,{error:"Pending guardian request not found"});
    const approvedVersion=Deno.env.get("LEARNORA_GUARDIAN_CONSENT_VERSION");
-   if(decision==="active"&&(!rel.evidence_reference||!approvedVersion||rel.consent_version!==approvedVersion))return json(422,{error:"Guardian activation requires independently verified authority evidence and the currently approved consent version."});
-   const {error:updateError}=await admin.from("guardian_relationships").update({status:decision,verified_by:user.id,verified_at:new Date().toISOString()}).eq("id",rel.id);if(updateError)throw updateError;
-   resourceType="guardian_relationship";resourceId=rel.id;result={status:decision};
+   if(decision==="active"&&(!rel.evidence_reference||!approvedVersion||rel.consent_version!==approvedVersion||rel.learner_consent_status!=="approved"||!rel.learner_consent_at||rel.learner_consent_version!=="learnora-learner-connection-v1"))return json(422,{error:"Activation requires a learner acknowledgement, the approved guardian consent version, and independently reviewed evidence of legal authority. A reference entered by the requester is not proof by itself."});
+   const reviewedAt=new Date().toISOString();
+   const {data:updated,error:updateError}=await admin.from("guardian_relationships").update({status:decision,verified_by:user.id,verified_at:reviewedAt}).eq("id",rel.id).eq("status","pending").select("id").maybeSingle();if(updateError)throw updateError;if(!updated)return json(409,{error:"This guardian request changed before the review could be completed."});
+   const {error:eventError}=await admin.from("guardian_relationship_events").insert({relationship_id:rel.id,actor_user_id:user.id,event_type:decision==="active"?"admin_activated":"admin_rejected",metadata:{decision,learner_consent_version:rel.learner_consent_version}});
+   if(eventError)throw eventError;
+   resourceType="guardian_relationship";resourceId=rel.id;result={status:decision,learner_acknowledgement:rel.learner_consent_status,authority_evidence_reviewed:decision==="active"};
   }else if(action==="institution_verification"){
    const decision=body.decision;if(!["verified","more_information_required","rejected"].includes(decision))return json(400,{error:"Invalid institution verification decision"});
    const submissionId=typeof body.submission_id==="string"?body.submission_id:"";
