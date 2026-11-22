@@ -204,7 +204,8 @@ begin
  return v_journal_id;
 end;
 $function$;
-revoke all on function private.post_ledger_journal(text,uuid,text,char,jsonb) from public,anon,authenticated;\ngrant execute on function private.post_ledger_journal(text,uuid,text,char,jsonb) to service_role;
+revoke all on function private.post_ledger_journal(text,uuid,text,char,jsonb) from public,anon,authenticated;
+grant execute on function private.post_ledger_journal(text,uuid,text,char,jsonb) to service_role;
 
 comment on table public.payment_transactions is 'Payment provider state is server-verified. A callback alone does not prove bank settlement.';
 comment on table public.ledger_journals is 'Immutable double-entry journals; only service-controlled workflows can post entries.';
