@@ -11,7 +11,7 @@ create table if not exists public.family_parent_details (
 );
 alter table public.family_parent_details enable row level security;
 create policy family_parent_details_owner_all on public.family_parent_details for all to authenticated using(user_id=auth.uid()) with check(user_id=auth.uid());
-create policy family_parent_details_owner_all on public.family_parent_details for all to authenticated using(user_id=auth.uid()) with check(user_id=auth.uid());
+
 
 insert into storage.buckets(id,name,public,file_size_limit,allowed_mime_types)
 values('learnora-family-documents','learnora-family-documents',false,10485760,array['application/pdf','image/jpeg','image/png'])
