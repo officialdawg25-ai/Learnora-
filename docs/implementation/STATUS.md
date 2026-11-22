@@ -7,7 +7,7 @@ Updated: 22 November 2026
 - Repository: `officialdawg25-ai/Learnora-`
 - Working branch: `foundation/learnora-platform-v1`
 - Supabase project: `gkloowmlfxfrwcxggnzl`, PostgreSQL 17, eu-west-1
-- Remote migration ledger: 33 applied migrations; every migration source is versioned under its exact remote ID.
+- Remote migration ledger: 35 applied migrations; every migration source is versioned under its exact remote ID.
 - Public application schema: 56 tables; all 56 have RLS enabled.
 - Authentication users: 0. No synthetic accounts or learner records were inserted.
 - Storage: one private `learnora-verification` bucket; no public Learnora bucket.
@@ -30,7 +30,7 @@ Updated: 22 November 2026
 - Educator profile, private credential evidence upload, verification submission metadata, academy team invitations, course publication review submission and descriptive course analytics.
 - Learnora AI navigation with Tutor and Teacher Intelligence modes; server-side access requires verified educator status for Teacher Intelligence and blocks under-18/unknown-age Tutor accounts until approved guardian consent is configured.
 - Family/guardian relationship request workspace with consent scopes and pending status.
-- Institution workspace for organisation setup, classes, class membership invitations, course allocation and aggregate class reporting.
+- Institution workspace for organisation setup, classes, class membership invitations, course allocation, aggregate class reporting and external institutional verification references with an authorised review queue.
 - Academic workspace for learner goals, credentials and opportunity discovery.
 - Permission-gated platform administration navigation and review dashboard. It becomes available only after an authorised platform administrator is assigned.
 
@@ -43,7 +43,7 @@ Updated: 22 November 2026
 - Orders, PayFast payment transactions, webhook idempotency records, refunds, double-entry ledger, educator earnings, payout records and subscription records. Pending orders are unique per learner/course, and each order can have only one active payment attempt.
 - Settlement batches/lines and server-only reconciliation functions.
 - AI conversations/messages, curriculum knowledge sources/chunks, full-text retrieval and scoped RLS. Learners may only append user-role messages; assistant messages are written server-side.
-- Institution campuses, departments, classes, class memberships and course assignments.
+- Institution campuses, departments, classes, class memberships, course assignments and institutional verification submissions with atomic reviewer decisions.
 - Guardian relationship requests, consent scopes and restricted safeguarding case records.
 - Competency frameworks, competencies, evidence, mastery summaries, credentials, public credential verification index, opportunities and learner goals.
 - Platform administrator roles and explicit permission sets.
