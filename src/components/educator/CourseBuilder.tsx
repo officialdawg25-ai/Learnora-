@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import type { FormEvent } from 'react'
 import { BookOpen, Check, Layers3, Plus } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 
@@ -105,7 +106,7 @@ export default function CourseBuilder({ academyId, refreshKey, onNotice }: Props
     return () => { active = false }
   }, [moduleId, onNotice])
 
-  async function addModule(event: React.FormEvent<HTMLFormElement>) {
+  async function addModule(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!supabase || !courseId) return
     setSavingModule(true)
@@ -132,7 +133,7 @@ export default function CourseBuilder({ academyId, refreshKey, onNotice }: Props
     onNotice('Module saved to the course.')
   }
 
-  async function addLesson(event: React.FormEvent<HTMLFormElement>) {
+  async function addLesson(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!supabase || !moduleId) return
     setSavingLesson(true)
