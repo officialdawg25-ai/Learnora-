@@ -32,10 +32,14 @@ The remote Supabase migration ledger was inspected directly. All 24 applied Lear
 - 20261122113628 — learnora_platform_admin_fk_index
 - 20261122114018 — learnora_invitation_acceptance
 - 20261122114147 — learnora_invitation_discovery
+- 20261122114827 — learnora_learning_progress_assessment_engine
+- 20261122114955 — 20261122120000_learnora_anonymous_grant_hardening
+- 20261122115156 — learnora_assessment_submission_key_validation
+- 20261122115411 — learnora_assessment_null_payload_guard
 
 ## Security and operating notes
 
-- RLS is enabled on all 55 current public application tables.
+- RLS is enabled on all 55 current public application tables. Anonymous table privileges are restricted to SELECT on `academies`, `courses` and `credential_verification_index` only.
 - Anonymous access is limited to explicitly public discovery and the minimal public credential verification index.
 - Financial journals, webhook events, settlement imports, safeguarding cases and credential verification index writes are server-controlled.
 - Payment callbacks are not treated as proof of bank settlement. PayFast payment confirmation and statement reconciliation are separate states.
@@ -43,6 +47,6 @@ The remote Supabase migration ledger was inspected directly. All 24 applied Lear
 - Five Edge Functions are deployed: Learnora AI, knowledge ingestion, PayFast checkout, PayFast notification and platform administration. Their source files are versioned under `supabase/functions`.
 - AI is provider-independent at the application gateway, but a provider/model/key must be configured before responses can be generated.
 - One private `learnora-verification` storage bucket is configured for educator evidence; no test users or demo records have been created. Date of birth is collected at signup for age-aware feature routing; unknown age is treated conservatively by AI services.
-- Security and health advisors returned no findings at the latest verification. Performance advisor findings are informational unused-index notices on a largely empty database; indexes were not removed without workload evidence.
+- Health advisor returned no findings. Security advisor reports three intentional authenticated `SECURITY DEFINER` RPC warnings for lesson progress, assessment submission and educator grading. Each function has an empty search path and performs explicit user/enrolment/academy-manager checks; adversarial tests remain required before production. Performance advisor findings are informational unused-index notices on a largely empty database; indexes were not removed without workload evidence.
 
 Before using Supabase CLI against another environment, compare `supabase migration list --remote` with these files. Do not blindly reapply migrations already present remotely.
