@@ -1,0 +1,16 @@
+project_id = "gkloowmlfxfrwcxggnzl"
+
+[functions.payfast-notify]
+verify_jwt = false
+
+[functions.learnora-ai]
+verify_jwt = true
+
+[functions.learnora-knowledge-ingest]
+verify_jwt = true
+
+[functions.payfast-checkout]
+verify_jwt = true
+
+[functions.learnora-admin]
+verify_jwt = true
