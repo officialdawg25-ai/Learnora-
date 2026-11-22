@@ -21,7 +21,7 @@ Updated: 22 November 2026
 - Public course discovery, subject filters and free enrolment.
 - Learner learning-space and educator studio.
 - Educator academy and draft course creation.
-- Module and text/activity lesson authoring.
+- Module and text/activity lesson authoring, immutable version history and snapshot preview.\n- Learner lesson player with explicit completion events, objective assessment submission and written-answer review.\n- Educator assessment studio for multiple-choice, numeric, short-answer and long-answer questions, private answer keys and manual grading with feedback.\n- Secure academy/class invitation inbox and acceptance workflow.\n- Learner order history, PayFast return-state verification and refund request submission.\n- Educator curriculum knowledge ingestion into private draft sources.
 - Educator profile, private credential evidence upload, verification submission metadata, academy team invitations, course publication review submission and descriptive course analytics.
 - Learnora AI navigation with Tutor and Teacher Intelligence modes.
 - Family/guardian relationship request workspace with consent scopes and pending status.
