@@ -15,7 +15,7 @@ Updated: 2026-11-22
 - React + TypeScript + Vite application shell.
 - Responsive discovery, learner-space and educator-studio screens.
 - Supabase email/password auth integration and auth profile bootstrap trigger.
-- Published course discovery, subject filtering, free enrolment, academy creation and draft course creation.
+- Published course discovery, subject filtering, free enrolment, academy creation and draft course creation.\n- Educator content studio can create ordered modules and text/activity lessons in private draft courses using the existing RLS-protected tables.
 - Core database domains for profiles, organisations, memberships, academies, courses, modules, lessons, enrolments, objectives, progress, assessments, attempts, assessment answer keys, AI usage metering and audit events.
 - RLS enabled for all 16 current public tables. Anonymous grants are limited to academy/course discovery; privileged table operations and client lifecycle mutations have been revoked where no audited workflow exists.
 - Private helper functions for organisation membership, academy management and paid/free course content access.
@@ -33,7 +33,7 @@ Updated: 2026-11-22
 - No communities, posts, messaging or live classroom services.
 - No complete institutional administration UI or SIS integrations.
 - No competency mastery engine, credentials or verified opportunity feeds.
-- No module/lesson authoring UI, lesson player, assessment submission/marking workflow or publish review workflow.
+- Lesson player, assessment submission/marking workflow, content version history and publish review workflow remain unimplemented.
 
 ## Verification status
 
@@ -42,7 +42,7 @@ Updated: 2026-11-22
 - Supabase security advisor returned no findings after hardening.
 - Performance advisor returned unused-index informational findings only; these are not reasons to remove indexes without workload evidence.
 - No Edge Functions are deployed.
-- A GitHub Actions TypeScript/Vite production build passed on a prior foundation-branch commit. Recheck CI on the latest head before merge.
+- GitHub Actions TypeScript/Vite production build and dependency audit passed on current commit `ef2f5be76e2c53d93cb4c9e444f72d887f937585` (run #54).
 - Browser/device and real-account workflow tests have not been run.
 - No production deployment or production-readiness claim is made.
 
