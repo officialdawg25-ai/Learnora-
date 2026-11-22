@@ -28,7 +28,7 @@ AI is unavailable until one provider and model are configured. The function retu
 - `PAYFAST_CANCEL_URL`: approved staging application cancel page.
 - `PAYFAST_NOTIFY_URL`: `https://gkloowmlfxfrwcxggnzl.supabase.co/functions/v1/payfast-notify`
 
-The merchant key is not embedded in the browser or checkout redirect. The notification function verifies the ITN signature and calls PayFast's sandbox validation endpoint before invoking the database payment-posting function.
+The merchant key is not embedded in the browser or checkout redirect. The notification function verifies the ITN signature and calls PayFast's sandbox validation endpoint before invoking the database payment-posting function. Pending orders are unique per learner/course and each order permits only one active payment attempt; repeated checkout requests reuse the pending order and active attempt.
 
 Do not switch to production mode. Production payments require explicit approval, provider review, legal review of marketplace funds handling, reconciliation procedures, monitoring and successful sandbox acceptance tests.
 
