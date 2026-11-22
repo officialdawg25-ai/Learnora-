@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import { BarChart3, ClipboardCheck, ShieldCheck, Users } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
+import AssessmentBuilder from './AssessmentBuilder'
 
 type Props = { academyId: string; userId: string; onNotice: (message: string) => void }
 type Analytics = { course_id: string; title: string; publication_status: string; total_enrolments: number; active_learners: number; completed_learners: number; completion_rate_percent: number }
@@ -101,7 +102,7 @@ export default function EducatorOperations({ academyId, userId, onNotice }: Prop
     else{setKnowledgeTitle('');setKnowledgeContent('');setKnowledgeUrl('');onNotice('Learning material saved as a private draft. It becomes available to Learnora AI only after authorised source review.')}
   }
 
-  return <section className="studio-panel educator-operations">
+  return <><section className="studio-panel educator-operations">
     <div className="panel-heading"><div><p className="eyebrow">EDUCATOR OPERATIONS</p><h2>Build with credibility.</h2></div><ShieldCheck size={22}/></div>
     <div className="operations-grid">
       <div className="operations-block">
@@ -157,5 +158,5 @@ export default function EducatorOperations({ academyId, userId, onNotice }: Prop
       <p className="form-hint">Submit a completed draft to the review queue. An authorised reviewer must approve it before it can become discoverable.</p>
       {analytics.filter(x=>x.publication_status==='draft').map(row=><div className="review-row" key={row.course_id}><span>{row.title}</span><button className="button button-outline" type="button" onClick={()=>void requestReview(row.course_id)}>Submit for review</button></div>)}
     </div>
-  </section>
+  </section><AssessmentBuilder academyId={academyId} userId={userId} onNotice={onNotice}/>
 }
