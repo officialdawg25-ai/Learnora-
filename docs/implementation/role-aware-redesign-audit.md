@@ -74,12 +74,15 @@ The public role-request RPC is SECURITY INVOKER. Privileged shared-class/course 
 
 No production schema or production deployment setting was changed. The role-aware and discovery migrations are present in the repository and the connected staging database has corresponding role/discovery/guardian migration records.
 
-## Build and deployment evidence
+## Build, deployment and advisory evidence
 
-- Cloudflare Pages preview commit `dd4160b491a8f11608c51a5482c421f091c952c8` passed `tsc --noEmit` and `vite build`; 1,668 modules transformed and assets deployed successfully.
-- Verified preview URL: https://025ca140.learnora-staging.pages.dev
-- Cloudflare Pages project `learnora-staging` has production deployments disabled; no production deployment was performed.
-- The build reports a non-blocking main JavaScript chunk warning (548.14 kB minified).
+- Cloudflare Pages build for integrated staging commit `e5dd4e1ab645fa5874675e49d455e3c61c1fbc78` passed `tsc --noEmit` and `vite build`; 1,668 modules transformed and assets deployed successfully.
+- Verified isolated preview: https://05f1f6d6.learnora-staging.pages.dev
+- Cloudflare Pages project `learnora-staging` has production deployments disabled; the staging-branch production trigger was skipped and no production deployment was performed.
+- The build reports a non-blocking main JavaScript chunk warning (548.46 kB minified).
+- Supabase security advisor: one warning — leaked-password protection is disabled. Enable it in Supabase Auth settings after reviewing sign-in impact: https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection
+- Supabase performance advisor: eight unindexed foreign keys, 97 currently unused indexes and one multiple-permissive-SELECT-policy warning on `institution_directory_profiles`. No health advisories were returned.
+- Migration history currently contains 52 records and two entries named `learner_discovery_role_gate` under different version IDs. Reconcile this history before the next CLI-based migration push; do not blindly reset or delete migration records.
 
 ## Remaining validation
 
