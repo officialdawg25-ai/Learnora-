@@ -5,7 +5,7 @@ import { supabase } from '../../lib/supabase'
 
 type CourseOption = { id: string; title: string; publication_status: string }
 type ModuleOption = { id: string; title: string; position: number; description: string | null }
-type LessonOption = { id: string; title: string; lesson_type: string; position: number }
+type LessonOption = { id: string; title: string; lesson_type: string; position: number }\ntype VersionOption = { id: string; version_number: number; created_at: string; created_by: string | null; snapshot: any }
 
 type Props = {
   academyId: string
@@ -18,7 +18,7 @@ export default function CourseBuilder({ academyId, refreshKey, onNotice }: Props
   const [courseId, setCourseId] = useState('')
   const [modules, setModules] = useState<ModuleOption[]>([])
   const [moduleId, setModuleId] = useState('')
-  const [lessons, setLessons] = useState<LessonOption[]>([])
+  const [lessons, setLessons] = useState<LessonOption[]>([])\n  const [versions, setVersions] = useState<VersionOption[]>([])\n  const [selectedVersion, setSelectedVersion] = useState('')
   const [moduleTitle, setModuleTitle] = useState('')
   const [moduleDescription, setModuleDescription] = useState('')
   const [lessonTitle, setLessonTitle] = useState('')
@@ -86,6 +86,20 @@ export default function CourseBuilder({ academyId, refreshKey, onNotice }: Props
       })
     return () => { active = false }
   }, [courseId, onNotice])
+
+  useEffect(() => {
+    if (!supabase || !courseId) { setVersions([]); setSelectedVersion(''); return }
+    let active = true
+    supabase.from('course_versions').select('id,version_number,created_at,created_by,snapshot').eq('course_id',courseId).order('version_number',{ascending:false}).limit(30)
+      .then(({data,error}) => {
+        if(!active)return
+        if(error){onNotice('Could not load course history: '+error.message);return}
+        const rows=(data??[]) as VersionOption[]
+        setVersions(rows)
+        setSelectedVersion(current=>rows.some(x=>x.id===current)?current:(rows[0]?.id??''))
+      })
+    return ()=>{active=false}
+  },[courseId,onNotice])
 
   useEffect(() => {
     if (!supabase || !moduleId) {
@@ -223,6 +237,14 @@ export default function CourseBuilder({ academyId, refreshKey, onNotice }: Props
                 <button className="button button-dark" type="submit" disabled={savingLesson || !moduleId}>{savingLesson ? 'Saving…' : 'Add lesson'} <Plus size={15} /></button>
               </form>
             </div>
+          </div>
+          <div className="course-version-history">
+            <div className="builder-subheading"><strong>Version history</strong><span>{versions.length} snapshots</span></div>
+            {versions.length===0?<p className="form-hint">A snapshot is recorded when course content changes.</p>:<div className="version-history-layout">
+              <div className="builder-list">{versions.map(v=><button type="button" key={v.id} className={selectedVersion===v.id?'builder-list-item selected':'builder-list-item'} onClick={()=>setSelectedVersion(v.id)}><span className="builder-index">V{v.version_number}</span><span>Saved {new Date(v.created_at).toLocaleString()}<small>{v.created_by??'System-triggered snapshot'}</small></span></button>)}</div>
+              {versions.filter(v=>v.id===selectedVersion).map(v=>{const modules=(v.snapshot?.modules??[]) as any[];const lessonCount=modules.reduce((n,m)=>n+(m.lessons?.length??0),0);return <div className="version-preview" key={v.id}><strong>Version {v.version_number}</strong><span>{v.snapshot?.course?.title??'Course snapshot'}</span><small>{modules.length} modules · {lessonCount} lessons</small><p>{v.snapshot?.course?.summary??v.snapshot?.course?.description??'No course summary was saved in this snapshot.'}</p><details><summary>View saved content snapshot</summary><pre>{JSON.stringify(v.snapshot,null,2)}</pre></details></div>})}
+            </div>}
+            <p className="form-hint">Snapshots preserve previous content and assessment history. Restore is intentionally not exposed until a safe restore process can preserve learner progress and existing lesson references.</p>
           </div>
         </>
       )}
