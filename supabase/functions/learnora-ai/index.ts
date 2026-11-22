@@ -96,7 +96,7 @@ Deno.serve(async (req: Request) => {
     else return json(503,{error:"Unsupported AI provider adapter"});
     if(!result.text.trim()) throw new Error("AI provider returned an empty response");
     const references=(chunks??[]).map((chunk:any,index:number)=>{const src:any=sourceMap.get(chunk.source_id);return {marker:`S${index+1}`,source_id:chunk.source_id,title:src?.title??"Learning source",url:src?.source_url??null};});
-    const {error:saveError}=await userClient.from("ai_messages").insert({conversation_id:conversationId,user_id:user.id,role:"assistant",content:result.text,source_references:references,provider,model,input_tokens:result.input,output_tokens:result.output});
+    const {error:saveError}=await admin.from("ai_messages").insert({conversation_id:conversationId,user_id:user.id,role:"assistant",content:result.text,source_references:references,provider,model,input_tokens:result.input,output_tokens:result.output});
     if(saveError) throw new Error("Response generated but could not be saved");
     await admin.from("ai_activity").insert({user_id:user.id,capability,provider,model,input_tokens:result.input??0,output_tokens:result.output??0,latency_ms:Date.now()-started,outcome:"success"});
     return json(200,{conversation_id:conversationId,answer:result.text,sources:references,provider,model,disclaimer:"AI-generated educational assistance may contain errors. Verify important information with your educator and learning materials."});
