@@ -33,15 +33,15 @@ export default function ParentPortal({userId,onNotice}:{userId:string;onNotice:(
  const unread=notifications.filter(item=>!item.read_at).length
  const parentName=profile.display_name?.trim()||'Parent'
  async function load(){
-  if(!supabase||!userId){setLoading(false);return}
+  const client=supabase;if(!client||!userId){setLoading(false);return}
   setLoading(true);setError('')
   const [snapshot,profileResult,notificationResult]=await Promise.all([
-   supabase.rpc('guardian_portal_snapshot'),
-   supabase.from('profiles').select('display_name,preferred_language').eq('id',userId).maybeSingle(),
-   supabase.from('user_notifications').select('id,title,body,notification_type,created_at,read_at').eq('recipient_user_id',userId).order('created_at',{ascending:false}).limit(30)
+   client.rpc('guardian_portal_snapshot'),
+   client.from('profiles').select('display_name,preferred_language').eq('id',userId).maybeSingle(),
+   client.from('user_notifications').select('id,title,body,notification_type,created_at,read_at').eq('recipient_user_id',userId).order('created_at',{ascending:false}).limit(30)
   ])
   if(snapshot.error){setError(snapshot.error.message);setChildren([])}
-  else{const rows=((snapshot.data as {children?:Child[]}|null)?.children??[]) as Child[];const enriched=await Promise.all(rows.map(async row=>{const {data,error}=await supabase.rpc('guardian_parent_workspace',{p_learner_id:row.learner_id});if(error||!data)return row;const invoices=(data.invoices??[]) as {balance_minor:number}[];return {...row,grade_label:data.learner?.grade_label??null,class_label:data.learner?.class_label??null,academic_year:data.learner?.academic_year??null,institution_name:data.institution?.name??null,attendance_summary:data.attendance_summary??null,outstanding_minor:invoices.reduce((sum,item)=>sum+Number(item.balance_minor||0),0)}}));setChildren(enriched);setSelectedId(current=>enriched.some(row=>row.learner_id===current)?current:enriched[0]?.learner_id??'')}
+  else{const rows=((snapshot.data as {children?:Child[]}|null)?.children??[]) as Child[];const enriched=await Promise.all(rows.map(async row=>{const {data,error}=await client.rpc('guardian_parent_workspace',{p_learner_id:row.learner_id});if(error||!data)return row;const invoices=(data.invoices??[]) as {balance_minor:number}[];return {...row,grade_label:data.learner?.grade_label??null,class_label:data.learner?.class_label??null,academic_year:data.learner?.academic_year??null,institution_name:data.institution?.name??null,attendance_summary:data.attendance_summary??null,outstanding_minor:invoices.reduce((sum,item)=>sum+Number(item.balance_minor||0),0)}}));setChildren(enriched);setSelectedId(current=>enriched.some(row=>row.learner_id===current)?current:enriched[0]?.learner_id??'')}
   if(profileResult.error)onNotice('Your profile could not be loaded: '+profileResult.error.message)
   else if(profileResult.data)setProfile({display_name:profileResult.data.display_name??'',preferred_language:profileResult.data.preferred_language??'en'})
   if(notificationResult.error)onNotice('Notifications could not be loaded: '+notificationResult.error.message)
