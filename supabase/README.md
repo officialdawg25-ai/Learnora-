@@ -42,7 +42,7 @@ The remote Supabase migration ledger was inspected directly. All 31 applied Lear
 
 ## Security and operating notes
 
-- RLS is enabled on all 55 current public application tables. Anonymous table privileges are restricted to SELECT on `academies`, `courses` and `credential_verification_index` only.
+- RLS is enabled on all 56 current public application tables. Anonymous table privileges are restricted to SELECT on `academies`, `courses` and `credential_verification_index` only.
 - Anonymous access is limited to explicitly public discovery and the minimal public credential verification index.
 - Financial journals, webhook events, settlement imports, safeguarding cases and credential verification index writes are server-controlled.
 - Payment callbacks are not treated as proof of bank settlement. PayFast payment confirmation and statement reconciliation are separate states.
