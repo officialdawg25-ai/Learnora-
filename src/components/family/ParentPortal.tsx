@@ -4,7 +4,7 @@ import { Activity, Bell, BookOpen, CalendarDays, ChevronDown, FileText, Graduati
 import { supabase } from '../../lib/supabase'
 import FamilyWorkspace from './FamilyWorkspace'
 import Parent360Workspace from './Parent360Workspace'
-import CreateLearnerAccount from './CreateLearnerAccount'
+import CreateLearnerAccount from './CreateLearnerAccountSecure'
 import './Parent360Workspace.css'
 import './CreateLearnerAccount.css'
 
