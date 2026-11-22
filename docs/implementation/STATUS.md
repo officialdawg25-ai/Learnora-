@@ -70,7 +70,7 @@ The deployed functions and their source files are versioned in the repository. N
 - Platform administrator records cannot be created or edited by ordinary client roles. The first administrator must be assigned by an authorised project operator using the documented bootstrap process.
 - Guardian activation requires a verified authority reference and an exact server-configured approved consent version. The current UI submits a draft consent version, so activation remains blocked pending legal approval.
 - Performance advisor: remaining notices are unused-index informational findings on a mostly empty database. Unindexed foreign keys and multiple-permissive-policy findings were addressed; no workload-unjustified indexes were removed.
-- GitHub Actions build and dependency advisory gate passed on commit `94e95c4ac5dadcf7024002f1ab6ae883201bee7b`. Subsequent migration and documentation commits require a fresh CI result before being treated as verified.
+- GitHub Actions build and dependency advisory gate passed on commit `123538997fc0d7ddb33a81a53ec5b8da2ca80314`. Subsequent migration and documentation commits require a fresh CI result before being treated as verified.
 - Browser/device, real-account, adversarial RLS and provider sandbox end-to-end tests have not yet been performed.
 - No production deployment, merge or launch is claimed.
 
