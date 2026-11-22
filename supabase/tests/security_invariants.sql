@@ -69,7 +69,7 @@ begin
  end if;
 
  select count(*) into v_migration_count from supabase_migrations.schema_migrations;
- if v_migration_count<31 then raise exception 'Remote migration ledger unexpectedly short: %',v_migration_count; end if;
+ if v_migration_count<34 then raise exception 'Remote migration ledger unexpectedly short: %',v_migration_count; end if;
 
  raise notice 'Learnora security invariants passed: % public tables with RLS, % migrations.',v_rls,v_migration_count;
 end
