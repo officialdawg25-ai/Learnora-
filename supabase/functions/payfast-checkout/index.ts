@@ -46,9 +46,11 @@ Deno.serve(async(req:Request)=>{
  }
  if(payment.status!=="initiated")return json(409,{error:"Payment transaction is no longer awaiting checkout."});
  const profile=await userClient.from("profiles").select("display_name").eq("id",user.id).maybeSingle();
+ const successUrl=new URL(returnUrl);successUrl.searchParams.set("payment","return");successUrl.searchParams.set("order_id",order.id);successUrl.searchParams.set("payment_transaction_id",payment.id);
+ const abortedUrl=new URL(cancelUrl);abortedUrl.searchParams.set("payment","cancel");abortedUrl.searchParams.set("order_id",order.id);
  const params=new URLSearchParams();
  params.set("merchant_id",merchant);
- params.set("return_url",returnUrl);params.set("cancel_url",cancelUrl);params.set("notify_url",notifyUrl);
+ params.set("return_url",successUrl.toString());params.set("cancel_url",abortedUrl.toString());params.set("notify_url",notifyUrl);
  params.set("m_payment_id",payment.merchant_payment_id);
  params.set("amount",(Number(order.amount_minor)/100).toFixed(2));
  params.set("item_name",String(course.title).slice(0,100));
