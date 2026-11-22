@@ -18,7 +18,7 @@ Deno.serve(async(req:Request)=>{
  if(!administrator||administrator.status!=="active"||!administrator.permissions.includes(permission))return json(403,{error:"This account is not authorised for that platform operation."});
  const notes=typeof body.notes==="string"?body.notes.slice(0,4000):null;
  if(action==="dashboard"){
-  const dashboard:any={educator_verifications:[],publication_reviews:[],guardian_requests:[],institutions:[],refunds:[],safeguarding_cases:[],competency_evidence:[],opportunities:[]};
+  const dashboard:any={educator_verifications:[],publication_reviews:[],guardian_requests:[],institutions:[],refunds:[],safeguarding_cases:[],competency_evidence:[],opportunities:[],knowledge_sources:[]};
   if(administrator.permissions.includes("educators:verify")){
    const {data}=await admin.from("educator_verification_submissions").select("id,educator_user_id,credential_type,issuer,credential_reference,document_storage_path,status,submitted_at").eq("status","pending").order("submitted_at").limit(25);
    dashboard.educator_verifications=await Promise.all((data??[]).map(async(row:any)=>{const signed=row.document_storage_path?await admin.storage.from("learnora-verification").createSignedUrl(row.document_storage_path,120):{data:null};return {...row,evidence_url:signed.data?.signedUrl??null};}));
@@ -29,7 +29,7 @@ Deno.serve(async(req:Request)=>{
   if(administrator.permissions.includes("finance:refund_approve")){const {data}=await admin.from("refunds").select("id,order_id,amount_minor,currency,reason,requested_at").eq("status","requested").order("requested_at").limit(25);dashboard.refunds=data??[];}
   if(administrator.permissions.includes("safeguarding:manage")){const {data}=await admin.from("safeguarding_cases").select("id,reporter_user_id,subject_user_id,category,severity,description,status,created_at").in("status",["open","triage","investigating"]).order("created_at").limit(25);dashboard.safeguarding_cases=data??[];}
   if(administrator.permissions.includes("competencies:verify")){const {data}=await admin.from("learner_competency_evidence").select("id,learner_user_id,competency_id,evidence_type,evidence_reference,created_at").eq("verification_status","pending_review").order("created_at").limit(25);dashboard.competency_evidence=data??[];}
-  if(administrator.permissions.includes("opportunities:publish")){const {data}=await admin.from("learning_opportunities").select("id,title,provider_name,source_url,verification_source,verified_at,deadline").eq("publication_status","draft").order("created_at").limit(25);dashboard.opportunities=data??[];}
+  if(administrator.permissions.includes("knowledge:publish")){const {data}=await admin.from("knowledge_sources").select("id,title,source_type,source_url,created_by,created_at").eq("publication_status","draft").order("created_at").limit(25);dashboard.knowledge_sources=data??[];}\n  if(administrator.permissions.includes("opportunities:publish")){const {data}=await admin.from("learning_opportunities").select("id,title,provider_name,source_url,verification_source,verified_at,deadline").eq("publication_status","draft").order("created_at").limit(25);dashboard.opportunities=data??[];}
   return json(200,{success:true,action,dashboard});
  }
  let resourceType="",resourceId="",result:any=null;
