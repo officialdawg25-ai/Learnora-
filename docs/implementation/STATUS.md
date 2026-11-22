@@ -7,7 +7,7 @@ Updated: 22 November 2026
 - Repository: `officialdawg25-ai/Learnora-`
 - Working branch: `foundation/learnora-platform-v1`
 - Supabase project: `gkloowmlfxfrwcxggnzl`, PostgreSQL 17, eu-west-1
-- Remote migration ledger: 19 applied migrations; every migration source is now versioned under its exact remote ID.
+- Remote migration ledger: 21 applied migrations; every migration source is now versioned under its exact remote ID.
 - Public application schema: 54 tables; all 54 have RLS enabled.
 - Authentication users: 0. No synthetic accounts or learner records were inserted.
 - Learnora storage buckets: 0.
@@ -16,7 +16,7 @@ Updated: 22 November 2026
 ## Implemented application experiences
 
 - React + TypeScript + Vite responsive application.
-- Supabase email/password authentication and profile bootstrap.
+- Supabase email/password authentication, profile bootstrap and date-of-birth capture for age-aware feature routing.
 - Public course discovery, subject filters and free enrolment.
 - Learner learning-space and educator studio.
 - Educator academy and draft course creation.
@@ -34,7 +34,7 @@ Updated: 22 November 2026
 - Immutable course snapshots, publication review records and educator analytics view.
 - Orders, PayFast payment transactions, webhook idempotency records, refunds, double-entry ledger, educator earnings, payout records and subscription records.
 - Settlement batches/lines and server-only reconciliation functions.
-- AI conversations/messages, curriculum knowledge sources/chunks, full-text retrieval and scoped RLS.
+- AI conversations/messages, curriculum knowledge sources/chunks, full-text retrieval and scoped RLS. Learners may only append user-role messages; assistant messages are written server-side.
 - Institution campuses, departments, classes, class memberships and course assignments.
 - Guardian relationship requests, consent scopes and restricted safeguarding case records.
 - Competency frameworks, competencies, evidence, mastery summaries, credentials, public credential verification index, opportunities and learner goals.
@@ -57,7 +57,7 @@ No AI provider keys or PayFast merchant secrets have been configured. The functi
 - Supabase health advisor: no findings.
 - All 54 public tables have RLS enabled.
 - Performance advisor: remaining notices are unused-index informational findings on a mostly empty database. Unindexed foreign keys and multiple-permissive-policy findings were addressed; no workload-unjustified indexes were removed.
-- GitHub Actions production build and dependency advisory gate passed on the latest fully verified application commit before the migration-source reconciliation. CI is running again on the current branch head.
+- GitHub Actions production build and dependency advisory gate passed on the current application implementation lineage; CI is rerunning on the latest branch head after source reconciliation and security updates.
 - Browser/device, real-account, adversarial RLS and provider sandbox end-to-end tests have not yet been performed.
 - No production deployment, merge or launch is claimed.
 
