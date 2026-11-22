@@ -1,1 +1,0 @@
-create index if not exists platform_administrators_assigned_by_idx on public.platform_administrators(assigned_by);
