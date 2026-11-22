@@ -2,7 +2,7 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2.58.0";
 const cors={"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"authorization, apikey, content-type","Access-Control-Allow-Methods":"POST, OPTIONS","Content-Type":"application/json"};
 const json=(status:number,body:unknown)=>new Response(JSON.stringify(body),{status,headers:cors});
-const permissions:Record<string,string>={educator_verification:"educators:verify",publication_review:"courses:review",knowledge_publish:"knowledge:publish",guardian_review:"guardians:verify",institution_verification:"institutions:verify",safeguarding_case:"safeguarding:manage",competency_evidence_review:"competencies:verify",opportunity_publish:"opportunities:publish",refund_approve:"finance:refund_approve",credential_issue:"credentials:issue"};
+const permissions:Record<string,string>={educator_verification:"educators:verify",publication_review:"courses:review",knowledge_publish:"knowledge:publish",guardian_review:"guardians:verify",institution_verification:"institutions:verify",safeguarding_case:"safeguarding:manage",competency_evidence_review:"competencies:verify",opportunity_publish:"opportunities:publish",refund_approve:"finance:refund_approve",credential_issue:"credentials:issue",dashboard:"platform:dashboard"};
 Deno.serve(async(req:Request)=>{
  if(req.method==="OPTIONS")return new Response("ok",{headers:cors});
  if(req.method!=="POST")return json(405,{error:"Method not allowed"});
@@ -17,6 +17,21 @@ Deno.serve(async(req:Request)=>{
  const {data:administrator}=await admin.from("platform_administrators").select("role,permissions,status").eq("user_id",user.id).maybeSingle();
  if(!administrator||administrator.status!=="active"||!administrator.permissions.includes(permission))return json(403,{error:"This account is not authorised for that platform operation."});
  const notes=typeof body.notes==="string"?body.notes.slice(0,4000):null;
+ if(action==="dashboard"){
+  const dashboard:any={educator_verifications:[],publication_reviews:[],guardian_requests:[],institutions:[],refunds:[],safeguarding_cases:[],competency_evidence:[],opportunities:[]};
+  if(administrator.permissions.includes("educators:verify")){
+   const {data}=await admin.from("educator_verification_submissions").select("id,educator_user_id,credential_type,issuer,credential_reference,document_storage_path,status,submitted_at").eq("status","pending").order("submitted_at").limit(25);
+   dashboard.educator_verifications=await Promise.all((data??[]).map(async(row:any)=>{const signed=row.document_storage_path?await admin.storage.from("learnora-verification").createSignedUrl(row.document_storage_path,120):{data:null};return {...row,evidence_url:signed.data?.signedUrl??null};}));
+  }
+  if(administrator.permissions.includes("courses:review")){const {data}=await admin.from("publication_reviews").select("id,course_id,requested_by,requested_at,courses(title)").eq("status","pending").order("requested_at").limit(25);dashboard.publication_reviews=data??[];}
+  if(administrator.permissions.includes("guardians:verify")){const {data}=await admin.from("guardian_relationships").select("id,guardian_user_id,learner_user_id,relationship_type,consent_scopes,consent_version,evidence_reference,created_at").eq("status","pending").order("created_at").limit(25);dashboard.guardian_requests=data??[];}
+  if(administrator.permissions.includes("institutions:verify")){const {data}=await admin.from("organisations").select("id,name,organisation_type,created_by,created_at").eq("status","pending").order("created_at").limit(25);dashboard.institutions=data??[];}
+  if(administrator.permissions.includes("finance:refund_approve")){const {data}=await admin.from("refunds").select("id,order_id,amount_minor,currency,reason,requested_at").eq("status","requested").order("requested_at").limit(25);dashboard.refunds=data??[];}
+  if(administrator.permissions.includes("safeguarding:manage")){const {data}=await admin.from("safeguarding_cases").select("id,reporter_user_id,subject_user_id,category,severity,description,status,created_at").in("status",["open","triage","investigating"]).order("created_at").limit(25);dashboard.safeguarding_cases=data??[];}
+  if(administrator.permissions.includes("competencies:verify")){const {data}=await admin.from("learner_competency_evidence").select("id,learner_user_id,competency_id,evidence_type,evidence_reference,created_at").eq("verification_status","pending_review").order("created_at").limit(25);dashboard.competency_evidence=data??[];}
+  if(administrator.permissions.includes("opportunities:publish")){const {data}=await admin.from("learning_opportunities").select("id,title,provider_name,source_url,verification_source,verified_at,deadline").eq("publication_status","draft").order("created_at").limit(25);dashboard.opportunities=data??[];}
+  return json(200,{success:true,action,dashboard});
+ }
  let resourceType="",resourceId="",result:any=null;
  try{
   if(action==="educator_verification"){
