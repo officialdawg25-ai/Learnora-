@@ -13,8 +13,10 @@ create table if not exists public.user_roles (
 );
 create index if not exists user_roles_user_status_idx on public.user_roles(user_id,status);
 alter table public.user_roles enable row level security;
+drop policy if exists user_roles_select_self_or_admin on public.user_roles;
 create policy user_roles_select_self_or_admin on public.user_roles for select to authenticated
 using (user_id=(select auth.uid()) or exists(select 1 from public.platform_administrators pa where pa.user_id=(select auth.uid()) and pa.status='active'));
+drop policy if exists user_roles_admin_update on public.user_roles;
 create policy user_roles_admin_update on public.user_roles for update to authenticated
 using (exists(select 1 from public.platform_administrators pa where pa.user_id=(select auth.uid()) and pa.status='active'))
 with check (exists(select 1 from public.platform_administrators pa where pa.user_id=(select auth.uid()) and pa.status='active'));
@@ -72,10 +74,13 @@ create table if not exists public.institution_directory_profiles (
   updated_at timestamptz not null default now()
 );
 alter table public.institution_directory_profiles enable row level security;
+drop policy if exists institution_directory_public_select on public.institution_directory_profiles;
 create policy institution_directory_public_select on public.institution_directory_profiles for select to authenticated
 using(public_listing and exists(select 1 from public.organisations o where o.id=organisation_id and o.status='active'));
+drop policy if exists institution_directory_manager_insert on public.institution_directory_profiles;
 create policy institution_directory_manager_insert on public.institution_directory_profiles for insert to authenticated
 with check(private.has_active_membership(organisation_id,array['owner','admin']));
+drop policy if exists institution_directory_manager_update on public.institution_directory_profiles;
 create policy institution_directory_manager_update on public.institution_directory_profiles for update to authenticated
 using(private.has_active_membership(organisation_id,array['owner','admin']))
 with check(private.has_active_membership(organisation_id,array['owner','admin']));
@@ -92,10 +97,13 @@ create table if not exists public.learner_discovery_profiles (
 create index if not exists learner_discovery_subjects_idx on public.learner_discovery_profiles using gin(subjects);
 create index if not exists learner_discovery_interests_idx on public.learner_discovery_profiles using gin(interests);
 alter table public.learner_discovery_profiles enable row level security;
+drop policy if exists learner_discovery_select_self_or_opted_adult on public.learner_discovery_profiles;
 create policy learner_discovery_select_self_or_opted_adult on public.learner_discovery_profiles for select to authenticated
 using(user_id=(select auth.uid()) or (discoverable and private.is_adult_discoverable(user_id)));
+drop policy if exists learner_discovery_insert_self on public.learner_discovery_profiles;
 create policy learner_discovery_insert_self on public.learner_discovery_profiles for insert to authenticated
 with check(user_id=(select auth.uid()) and (not discoverable or private.is_adult_discoverable(user_id)));
+drop policy if exists learner_discovery_update_self on public.learner_discovery_profiles;
 create policy learner_discovery_update_self on public.learner_discovery_profiles for update to authenticated
 using(user_id=(select auth.uid()))
 with check(user_id=(select auth.uid()) and (not discoverable or private.is_adult_discoverable(user_id)));
@@ -121,17 +129,23 @@ create table if not exists public.learning_space_memberships (
 );
 alter table public.learning_spaces enable row level security;
 alter table public.learning_space_memberships enable row level security;
+drop policy if exists learning_spaces_select_public_or_member on public.learning_spaces;
 create policy learning_spaces_select_public_or_member on public.learning_spaces for select to authenticated
 using((status='active' and visibility='public') or owner_user_id=(select auth.uid()) or exists(select 1 from public.learning_space_memberships m where m.space_id=id and m.user_id=(select auth.uid()) and m.status='active'));
+drop policy if exists learning_spaces_insert_owner on public.learning_spaces;
 create policy learning_spaces_insert_owner on public.learning_spaces for insert to authenticated
 with check(owner_user_id=(select auth.uid()) and (space_type='study_group' or exists(select 1 from public.user_roles r where r.user_id=(select auth.uid()) and r.role in ('educator','platform_admin') and r.status='active')));
+drop policy if exists learning_spaces_update_owner on public.learning_spaces;
 create policy learning_spaces_update_owner on public.learning_spaces for update to authenticated
 using(owner_user_id=(select auth.uid())) with check(owner_user_id=(select auth.uid()));
+drop policy if exists learning_space_memberships_select_self_or_owner on public.learning_space_memberships;
 create policy learning_space_memberships_select_self_or_owner on public.learning_space_memberships for select to authenticated
 using(user_id=(select auth.uid()) or exists(select 1 from public.learning_spaces s where s.id=space_id and s.owner_user_id=(select auth.uid())));
+drop policy if exists learning_space_memberships_insert_join on public.learning_space_memberships;
 create policy learning_space_memberships_insert_join on public.learning_space_memberships for insert to authenticated
 with check((user_id=(select auth.uid()) and role='member' and exists(select 1 from public.learning_spaces s where s.id=space_id and s.status='active' and s.visibility='public'))
  or (user_id=(select auth.uid()) and role='owner' and exists(select 1 from public.learning_spaces s where s.id=space_id and s.owner_user_id=(select auth.uid()))));
+drop policy if exists learning_space_memberships_update_self_leave on public.learning_space_memberships;
 create policy learning_space_memberships_update_self_leave on public.learning_space_memberships for update to authenticated
 using(user_id=(select auth.uid()) and role='member') with check(user_id=(select auth.uid()) and role='member' and status='left');
 grant select,insert,update on public.learning_spaces,public.learning_space_memberships to authenticated;
@@ -150,11 +164,48 @@ create table if not exists public.live_class_sessions (
 );
 create index if not exists live_class_sessions_class_start_idx on public.live_class_sessions(class_id,scheduled_start);
 alter table public.live_class_sessions enable row level security;
+drop policy if exists live_class_sessions_select_class_members on public.live_class_sessions;
 create policy live_class_sessions_select_class_members on public.live_class_sessions for select to authenticated
 using(private.is_class_member(class_id) or private.is_class_staff(class_id) or exists(select 1 from public.platform_administrators pa where pa.user_id=(select auth.uid()) and pa.status='active'));
+drop policy if exists live_class_sessions_insert_class_staff on public.live_class_sessions;
 create policy live_class_sessions_insert_class_staff on public.live_class_sessions for insert to authenticated
 with check(created_by=(select auth.uid()) and educator_user_id=(select auth.uid()) and private.is_class_staff(class_id));
+drop policy if exists live_class_sessions_update_class_staff on public.live_class_sessions;
 create policy live_class_sessions_update_class_staff on public.live_class_sessions for update to authenticated
 using(created_by=(select auth.uid()) and private.is_class_staff(class_id))
 with check(created_by=(select auth.uid()) and educator_user_id=(select auth.uid()) and private.is_class_staff(class_id));
 grant select,insert,update on public.live_class_sessions to authenticated;
+
+-- Public institution directory is curated separately from private organisation records.
+create or replace function private.is_active_public_org(p_org_id uuid)
+returns boolean language sql stable security definer set search_path=''
+as $$ select exists(select 1 from public.organisations o where o.id=p_org_id and o.status='active') $$;
+revoke all on function private.is_active_public_org(uuid) from public,anon;
+grant execute on function private.is_active_public_org(uuid) to authenticated;
+drop policy if exists institution_directory_public_select on public.institution_directory_profiles;
+create policy institution_directory_public_select on public.institution_directory_profiles for select to authenticated
+using(public_listing and private.is_active_public_org(organisation_id));
+
+-- Replace permissive legacy creator policies with verified role checks.
+drop policy if exists academies_insert_owner_or_org_manager on public.academies;
+create policy academies_insert_authorised_educator_or_institution on public.academies for insert to authenticated
+with check(owner_user_id=(select auth.uid()) and (
+ (organisation_id is null and exists(select 1 from public.user_roles r where r.user_id=(select auth.uid()) and r.role='educator' and r.status='active'))
+ or (organisation_id is not null and private.has_active_membership(organisation_id,array['owner','admin']) and exists(select 1 from public.user_roles r where r.user_id=(select auth.uid()) and r.role='institution' and r.status='active'))
+));
+drop policy if exists courses_insert_academy_manager on public.courses;
+create policy courses_insert_authorised_educator_or_institution on public.courses for insert to authenticated
+with check(created_by=(select auth.uid()) and private.can_manage_academy(academy_id) and exists(
+ select 1 from public.user_roles r where r.user_id=(select auth.uid()) and r.status='active' and r.role in ('educator','institution','platform_admin')
+));
+drop policy if exists organisations_insert_creator on public.organisations;
+create policy organisations_insert_authorised_institution on public.organisations for insert to authenticated
+with check(created_by=(select auth.uid()) and exists(
+ select 1 from public.user_roles r where r.user_id=(select auth.uid()) and r.role in ('institution','platform_admin') and r.status='active'
+));
+drop policy if exists memberships_insert_self_owner on public.organisation_memberships;
+create policy memberships_insert_authorised_owner on public.organisation_memberships for insert to authenticated
+with check(user_id=(select auth.uid()) and role='owner'
+ and exists(select 1 from public.organisations o where o.id=organisation_id and o.created_by=(select auth.uid()))
+ and exists(select 1 from public.user_roles r where r.user_id=(select auth.uid()) and r.role in ('institution','platform_admin') and r.status='active')
+);
