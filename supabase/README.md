@@ -2,7 +2,7 @@
 
 Project reference: `gkloowmlfxfrwcxggnzl` (Learnora).
 
-The remote Supabase migration ledger was inspected directly. All 21 applied Learnora migrations now have corresponding SQL files in this repository using the exact remote version and migration name. The first two migrations, which predated repository bootstrap, were recovered from `supabase_migrations.schema_migrations.statements` and committed rather than recreated.
+The remote Supabase migration ledger was inspected directly. All 23 applied Learnora migrations now have corresponding SQL files in this repository using the exact remote version and migration name. The first two migrations, which predated repository bootstrap, were recovered from `supabase_migrations.schema_migrations.statements` and committed rather than recreated.
 
 ## Applied migration history
 
@@ -27,6 +27,8 @@ The remote Supabase migration ledger was inspected directly. All 21 applied Lear
 - 20261122112132 — learnora_performance_policy_consolidation
 - 20261122112552 — learnora_ai_message_integrity
 - 20261122112646 — learnora_age_appropriate_signup
+- 20261122112826 — learnora_private_verification_storage
+- 20261122112914 — learnora_platform_governance
 
 ## Security and operating notes
 
@@ -36,7 +38,7 @@ The remote Supabase migration ledger was inspected directly. All 21 applied Lear
 - Payment callbacks are not treated as proof of bank settlement. PayFast payment confirmation and statement reconciliation are separate states.
 - The PayFast Edge Functions are sandbox-only; production checkout is deliberately disabled.
 - AI is provider-independent at the application gateway, but a provider/model/key must be configured before responses can be generated.
-- No Learnora storage buckets, test users or demo records have been created. Date of birth is collected at signup for age-aware feature routing; unknown age is treated conservatively by AI services.
+- One private `learnora-verification` storage bucket is configured for educator evidence; no test users or demo records have been created. Date of birth is collected at signup for age-aware feature routing; unknown age is treated conservatively by AI services.
 - Security and health advisors returned no findings at the latest verification. Performance advisor findings are informational unused-index notices on a largely empty database; indexes were not removed without workload evidence.
 
 Before using Supabase CLI against another environment, compare `supabase migration list --remote` with these files. Do not blindly reapply migrations already present remotely.
