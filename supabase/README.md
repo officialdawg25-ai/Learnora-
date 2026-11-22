@@ -37,7 +37,8 @@ The remote Supabase migration ledger was inspected directly. All 23 applied Lear
 - Financial journals, webhook events, settlement imports, safeguarding cases and credential verification index writes are server-controlled.
 - Payment callbacks are not treated as proof of bank settlement. PayFast payment confirmation and statement reconciliation are separate states.
 - The PayFast Edge Functions are sandbox-only; production checkout is deliberately disabled. The `learnora-admin` function is JWT-protected and requires an explicit active permission record; no platform administrator has been assigned.
-- Five Edge Functions are deployed: Learnora AI, knowledge ingestion, PayFast checkout, PayFast notification and platform administration. Their source files are versioned under `supabase/functions`.\n- AI is provider-independent at the application gateway, but a provider/model/key must be configured before responses can be generated.
+- Five Edge Functions are deployed: Learnora AI, knowledge ingestion, PayFast checkout, PayFast notification and platform administration. Their source files are versioned under `supabase/functions`.
+- AI is provider-independent at the application gateway, but a provider/model/key must be configured before responses can be generated.
 - One private `learnora-verification` storage bucket is configured for educator evidence; no test users or demo records have been created. Date of birth is collected at signup for age-aware feature routing; unknown age is treated conservatively by AI services.
 - Security and health advisors returned no findings at the latest verification. Performance advisor findings are informational unused-index notices on a largely empty database; indexes were not removed without workload evidence.
 
