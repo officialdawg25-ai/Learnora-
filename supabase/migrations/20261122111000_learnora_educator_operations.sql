@@ -87,9 +87,24 @@ for select to authenticated using (
 );
 create policy educator_profiles_insert_self on public.educator_profiles
 for insert to authenticated with check (user_id = (select auth.uid()));
-create policy educator_profiles_update_self_non_verification on public.educator_profiles
+create policy educator_profiles_update_self on public.educator_profiles
 for update to authenticated using (user_id = (select auth.uid()))
-with check (user_id = (select auth.uid()) and verification_status = (select ep.verification_status from public.educator_profiles ep where ep.user_id = (select auth.uid())));
+with check (user_id = (select auth.uid()));
+
+create or replace function private.prevent_self_verification_change()
+returns trigger language plpgsql security definer set search_path = ''
+as $function$
+begin
+  if auth.role() <> 'service_role'
+     and new.verification_status is distinct from old.verification_status then
+    raise exception 'Educator verification status is controlled by the verification review process' using errcode='42501';
+  end if;
+  return new;
+end;
+$function$;
+create trigger educator_verification_status_guard
+before update on public.educator_profiles
+for each row execute function private.prevent_self_verification_change();
 
 create policy educator_verification_select_owner on public.educator_verification_submissions
 for select to authenticated using (educator_user_id = (select auth.uid()));
@@ -100,15 +115,29 @@ create policy academy_memberships_select_member_or_manager on public.academy_mem
 for select to authenticated using (
   user_id = (select auth.uid()) or private.can_manage_academy(academy_id)
 );
+create or replace function private.can_admin_academy(p_academy_id uuid)
+returns boolean language sql stable security definer set search_path = ''
+as $function$
+  select auth.uid() is not null and exists (
+    select 1 from public.academies a
+    where a.id=p_academy_id and (
+      a.owner_user_id=(select auth.uid())
+      or (a.organisation_id is not null and private.has_active_membership(a.organisation_id,array['owner','admin']))
+      or exists (select 1 from public.academy_memberships am where am.academy_id=a.id
+        and am.user_id=(select auth.uid()) and am.status='active' and am.role='admin')
+    )
+  );
+$function$;
+
 create policy academy_memberships_insert_manager on public.academy_memberships
 for insert to authenticated with check (
-  private.can_manage_academy(academy_id)
+  private.can_admin_academy(academy_id)
   and invited_by = (select auth.uid())
   and role in ('admin','editor','instructor','analyst')
 );
 create policy academy_memberships_update_manager on public.academy_memberships
-for update to authenticated using (private.can_manage_academy(academy_id))
-with check (private.can_manage_academy(academy_id));
+for update to authenticated using (private.can_admin_academy(academy_id))
+with check (private.can_admin_academy(academy_id));
 
 create policy course_versions_select_manager on public.course_versions
 for select to authenticated using (
@@ -212,16 +241,25 @@ set search_path = ''
 as $function$
 declare v_course_id uuid;
 begin
-  if tg_table_name='courses' then
-    v_course_id := coalesce(new.id,old.id);
-  elsif tg_table_name='course_modules' then
-    v_course_id := coalesce(new.course_id,old.course_id);
+  if tg_op='DELETE' then
+    if tg_table_name='courses' then
+      return old;
+    elsif tg_table_name='course_modules' then
+      v_course_id := old.course_id;
+    else
+      select cm.course_id into v_course_id from public.course_modules cm where cm.id=old.module_id;
+    end if;
   else
-    select cm.course_id into v_course_id from public.course_modules cm
-    where cm.id=coalesce(new.module_id,old.module_id);
+    if tg_table_name='courses' then
+      v_course_id := new.id;
+    elsif tg_table_name='course_modules' then
+      v_course_id := new.course_id;
+    else
+      select cm.course_id into v_course_id from public.course_modules cm where cm.id=new.module_id;
+    end if;
   end if;
   perform private.snapshot_course(v_course_id);
-  return coalesce(new,old);
+  if tg_op='DELETE' then return old; else return new; end if;
 end;
 $function$;
 
@@ -231,11 +269,11 @@ after insert or update on public.courses
 for each row execute function private.capture_course_version_from_content();
 drop trigger if exists modules_snapshot_after_change on public.course_modules;
 create trigger modules_snapshot_after_change
-after insert or update or delete on public.course_modules
+after insert or update on public.course_modules
 for each row execute function private.capture_course_version_from_content();
 drop trigger if exists lessons_snapshot_after_change on public.lessons;
 create trigger lessons_snapshot_after_change
-after insert or update or delete on public.lessons
+after insert or update on public.lessons
 for each row execute function private.capture_course_version_from_content();
 
 create or replace view public.educator_course_analytics
