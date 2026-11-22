@@ -29,7 +29,7 @@ export default function SplashExperience({ loading = false, onComplete }: Props)
       }}
     >
       <div className="splash-mark-wrap" aria-hidden="true">
-        <svg className="splash-logo-trace" viewBox="0 0 624 434" xmlns="http://www.w3.org/2000/svg">
+        <svg className="splash-logo-trace" viewBox="0 0 624 628" xmlns="http://www.w3.org/2000/svg">
           <path className="splash-logo-path" d={logoPath} />
         </svg>
       </div>
