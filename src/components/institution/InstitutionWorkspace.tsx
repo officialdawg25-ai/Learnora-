@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Building2, GraduationCap, Plus, Users } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
+import InstitutionFamilyOperations from './InstitutionFamilyOperations'
+import './InstitutionFamilyOperations.css'
 
 type Organisation={id:string;name:string;organisation_type:string;status:string}
 type ClassRow={id:string;name:string;grade_or_level:string|null;academic_year:number|null}
@@ -113,5 +115,6 @@ export default function InstitutionWorkspace({userId,onNotice}:{userId:string;on
   <section className="studio-panel institution-reports"><div className="panel-heading"><div><p className="eyebrow">ACADEMIC INTELLIGENCE</p><h2>Institution reporting</h2></div><Users size={22}/></div>
    {reports.length===0?<p className="form-hint">Class-level reporting appears when classes and academic activity exist. No sample statistics are displayed.</p>:<div className="analytics-table"><div className="analytics-head institution-report-head"><span>CLASS</span><span>LEARNERS</span><span>EDUCATORS</span><span>COURSES</span><span>ATTEMPTS</span><span>AVG SCORE</span></div>{reports.map(r=><div className="analytics-row institution-report-row" key={r.class_id}><span>{r.name}<small>{r.grade_or_level??'—'} · {r.academic_year??'—'}</small></span><span>{r.active_learners}</span><span>{r.active_educators}</span><span>{r.assigned_courses}</span><span>{r.assessment_attempts}</span><span>{r.average_assessment_score??'—'}</span></div>)}</div>}
   </section>
+  {organisationId&&<InstitutionFamilyOperations userId={userId} organisationId={organisationId} organisationStatus={organisations.find(o=>o.id===organisationId)?.status??'pending'} onNotice={onNotice}/>}
  </section>
 }
