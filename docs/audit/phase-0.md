@@ -1,118 +1,116 @@
-# Learnora — Phase 0 current-state audit
+# Learnora — Phase 0 and implementation audit
 
 **Audit date:** 22 November 2026  
-**GitHub repository:** `officialdawg25-ai/Learnora-`  
+**Repository:** `officialdawg25-ai/Learnora-`  
 **Working branch:** `foundation/learnora-platform-v1`  
-**Supabase project:** `gkloowmlfxfrwcxggnzl` — Learnora, eu-west-1, PostgreSQL 17
+**Supabase project:** `gkloowmlfxfrwcxggnzl` — PostgreSQL 17, eu-west-1
 
 ## Executive finding
 
-The main branch began as a README-only repository. The linked Supabase project already contains a 15-table learning/organisation foundation and has since been extended through additional remote migrations. The active foundation branch contains a React/Vite app, initial educator and learner flows, SQL migration files, RLS hardening and CI.
+The original main branch was README-only. The isolated foundation branch now contains a real React/Vite application, educator and learner experiences, 54 RLS-protected public tables, four deployed Edge Functions, a 19-migration source history and initial institutional, family and academic workspaces.
 
-The remote migration ledger is now ahead of the original source baseline. Do not run a blanket migration push or recreate the remote schema. Reconcile the exact remote history before treating the repository as the authoritative migration source.
+The application and schema are materially more capable than the original audit baseline, but this is still a foundation build. Provider secrets, real-user tests, reviewer operations, safeguarding review and end-to-end financial/AI validation remain incomplete. Do not merge or launch based only on a green build.
 
 ## Verified current state
 
 | Area | Finding | Status |
 |---|---|---|
-| GitHub main | README-only at initial audit | VERIFIED |
-| Working branch | React/Vite foundation, learner discovery, free enrolment and educator academy/course drafts | VERIFIED |
-| Supabase | ACTIVE_HEALTHY, PostgreSQL 17, eu-west-1 | VERIFIED |
-| Remote migration ledger | Six migrations listed below | VERIFIED |
-| Public tables | 16 tables, all with RLS enabled | VERIFIED |
-| Auth users | Zero at initial audit; no test users were created by this audit | VERIFIED |
-| Storage buckets | No application buckets at initial audit | VERIFIED |
-| Edge Functions | None deployed at initial audit | VERIFIED |
-| Security advisor | No findings returned after hardening | VERIFIED |
-| Performance advisor | Unused-index informational findings only; no index removals justified without workload evidence | VERIFIED |
-| CI | At least one GitHub Actions TypeScript/Vite production build completed successfully on the foundation branch; newer runs must be checked by exact commit before merge | VERIFIED / PARTIAL |
-| Browser/device testing | Not demonstrated by CI | BLOCKED |
-| Payment/AI/video/email providers | No operational provider integration established by the audit | BLOCKED |
+| Main branch | Unchanged by this work; implementation is isolated on the foundation branch | VERIFIED |
+| Application | React + TypeScript + Vite; learner, educator, AI, family, institution and academic workspaces | VERIFIED |
+| Supabase | Active PostgreSQL 17 project | VERIFIED |
+| Migration history | 19 applied remote migrations; all exact-version SQL files are now present in the repository | VERIFIED |
+| Public schema | 54 base tables, all with RLS enabled | VERIFIED |
+| Auth users | 0; no test accounts or demo learner data created | VERIFIED |
+| Learnora storage buckets | 0 | VERIFIED |
+| Edge Functions | 4 deployed and ACTIVE | VERIFIED |
+| Security advisor | No findings | VERIFIED |
+| Health advisor | No findings | VERIFIED |
+| Performance advisor | Remaining unused-index notices only; no unindexed-FK or multiple-permissive-policy findings | VERIFIED |
+| Build | Latest verified code build passed; CI rerun on current branch head after migration reconciliation | VERIFIED / PARTIAL |
+| Browser/mobile UAT | Not yet performed with real accounts/devices | BLOCKED |
+| Provider tests | PayFast sandbox credentials and AI model provider secrets not configured | BLOCKED |
+| Production deployment | Not performed | VERIFIED |
 
-## Remote Supabase migration history
+## Implemented systems
 
-The remote migration ledger reports:
+### Learning and educator operations
+- Published course discovery and free enrolment.
+- Academy creation and draft course authoring.
+- Module and lesson authoring.
+- Educator profiles and verification submission metadata.
+- Academy team memberships.
+- Course version snapshots and publication review request records.
+- Descriptive educator course analytics.
 
-1. `20261122103407 learnora_core_learning_foundation`
-2. `20261122103505 learnora_rls_hardening_and_auth_profiles`
-3. `20261122104247 learnora_public_discovery_and_privilege_restrictions`
-4. `20261122104407 learnora_academy_tenancy_and_index_fix`
-5. `20261122104911 learnora_assessment_key_and_progress_integrity`
-6. `20261122104924 learnora_course_visibility_and_assessment_key_grants`\n7. `20261122105740 learnora_least_privilege_grants`
+### Commercial infrastructure
+- Course orders and PayFast payment transaction records.
+- Idempotent webhook event records.
+- PayFast sandbox checkout and ITN verification Edge Functions.
+- Double-entry ledger accounts, journals and entries.
+- Refund requests and controlled completion workflow.
+- Settlement batches, statement lines and reconciliation functions.
+- Educator earnings, payout and subscription records.
 
-The repository's Supabase notes identify the first two as remotely applied before the repository was populated. Migrations 3–7 are tracked with their exact remote version IDs. Confirm the exact SQL for every remote version before any CLI migration deployment. A migration ledger entry alone is not the migration source.
+### Learnora AI
+- AI conversations and messages.
+- Provider-independent OpenAI-compatible, Anthropic and Gemini adapters.
+- Tutor and Teacher Intelligence workflows.
+- Full-text curriculum knowledge retrieval under user RLS.
+- Authenticated knowledge ingestion into private draft sources.
+- AI activity metering and request limits.
 
-## Current public database domains
+### Institutional and safeguarding foundations
+- Organisation, campus, department, class, class membership and course allocation.
+- Aggregate institutional class reporting.
+- Guardian relationship requests with explicit access scopes.
+- Guardian access is pending until independently verified.
+- Safeguarding case records are server-controlled.
 
-The 16 current public tables are:
+### Academic intelligence
+- Competency frameworks and prerequisite relationships.
+- Learner competency evidence and mastery summary records.
+- Platform/institution/accredited credential distinctions.
+- Minimal public credential verification index.
+- Verified-source opportunity directory and learner goals.
 
-- Identity/tenancy: `profiles`, `organisations`, `organisation_memberships`, `academies`.
-- Learning catalogue/delivery: `courses`, `course_modules`, `lessons`, `enrolments`, `learning_objectives`, `learning_progress`.
-- Assessment: `assessments`, `assessment_questions`, `assessment_question_keys`, `assessment_attempts`.
-- Intelligence/governance: `ai_activity`, `audit_events`.
+## Migration reconciliation
 
-All 16 have RLS enabled. The question-key table is separate from learner-visible question content and its observed policies are academy-manager scoped. This is an important improvement over exposing answer keys in question JSON.
+The first two remote migrations predated repository bootstrap. Their SQL was recovered from the remote `supabase_migrations.schema_migrations.statements` history and committed under their original versions. The remaining 17 migrations are also present with exact remote IDs.
 
-## Existing security boundaries observed
+Before using Supabase CLI in another environment, run `supabase migration list --remote` and confirm local/remote version alignment. Do not blindly push or recreate the schema.
 
-- One Supabase Auth identity system; `profiles.id` references `auth.users.id`.
-- Auth user creation invokes a profile bootstrap trigger.
-- Organisation membership and academy ownership are represented in database records.
-- Private helper functions govern active membership, academy management and course-content access.
-- Published course/academy discovery is exposed through explicit anonymous read policies.
-- Free self-enrolment is limited to published courses and active academies.
-- Learner progress and assessment attempt updates are restricted; client-side attempts are constrained to enrolled learners and published assessments.
-- Assessment answer keys are stored separately and only accessible to authorised academy managers.
-- The Supabase security advisor returned no findings. Anonymous table privileges were reduced to SELECT on academies/courses; authenticated TRUNCATE/MAINTAIN/REFERENCES/TRIGGER were revoked, and client UPDATE/DELETE was removed from memberships, enrolments, progress and assessment attempts.
+## Security findings and boundaries
 
-These controls are not a substitute for adversarial RLS tests. Test anonymous, learner A vs learner B, educator A vs academy B, institution A vs institution B, revoked membership, guardian scope, and direct REST/RPC access.
+- All 54 public tables have RLS enabled.
+- Anonymous discovery is limited to explicitly public records.
+- Financial ledger and webhook tables are inaccessible to ordinary client roles.
+- Credential verification exposes only a minimal public index, not recipient identity.
+- Guardian access is scoped and remains pending until verified.
+- Institution class membership and academy team access are checked through server-side database helpers.
+- AI retrieval runs with the requesting user's JWT context; private source content is not globally indexed for every learner.
+- PayFast payment confirmation is separate from settlement; educator payout/marketplace fund handling is not enabled.
+- Security and health advisors returned no findings at the latest check.
 
-## Repository implementation observed
+These controls still require adversarial tests using separate learner, educator, guardian and institution identities. The absence of advisor findings is not proof of full compliance or absence of exploitable application flaws.
 
-The active foundation branch includes:
-- React, TypeScript and Vite.
-- Supabase email/password authentication and profile bootstrap.
-- Published course discovery and subject filtering.
-- Free course enrolment.
-- Academy creation and draft course creation.
-- Responsive learner/discovery/educator-studio screens.
-- Initial database migrations and RLS restrictions.
-- GitHub Actions TypeScript/Vite build workflow.
-- Foundation architecture and implementation status documentation.
+## Outstanding launch blockers
 
-The foundation is not the full product. The lesson authoring/player, secure assessment submission/marking workflows, AI gateway, payments/ledger, guardian/child controls, community/messaging, live classrooms, complete institution administration, credentials and opportunities remain future phases.
+1. **Real-user testing:** no auth users exist; verify signup, confirmation, signin, password recovery and role journeys.
+2. **Educator governance:** private document upload, reviewer console, appeals, suspension workflow, invitation acceptance, version restore/diff and publication approval.
+3. **Payments:** configure PayFast sandbox merchant details and URLs; test signature, server validation, retries, duplicate notifications, failure states, refunds and settlement statements.
+4. **Finance:** implement approved commission policy and marketplace payout provider/legal arrangement before enabling educator withdrawals.
+5. **AI:** configure provider secrets, seed authorised/licensed curriculum sources, evaluate outputs across subjects and South African languages, test prompt injection, and set actual cost limits.
+6. **Child safeguarding:** approve consent wording with South African counsel, verify guardian identity/authority, implement moderation/escalation and test every minor communication boundary.
+7. **Institutional:** invitation acceptance, verification, class workflows and interoperability conformance tests.
+8. **Academic intelligence:** deterministic evidence processing, human review, credential issuance controls and verified opportunity operations.
+9. **Core learning:** learner lesson player, assessment authoring/submission/marking, offline synchronisation and mastery evidence.
+10. **Operations:** private storage buckets, backups and restore drills, incident response, monitoring, accessibility and mobile performance.
 
-## High-priority gaps
+## Guardrails maintained
 
-1. Migration source reconciliation: exact remote SQL must be committed for all six applied versions.
-2. RLS tests: create isolated test identities and prove negative access cases in a disposable/staging environment.
-3. Assessment execution: implement server-authoritative attempt creation, deterministic marking, educator-reviewed subjective marking and immutable attempt history.
-4. Learning evidence: progress is not mastery; build a competency/evidence model before academic claims.
-5. Educator governance: verification states, evidence handling, appeals and suspension controls.
-6. Child safeguarding: age-appropriate onboarding, guardian relationship/consent, communication restrictions, reporting and incident workflows.
-7. Commerce: PayFast sandbox verification, idempotent webhook processing, double-entry ledger, refunds and reconciliation before paid enrolment.
-8. AI: provider-independent server gateway, authorised retrieval, evaluation and cost controls; no live AI capability should be claimed until configured and tested.
-9. Storage: private buckets, scoped policies, file validation, retention and authorised signed downloads.
-10. Institution tenancy: explicit institution/campus/class hierarchy and cross-tenant negative tests.
-11. Operations: backups, restore test, incident response, observability, accessibility and mobile UAT.
-
-## Guardrails
-
-- No production user/test data created during the audit.
-- No production secrets read or exposed.
-- No payment configuration changed.
-- No destructive DDL or RLS policy changes performed in this audit.
-- No indexes dropped because they are currently unused.
-- No claim of accreditation, POPIA compliance or production readiness.
-- No public release or merge is implied by the existence of a successful build.
-
-## Next sequence
-
-1. Reconcile and version-control all six remote migrations.
-2. Validate the latest foundation branch CI against its current head commit.
-3. Run real-account signup/confirmation/sign-in, discovery, free enrolment, academy creation and draft-course creation in a staging or approved test environment.
-4. Add database/RLS integration tests before expanding data access.
-5. Implement lesson authoring/player and secure assessment workflows.
-6. Add educator verification and guardian safeguarding before onboarding minors.
-7. Add PayFast sandbox and ledger only after financial workflow design and provider validation.
-8. Continue AI, community, institutional and academic-record phases in dependency order.
+- No production users, learner records or fabricated content were seeded.
+- No production payment configuration or secrets were changed.
+- No service-role credentials were placed in browser code.
+- No destructive schema reset or main-branch merge was performed.
+- No accreditation, legal compliance or production-readiness claim is made.
+- Unused indexes were not dropped without workload evidence.
