@@ -8,7 +8,7 @@ Updated: 22 November 2026
 - Working branch: `foundation/learnora-platform-v1`
 - Supabase project: `gkloowmlfxfrwcxggnzl`, PostgreSQL 17, eu-west-1
 - Remote migration ledger: 33 applied migrations; every migration source is versioned under its exact remote ID.
-- Public application schema: 55 tables; all 55 have RLS enabled.
+- Public application schema: 56 tables; all 56 have RLS enabled.
 - Authentication users: 0. No synthetic accounts or learner records were inserted.
 - Storage: one private `learnora-verification` bucket; no public Learnora bucket.
 - Platform administrator records: 0. No user has been self-promoted or automatically assigned administrator access.
@@ -63,9 +63,8 @@ The deployed functions and their source files are versioned in the repository. N
 
 ## Security and verification
 
-- Supabase health advisor: no findings.
 - Supabase security and health advisors: no findings. Privileged learning-write routines were moved into the non-exposed `private` schema; public RPC entry points now use `SECURITY INVOKER`. The private routines retain explicit authentication, enrolment or academy-manager checks and an empty search path. Adversarial tests remain required before production.
-- All 55 public tables have RLS enabled. Anonymous table privileges are restricted to `SELECT` on `academies`, `courses` and `credential_verification_index` only.
+- All 56 public tables have RLS enabled. Anonymous table privileges are restricted to `SELECT` on `academies`, `courses` and `credential_verification_index` only.
 - Private verification storage allows an authenticated educator to upload/read only within their own user-ID folder; no public object access.
 - Platform administrator records cannot be created or edited by ordinary client roles. The first administrator must be assigned by an authorised project operator using the documented bootstrap process.
 - Guardian activation requires a verified authority reference and an exact server-configured approved consent version. The current UI submits a draft consent version, so activation remains blocked pending legal approval.
