@@ -57,6 +57,16 @@ const credentialTypes = [
   ['other', 'Other supporting evidence'],
 ]
 const labelFor = (value: string) => value.replaceAll('_', ' ')
+const recommendedCredential = (category: string) => ({
+  registered_educator: 'sace_registration',
+  provisionally_registered_educator: 'provisional_sace_registration',
+  student_educator: 'academic_qualification',
+  private_tutor: 'experience_reference',
+  subject_specialist: 'professional_certification',
+  learning_facilitator: 'professional_certification',
+  institution_affiliated_educator: 'experience_reference',
+  international_educator: 'foreign_qualification_evaluation',
+}[category] ?? 'teaching_qualification')
 
 export default function EducatorApplicationWorkspace({ userId, onNotice }: { userId: string; onNotice: (s: string) => void }) {
   const [profile, setProfile] = useState<Profile | null>(null)
@@ -70,7 +80,7 @@ export default function EducatorApplicationWorkspace({ userId, onNotice }: { use
   const [subjects, setSubjects] = useState('')
   const [levels, setLevels] = useState('')
   const [region, setRegion] = useState('')
-  const [credentialType, setCredentialType] = useState('sace_registration')
+  const [credentialType, setCredentialType] = useState('teaching_qualification')
   const [issuer, setIssuer] = useState('')
   const [issuerCountry, setIssuerCountry] = useState('ZA')
   const [credentialReference, setCredentialReference] = useState('')
@@ -206,10 +216,11 @@ export default function EducatorApplicationWorkspace({ userId, onNotice }: { use
       <form className="educator-application-form" onSubmit={save}>
         <p className="eyebrow">YOUR PROFESSIONAL IDENTITY</p>
         <label>Professional category
-          <select required value={category} onChange={e => setCategory(e.target.value)}>
+          <select required value={category} onChange={e => { const value = e.target.value; setCategory(value); setCredentialType(recommendedCredential(value)) }}>
             <option value="">Select your category</option>
             {categories.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
           </select>
+          <p className="form-hint">Choose the pathway that accurately describes your work. Registered educators should provide SACE evidence; tutors and subject specialists can submit relevant qualifications, certifications or experience references.</p>
         </label>
         <label>Country of professional practice
           <input required minLength={2} maxLength={2} value={country} onChange={e => setCountry(e.target.value.toUpperCase())} placeholder="ZA" />
