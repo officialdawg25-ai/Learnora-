@@ -933,3 +933,12 @@ body{background:var(--paper);color:var(--ink)}
 .educator-class-roster strong{font-size:10px}
 .educator-class-roster small{font-size:9px;color:var(--muted)}
 .educator-overview-row .text-button{font-size:9px;white-space:nowrap}
+
+.educator-class-roster article>div{display:grid;gap:5px;min-width:0}
+.educator-learner-progress{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+.educator-learner-progress>.eyebrow{margin-bottom:10px}
+.educator-learner-progress article{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.educator-learner-progress article>div{display:grid;gap:5px;min-width:0}
+.educator-learner-progress strong{font-size:10px}
+.educator-learner-progress small{font-size:9px;line-height:1.5;color:var(--muted)}
+.educator-learner-progress article>span{font-size:9px;color:#77709e;white-space:nowrap;text-transform:capitalize}
