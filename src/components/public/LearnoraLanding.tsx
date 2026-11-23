@@ -80,6 +80,6 @@ export default function LearnoraLanding({onSignIn,onStart}:Props){
    <section className="public-closing"><p className="public-kicker">THE NEXT CHAPTER STARTS HERE</p><h2>Education works better<br/>when we move <em>forward together.</em></h2><p>Find your place in a more connected educational experience.</p><button className="public-button dark" onClick={()=>start('parent')}>Join Learnora <ArrowRight size={16}/></button><img className="public-closing-mark" src="/brand/learnora-mark.svg" alt="" /></section>
   </main>
 
-  <footer className="public-footer"><a className="public-brand" href="#top"><span className="public-brand-mark">L</span><span><strong>learnora</strong><small>WHERE POTENTIAL BECOMES POSSIBILITY.</small></span></a><div className="public-footer-links"><a href="#ecosystem">The ecosystem</a><a href="#parents">Parents</a><a href="#learners">Learners</a><a href="#educators">Educators</a><a href="#trust">Trust & privacy</a></div><span>© {new Date().getFullYear()} Learnora. The Future Of Learning</span></footer>
+  <footer className="public-footer"><a className="public-brand" href="#top"><img className="public-brand-logo" src="/brand/learnora-mark.svg" alt="" /><span><strong>learnora</strong><small>THE FUTURE OF LEARNING</small></span></a><div className="public-footer-links"><a href="#ecosystem">The ecosystem</a><a href="#parents">Parents</a><a href="#learners">Learners</a><a href="#educators">Educators</a><a href="#trust">Trust & privacy</a></div><span>© {new Date().getFullYear()} Learnora. The Future Of Learning</span></footer>
  </div>
 }
