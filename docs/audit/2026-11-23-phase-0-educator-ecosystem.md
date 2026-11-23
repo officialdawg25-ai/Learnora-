@@ -61,7 +61,9 @@ Migrations: `20261123125318_educator_trust_phase1_foundation` and `2026112312585
 
 - Added an educator teaching overview to the existing educator workspace. It reads authorised institution classes, active learner enrolment counts, upcoming/live sessions and submitted assessment attempts from existing canonical tables.
 - Added a secure `get_educator_class_roster(uuid)` RPC. It is SECURITY DEFINER with an empty search path, is executable only by authenticated users, and returns only learners in classes for which the caller passes the existing `private.is_class_staff()` check.
+- Added a secure `get_educator_learner_progress(uuid, uuid)` RPC. It checks active class-staff status and active learner membership, then returns competency mastery summaries from the existing competency system without exposing assessment answers or unrelated learner records.
 - The roster returns learner display name and enrolment date only; it does not expose date of birth, contact details, guardian records or assessment answers.
+- The progress RPC is SECURITY DEFINER, callable by authenticated users only, and returned no records when called without an authenticated class-staff context. Positive-path educator access remains untested because there is no active educator/class-staff test account.
 - Reused existing class membership, live-session, assessment and educator analytics infrastructure. No duplicate class, learner or assessment system was created.
 - Individual learner academic records, intervention workflows, attendance management, recurring calendar views and the full educator navigation remain outstanding.
 
