@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
-import { CalendarDays, ClipboardCheck, Users } from 'lucide-react'
+import { BookOpen, CalendarDays, ClipboardCheck, Users } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 
 type ClassRow = { id:string; name:string; grade_or_level:string|null; academic_year:number|null }
 type SessionRow = { id:string; class_id:string; title:string; scheduled_start:string; scheduled_end:string; status:string }
 type RosterRow = { learner_user_id:string; display_name:string; joined_at:string }
 type ProgressRow = { competency_code:string; competency_title:string; competency_description:string|null; competency_level:string|null; mastery_state:string; evidence_count:number; confidence:number|null; rationale:string|null; evaluated_at:string }
+type CourseRow = { id:string; title:string; publication_status:string }
+type CourseRosterRow = { learner_user_id:string; display_name:string; enrolment_status:string; enrolled_at:string; completed_at:string|null }
 
 export default function EducatorOverview({userId,academyId,onNotice}:{userId:string;academyId:string;onNotice:(s:string)=>void}) {
   const [classes,setClasses]=useState<ClassRow[]>([])
@@ -18,6 +20,10 @@ export default function EducatorOverview({userId,academyId,onNotice}:{userId:str
   const [selectedLearnerId,setSelectedLearnerId]=useState('')
   const [progress,setProgress]=useState<ProgressRow[]>([])
   const [progressLoading,setProgressLoading]=useState(false)
+  const [courses,setCourses]=useState<CourseRow[]>([])
+  const [selectedCourseId,setSelectedCourseId]=useState('')
+  const [courseRoster,setCourseRoster]=useState<CourseRosterRow[]>([])
+  const [courseRosterLoading,setCourseRosterLoading]=useState(false)
   const [loading,setLoading]=useState(true)
 
   async function load() {
@@ -47,6 +53,19 @@ export default function EducatorOverview({userId,academyId,onNotice}:{userId:str
     else setSessions((sessionResult.data??[]) as SessionRow[])
     if(attemptResult.error)onNotice('Assessment marking queue: '+attemptResult.error.message)
     else setPendingMarking(attemptResult.count??0)
+    if(academyId){
+      const courseResult=await supabase.from('courses').select('id,title,publication_status').eq('academy_id',academyId).order('created_at',{ascending:false}).limit(50)
+      if(courseResult.error)onNotice('Academy programmes: '+courseResult.error.message)
+      else{
+        const rows=(courseResult.data??[]) as CourseRow[]
+        setCourses(rows)
+        setSelectedCourseId(current=>rows.some(x=>x.id===current)?current:(rows[0]?.id??''))
+      }
+    }else{
+      setCourses([])
+      setSelectedCourseId('')
+      setCourseRoster([])
+    }
   }
 
   useEffect(()=>{void load()},[userId,academyId])
@@ -76,6 +95,16 @@ export default function EducatorOverview({userId,academyId,onNotice}:{userId:str
     setProgress((data??[]) as ProgressRow[])
   }
 
+  async function loadCourseRoster(courseId:string) {
+    if(!supabase||!courseId)return
+    setCourseRosterLoading(true)
+    setCourseRoster([])
+    const {data,error}=await supabase.rpc('get_educator_course_roster',{p_course_id:courseId})
+    setCourseRosterLoading(false)
+    if(error){onNotice('Programme learner roster is unavailable: '+error.message);return}
+    setCourseRoster((data??[]) as CourseRosterRow[])
+  }
+
   const className=(id:string)=>classes.find(x=>x.id===id)?.name??'Class'
   const learnerTotal=Object.values(counts).reduce((sum,n)=>sum+n,0)
 
@@ -103,5 +132,12 @@ export default function EducatorOverview({userId,academyId,onNotice}:{userId:str
         {loading?<p className="form-hint">Loading sessions…</p>:sessions.length===0?<p className="form-hint">No scheduled or live sessions are currently connected to your account.</p>:sessions.map(item=><article className="educator-overview-row" key={item.id}><div><strong>{item.title}</strong><small>{className(item.class_id)} · {new Date(item.scheduled_start).toLocaleString()}</small></div><span>{item.status}</span></article>)}
       </section>
     </div>
+    {academyId&&<section className="studio-panel educator-course-roster-panel">
+      <div className="panel-heading"><div><p className="eyebrow">ACADEMY LEARNERS</p><h3>Enrolments across your programmes</h3></div><BookOpen size={20}/></div>
+      {courses.length===0?<p className="form-hint">Create a programme in your academy to begin receiving learner enrolments.</p>:<>
+        <div className="educator-course-roster-controls"><label>Programme<select value={selectedCourseId} onChange={e=>{setSelectedCourseId(e.target.value);setCourseRoster([])}}>{courses.map(course=><option key={course.id} value={course.id}>{course.title} · {course.publication_status}</option>)}</select></label><button className="button button-outline" type="button" disabled={!selectedCourseId||courseRosterLoading} onClick={()=>void loadCourseRoster(selectedCourseId)}>{courseRosterLoading?'Loading…':'View enrolled learners'}</button></div>
+        {courseRosterLoading?<p className="form-hint">Loading enrolled learners…</p>:courseRoster.length===0?<p className="form-hint">Choose a programme and load its current enrolments. Learner records remain restricted to the academy team.</p>:courseRoster.map(item=><article className="educator-overview-row" key={item.learner_user_id}><div><strong>{item.display_name}</strong><small>Enrolled {new Date(item.enrolled_at).toLocaleDateString()}{item.completed_at?' · Completed '+new Date(item.completed_at).toLocaleDateString():''}</small></div><span>{item.enrolment_status}</span></article>)}
+      </>}
+    </section>}
   </section>
 }
