@@ -61,8 +61,6 @@ export default function EducatorOperations({ academyId, userId, onNotice }: Prop
 
   return <><section className="studio-panel educator-operations">
     <div className="panel-heading"><div><p className="eyebrow">EDUCATOR OPERATIONS</p><h2>Build with credibility.</h2></div><ShieldCheck size={22}/></div>
-    <div className="operations-grid">
-    </div>
     <div className="operations-block team-block">
       <div className="builder-subheading"><strong><Users size={15}/> Academy team</strong><span>{team.length} memberships</span></div>
       {team.length===0?<p className="form-hint">No team memberships yet. The academy owner remains the default manager.</p>:<div className="builder-list">{team.map(member=><div className="builder-list-item static" key={member.id}><span className="builder-index">{member.role.toUpperCase()}</span><span>{member.user_id}<small>{member.status}</small></span></div>)}</div>}
