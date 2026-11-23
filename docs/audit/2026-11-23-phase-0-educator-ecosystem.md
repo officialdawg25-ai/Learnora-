@@ -69,6 +69,6 @@ Migrations: `20261123125318_educator_trust_phase1_foundation` and `2026112312585
 
 - GitHub Actions CI passed for the staging implementation commit `017cc4fe03ac6330af78c52b531725735dc958df`; `npm install`, dependency audit and `tsc --noEmit && vite build` completed successfully. The workflow has no configured unit/e2e test script.
 - A non-production Cloudflare Pages preview branch `preview/educator-trust-phase1` was created and allowlisted. Production deployments remain disabled.
-- The current preview deployment was queued at audit update time; deployment success must be confirmed separately.
-- Automated browser-based visual inspection could not be completed in this environment. The preview URL is provided for manual desktop/mobile review.
+- The current preview deployment completed successfully at `https://56570a45.learnora-staging.pages.dev` (preview environment, commit `92a68947ee9bb2cd8503bdef9bcc5aa0b3ba160d`).
+- Automated browser-based visual inspection could not be completed: the web inspection client could not access the deployed `pages.dev` preview. Manual Android/desktop review remains required. The preview URL is provided for that review.
 - Migration history is still not reconciled: the repository currently has 71 migration files while the remote ledger has 73 applied migrations. No CLI migration push should be run until the two-version discrepancy and older timestamp/name drift are resolved.
