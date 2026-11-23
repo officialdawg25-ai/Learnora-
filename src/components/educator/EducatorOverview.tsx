@@ -4,7 +4,6 @@ import { supabase } from '../../lib/supabase'
 
 type ClassRow = { id:string; name:string; grade_or_level:string|null; academic_year:number|null }
 type SessionRow = { id:string; class_id:string; title:string; scheduled_start:string; scheduled_end:string; status:string }
-type ClassCount = { class_id:string; learners:number }
 
 export default function EducatorOverview({userId,academyId,onNotice}:{userId:string;academyId:string;onNotice:(s:string)=>void}) {
   const [classes,setClasses]=useState<ClassRow[]>([])
