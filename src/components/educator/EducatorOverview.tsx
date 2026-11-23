@@ -4,12 +4,16 @@ import { supabase } from '../../lib/supabase'
 
 type ClassRow = { id:string; name:string; grade_or_level:string|null; academic_year:number|null }
 type SessionRow = { id:string; class_id:string; title:string; scheduled_start:string; scheduled_end:string; status:string }
+type RosterRow = { learner_user_id:string; display_name:string; joined_at:string }
 
 export default function EducatorOverview({userId,academyId,onNotice}:{userId:string;academyId:string;onNotice:(s:string)=>void}) {
   const [classes,setClasses]=useState<ClassRow[]>([])
   const [counts,setCounts]=useState<Record<string,number>>({})
   const [sessions,setSessions]=useState<SessionRow[]>([])
   const [pendingMarking,setPendingMarking]=useState(0)
+  const [selectedClassId,setSelectedClassId]=useState('')
+  const [roster,setRoster]=useState<RosterRow[]>([])
+  const [rosterLoading,setRosterLoading]=useState(false)
   const [loading,setLoading]=useState(true)
 
   async function load() {
@@ -43,6 +47,16 @@ export default function EducatorOverview({userId,academyId,onNotice}:{userId:str
 
   useEffect(()=>{void load()},[userId,academyId])
 
+  async function loadRoster(classId:string) {
+    if(!supabase||!classId)return
+    setSelectedClassId(classId)
+    setRosterLoading(true)
+    const {data,error}=await supabase.rpc('get_educator_class_roster',{p_class_id:classId})
+    setRosterLoading(false)
+    if(error){onNotice('Learner roster is unavailable: '+error.message);return}
+    setRoster((data??[]) as RosterRow[])
+  }
+
   const className=(id:string)=>classes.find(x=>x.id===id)?.name??'Class'
   const learnerTotal=Object.values(counts).reduce((sum,n)=>sum+n,0)
 
@@ -60,7 +74,8 @@ export default function EducatorOverview({userId,academyId,onNotice}:{userId:str
     <div className="educator-overview-columns">
       <section className="studio-panel">
         <div className="panel-heading"><div><p className="eyebrow">MY CLASSES</p><h3>Teaching relationships</h3></div><Users size={20}/></div>
-        {loading?<p className="form-hint">Loading authorised classes…</p>:classes.length===0?<p className="form-hint">No institution classes are currently connected to your educator account. An institution administrator can invite you to an existing class.</p>:classes.map(item=><article className="educator-overview-row" key={item.id}><div><strong>{item.name}</strong><small>{item.grade_or_level??'Level not specified'}{item.academic_year?' · '+item.academic_year:''}</small></div><span>{counts[item.id]??0} learners</span></article>)}
+        {loading?<p className="form-hint">Loading authorised classes…</p>:classes.length===0?<p className="form-hint">No institution classes are currently connected to your educator account. An institution administrator can invite you to an existing class.</p>:classes.map(item=><article className="educator-overview-row" key={item.id}><div><strong>{item.name}</strong><small>{item.grade_or_level??'Level not specified'}{item.academic_year?' · '+item.academic_year:''}</small></div><span>{counts[item.id]??0} learners</span><button className="text-button" type="button" onClick={()=>{if(selectedClassId===item.id){setSelectedClassId('');setRoster([])}else void loadRoster(item.id)}}>{selectedClassId===item.id?'Hide learners':'View learners'}</button></article>)}
+        {selectedClassId&&<div className="educator-class-roster"><p className="eyebrow">LEARNER ROSTER · {className(selectedClassId)}</p>{rosterLoading?<p className="form-hint">Loading authorised learner records…</p>:roster.length===0?<p className="form-hint">No active learner enrolments are available for this class.</p>:roster.map(item=><article key={item.learner_user_id}><strong>{item.display_name}</strong><small>Joined {new Date(item.joined_at).toLocaleDateString()}</small></article>)}</div>}
       </section>
       <section className="studio-panel">
         <div className="panel-heading"><div><p className="eyebrow">UPCOMING TEACHING</p><h3>Scheduled sessions</h3></div><CalendarDays size={20}/></div>
