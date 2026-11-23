@@ -5,6 +5,7 @@ import { supabase } from '../../lib/supabase'
 type ClassRow = { id:string; name:string; grade_or_level:string|null; academic_year:number|null }
 type SessionRow = { id:string; class_id:string; title:string; scheduled_start:string; scheduled_end:string; status:string }
 type RosterRow = { learner_user_id:string; display_name:string; joined_at:string }
+type ProgressRow = { competency_code:string; competency_title:string; competency_description:string|null; competency_level:string|null; mastery_state:string; evidence_count:number; confidence:number|null; rationale:string|null; evaluated_at:string }
 
 export default function EducatorOverview({userId,academyId,onNotice}:{userId:string;academyId:string;onNotice:(s:string)=>void}) {
   const [classes,setClasses]=useState<ClassRow[]>([])
@@ -14,6 +15,9 @@ export default function EducatorOverview({userId,academyId,onNotice}:{userId:str
   const [selectedClassId,setSelectedClassId]=useState('')
   const [roster,setRoster]=useState<RosterRow[]>([])
   const [rosterLoading,setRosterLoading]=useState(false)
+  const [selectedLearnerId,setSelectedLearnerId]=useState('')
+  const [progress,setProgress]=useState<ProgressRow[]>([])
+  const [progressLoading,setProgressLoading]=useState(false)
   const [loading,setLoading]=useState(true)
 
   async function load() {
@@ -57,6 +61,16 @@ export default function EducatorOverview({userId,academyId,onNotice}:{userId:str
     setRoster((data??[]) as RosterRow[])
   }
 
+  async function loadProgress(learnerId:string) {
+    if(!supabase||!selectedClassId)return
+    setSelectedLearnerId(learnerId)
+    setProgressLoading(true)
+    const {data,error}=await supabase.rpc('get_educator_learner_progress',{p_class_id:selectedClassId,p_learner_user_id:learnerId})
+    setProgressLoading(false)
+    if(error){onNotice('Learner progress is unavailable: '+error.message);return}
+    setProgress((data??[]) as ProgressRow[])
+  }
+
   const className=(id:string)=>classes.find(x=>x.id===id)?.name??'Class'
   const learnerTotal=Object.values(counts).reduce((sum,n)=>sum+n,0)
 
@@ -75,7 +89,9 @@ export default function EducatorOverview({userId,academyId,onNotice}:{userId:str
       <section className="studio-panel">
         <div className="panel-heading"><div><p className="eyebrow">MY CLASSES</p><h3>Teaching relationships</h3></div><Users size={20}/></div>
         {loading?<p className="form-hint">Loading authorised classes…</p>:classes.length===0?<p className="form-hint">No institution classes are currently connected to your educator account. An institution administrator can invite you to an existing class.</p>:classes.map(item=><article className="educator-overview-row" key={item.id}><div><strong>{item.name}</strong><small>{item.grade_or_level??'Level not specified'}{item.academic_year?' · '+item.academic_year:''}</small></div><span>{counts[item.id]??0} learners</span><button className="text-button" type="button" onClick={()=>{if(selectedClassId===item.id){setSelectedClassId('');setRoster([])}else void loadRoster(item.id)}}>{selectedClassId===item.id?'Hide learners':'View learners'}</button></article>)}
-        {selectedClassId&&<div className="educator-class-roster"><p className="eyebrow">LEARNER ROSTER · {className(selectedClassId)}</p>{rosterLoading?<p className="form-hint">Loading authorised learner records…</p>:roster.length===0?<p className="form-hint">No active learner enrolments are available for this class.</p>:roster.map(item=><article key={item.learner_user_id}><strong>{item.display_name}</strong><small>Joined {new Date(item.joined_at).toLocaleDateString()}</small></article>)}</div>}
+        {selectedClassId&&<div className="educator-class-roster"><p className="eyebrow">LEARNER ROSTER · {className(selectedClassId)}</p>{rosterLoading?<p className="form-hint">Loading authorised learner records…</p>:roster.length===0?<p className="form-hint">No active learner enrolments are available for this class.</p>:roster.map(item=><article key={item.learner_user_id}><div><strong>{item.display_name}</strong><small>Joined {new Date(item.joined_at).toLocaleDateString()}</small></div><button className="text-button" type="button" onClick={()=>{if(selectedLearnerId===item.learner_user_id){setSelectedLearnerId('');setProgress([])}else void loadProgress(item.learner_user_id)}}>{selectedLearnerId===item.learner_user_id?'Hide progress':'View progress'}</button></article>)}
+          {selectedLearnerId&&<div className="educator-learner-progress"><p className="eyebrow">LEARNING PROGRESS</p>{progressLoading?<p className="form-hint">Loading authorised progress signals…</p>:progress.length===0?<p className="form-hint">No competency evidence has been recorded for this learner yet.</p>:progress.map(item=><article key={item.competency_code}><div><strong>{item.competency_title}</strong><small>{item.competency_code}{item.competency_level?' · '+item.competency_level:''}</small>{item.rationale&&<small>{item.rationale}</small>}</div><span>{item.mastery_state.replaceAll('_',' ')} · {item.evidence_count} evidence</span></article>)}<p className="form-hint">Competency mastery is a learning signal, not a final grade or a diagnosis.</p></div>}
+        </div>}
       </section>
       <section className="studio-panel">
         <div className="panel-heading"><div><p className="eyebrow">UPCOMING TEACHING</p><h3>Scheduled sessions</h3></div><CalendarDays size={20}/></div>
