@@ -925,3 +925,11 @@ body{background:var(--paper);color:var(--ink)}
 .educator-overview-row>span{font-size:9px;color:var(--muted);white-space:nowrap;text-transform:capitalize}
 @media(max-width:760px){.educator-overview-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.educator-overview-metrics>div:nth-child(2){border-right:0}.educator-overview-metrics>div:nth-child(3){padding-left:0;border-top:1px solid var(--line)}.educator-overview-metrics>div:nth-child(4){border-top:1px solid var(--line)}.educator-overview-columns{grid-template-columns:1fr}}
 @media(max-width:420px){.educator-overview-heading{align-items:flex-start;flex-direction:column}.educator-overview-metrics>div{padding:14px 8px}.educator-overview-metrics strong{font-size:18px}}
+
+.educator-class-roster{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+.educator-class-roster>.eyebrow{margin-bottom:10px}
+.educator-class-roster article{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.educator-class-roster article:last-child{border-bottom:0}
+.educator-class-roster strong{font-size:10px}
+.educator-class-roster small{font-size:9px;color:var(--muted)}
+.educator-overview-row .text-button{font-size:9px;white-space:nowrap}
