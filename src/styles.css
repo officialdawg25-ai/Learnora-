@@ -942,3 +942,10 @@ body{background:var(--paper);color:var(--ink)}
 .educator-learner-progress strong{font-size:10px}
 .educator-learner-progress small{font-size:9px;line-height:1.5;color:var(--muted)}
 .educator-learner-progress article>span{font-size:9px;color:#77709e;white-space:nowrap;text-transform:capitalize}
+
+.educator-course-roster-panel{margin-top:18px;padding:20px}
+.educator-course-roster-controls{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap;padding:14px 0}
+.educator-course-roster-controls label{display:grid;gap:7px;min-width:min(100%,280px);flex:1;font-size:10px;color:var(--muted)}
+.educator-course-roster-controls select{width:100%;padding:11px;border:1px solid var(--line);background:#fbfaf7;font:12px Arial,Helvetica,sans-serif}
+.educator-course-roster-panel .educator-overview-row{border-top:1px solid var(--line)}
+@media(max-width:620px){.educator-course-roster-controls{align-items:stretch;flex-direction:column}.educator-course-roster-controls .button{width:100%}}
