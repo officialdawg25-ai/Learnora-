@@ -27,8 +27,8 @@ const tabs:{id:Tab;label:string;icon:typeof Users}[]=[
 const dateLabel=(value:string|null|undefined)=>value?new Date(value).toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'}):'—'
 const moneyLabel=(minor:number)=>new Intl.NumberFormat('en-ZA',{style:'currency',currency:'ZAR'}).format(minor/100)
 function EmptyFeature({title,description}:{title:string;description:string}){return <section className="parent-feature-empty"><div className="parent-empty-icon"><LockKeyhole size={20}/></div><p className="eyebrow">PLATFORM INTEGRATION REQUIRED</p><h2>{title}</h2><p>{description}</p><small>Learnora will only display this information once the relevant institution or platform workflow is configured. No sample or invented records are shown.</small></section>}
-export default function ParentPortal({userId,onNotice}:{userId:string;onNotice:(message:string)=>void}){
- const [tab,setTab]=useState<Tab>('overview'),[children,setChildren]=useState<Child[]>([]),[selectedId,setSelectedId]=useState(''),[notifications,setNotifications]=useState<Notice[]>([]),[profile,setProfile]=useState<ParentProfile>({display_name:'',preferred_language:'en'}),[loading,setLoading]=useState(true),[error,setError]=useState('')
+export default function ParentPortal({userId,onNotice,initialTab='overview'}:{userId:string;onNotice:(message:string)=>void;initialTab?:Tab}){
+ const [tab,setTab]=useState<Tab>(initialTab),[children,setChildren]=useState<Child[]>([]),[selectedId,setSelectedId]=useState(''),[notifications,setNotifications]=useState<Notice[]>([]),[profile,setProfile]=useState<ParentProfile>({display_name:'',preferred_language:'en'}),[loading,setLoading]=useState(true),[error,setError]=useState('')
  const selected=children.find(child=>child.learner_id===selectedId)??children[0]??null
  const unread=notifications.filter(item=>!item.read_at).length
  const parentName=profile.display_name?.trim()||'Parent'
@@ -49,6 +49,7 @@ export default function ParentPortal({userId,onNotice}:{userId:string;onNotice:(
   setLoading(false)
  }
  useEffect(()=>{void load()},[userId])
+ useEffect(()=>{setTab(initialTab)},[initialTab])
 
  async function markRead(id:string){if(!supabase)return;const {error}=await supabase.rpc('mark_user_notification_read',{p_notification_id:id});if(error){onNotice('Notification could not be updated: '+error.message);return}setNotifications(rows=>rows.map(item=>item.id===id?{...item,read_at:new Date().toISOString()}:item))}
  const academicSummary=useMemo(()=>({progress:children.reduce((sum,child)=>sum+(child.progress?.record_count??0),0),assessments:children.reduce((sum,child)=>sum+(child.assessments?.record_count??0),0),outstanding:children.reduce((sum,child)=>sum+(child.outstanding_minor??0),0),attendance:children.reduce((sum,child)=>sum+(child.attendance_summary?.total??0),0),present:children.reduce((sum,child)=>sum+(child.attendance_summary?.present??0),0)}),[children])
