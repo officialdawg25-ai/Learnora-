@@ -56,3 +56,19 @@ Migrations: `20261123125318_educator_trust_phase1_foundation` and `2026112312585
 - **VERIFIED:** repository structure, branch configuration, database schema, RLS state, migration ledger, storage buckets, Edge Function inventory, provider enablement responses, new migration success and schema verification query.
 - **PARTIAL:** educator application, educator operations, reviewer queue and live-session scheduling.
 - **BLOCKED:** R2, Stream, native LiveKit-equivalent conferencing, authorised identity registry APIs, active admin UAT, adversarial multi-account tests and production launch.
+
+## Phase 2 — PARTIAL educator operating system
+
+- Added an educator teaching overview to the existing educator workspace. It reads authorised institution classes, active learner enrolment counts, upcoming/live sessions and submitted assessment attempts from existing canonical tables.
+- Added a secure `get_educator_class_roster(uuid)` RPC. It is SECURITY DEFINER with an empty search path, is executable only by authenticated users, and returns only learners in classes for which the caller passes the existing `private.is_class_staff()` check.
+- The roster returns learner display name and enrolment date only; it does not expose date of birth, contact details, guardian records or assessment answers.
+- Reused existing class membership, live-session, assessment and educator analytics infrastructure. No duplicate class, learner or assessment system was created.
+- Individual learner academic records, intervention workflows, attendance management, recurring calendar views and the full educator navigation remain outstanding.
+
+## Build and preview evidence
+
+- GitHub Actions CI passed for the staging implementation commit `017cc4fe03ac6330af78c52b531725735dc958df`; `npm install`, dependency audit and `tsc --noEmit && vite build` completed successfully. The workflow has no configured unit/e2e test script.
+- A non-production Cloudflare Pages preview branch `preview/educator-trust-phase1` was created and allowlisted. Production deployments remain disabled.
+- The current preview deployment was queued at audit update time; deployment success must be confirmed separately.
+- Automated browser-based visual inspection could not be completed in this environment. The preview URL is provided for manual desktop/mobile review.
+- Migration history is still not reconciled: the repository currently has 71 migration files while the remote ledger has 73 applied migrations. No CLI migration push should be run until the two-version discrepancy and older timestamp/name drift are resolved.
