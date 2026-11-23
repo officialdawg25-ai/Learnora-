@@ -829,3 +829,56 @@ body{background:var(--paper);color:var(--ink)}
 .splash-loading-slogan{margin:0;color:#77766f;font-size:10px;letter-spacing:.2em;animation:none}
 @media(max-width:600px){.splash-slogan{font-size:11px;letter-spacing:.16em;margin-top:14px}.splash-loading-slogan{font-size:9px;letter-spacing:.15em}}
 @media(prefers-reduced-motion:reduce){.splash-slogan{animation:none;opacity:1}}
+
+
+/* Unified Learnora identity, adaptive navigation and resilient application layout */
+.brand-logo{display:block;width:39px;height:39px;object-fit:contain;flex:none;color:#22231f}
+.footer-brand .brand-logo{width:31px;height:31px}
+.auth-modal>.brand-logo{width:44px;height:44px;margin:0 0 25px}
+.setup-card>.brand-logo{width:48px;height:48px;margin-bottom:24px}
+.public-brand-logo{display:block;width:39px;height:39px;object-fit:contain;flex:none}
+.public-footer .public-brand-logo{width:32px;height:32px}
+.public-closing-mark{position:absolute;right:8%;top:22px;width:190px;height:190px;object-fit:contain;color:#e9ece8;opacity:.52;z-index:0;pointer-events:none}
+.public-brand small{letter-spacing:1.5px}
+.learner-head-mark img{display:block;width:46px;height:46px;object-fit:contain;margin:0 auto 8px}
+.learner-head-mark span{display:none}
+
+/* The application shell uses natural document flow: short pages fill the viewport,
+   while long pages scroll and keep the footer after their content. */
+.app-shell{min-height:100vh;display:flex}
+.main{display:flex;flex-direction:column;width:calc(100% - 248px);min-height:100vh}
+.content{display:flex;flex:1 0 auto;flex-direction:column;width:100%;min-height:calc(100vh - 76px);max-width:1240px;margin:0 auto}
+.content>.footer{margin-top:auto}
+.sidebar-collapse-toggle{display:grid;flex:none;width:30px;height:30px;margin-left:auto;border:1px solid #d8d6ce;border-radius:5px;color:#62645e}
+.sidebar-collapse-toggle:hover{background:#e5e3dc;color:#252620}
+.sidebar.collapsed{width:78px;padding:26px 11px}
+.sidebar.collapsed .brand{justify-content:center;gap:0;position:relative;margin-bottom:24px}
+.sidebar.collapsed .brand-logo{width:36px;height:36px}
+.sidebar.collapsed .brand-copy,.sidebar.collapsed .side-label,.sidebar.collapsed .sidebar-note{display:none}
+.sidebar.collapsed .sidebar-collapse-toggle{position:absolute;right:-5px;top:-18px;width:25px;height:25px;background:#efeee8}
+.sidebar.collapsed .nav-item{justify-content:center;gap:0;padding:13px 5px;font-size:0;min-height:42px}
+.sidebar.collapsed .nav-item svg{width:19px;height:19px;flex:none}
+.sidebar.collapsed .sidebar-bottom{width:100%}
+.main.sidebar-collapsed{width:calc(100% - 78px);margin-left:78px}
+@media(max-width:1050px) and (min-width:761px){
+ .main{width:calc(100% - 215px)}
+ .main.sidebar-collapsed{width:calc(100% - 78px)}
+}
+@media(max-width:760px){
+ .main,.main.sidebar-collapsed{width:100%;margin-left:0}
+ .content{min-height:calc(100vh - 64px)}
+ .sidebar-collapse-toggle{display:none}
+ .sidebar.collapsed{width:270px;padding:30px 20px}
+ .sidebar.collapsed .brand{justify-content:flex-start;gap:12px;margin-bottom:0}
+ .sidebar.collapsed .brand-logo{width:39px;height:39px}
+ .sidebar.collapsed .brand-copy,.sidebar.collapsed .side-label,.sidebar.collapsed .sidebar-note{display:block}
+ .sidebar.collapsed .sidebar-collapse-toggle{display:none}
+ .sidebar.collapsed .nav-item{justify-content:flex-start;gap:12px;padding:12px 11px;font-size:13px}
+ .sidebar.collapsed .nav-item svg{width:18px;height:18px}
+ .public-closing-mark{width:125px;height:125px;right:2%;top:35px}
+}
+
+/* Animate the actual official SVG asset rather than a hand-recreated path. */
+.splash-logo-trace{display:block;width:100%;height:100%;object-fit:contain;overflow:visible;filter:none;stroke:none;fill:currentColor;clip-path:inset(100% 0 0 0);transform:translateY(12px) scale(.96);opacity:0;animation:learnora-official-logo-reveal 1.65s cubic-bezier(.2,.78,.22,1) .2s forwards}
+@keyframes learnora-official-logo-reveal{0%{clip-path:inset(100% 0 0 0);transform:translateY(12px) scale(.96);opacity:0}55%{opacity:1}100%{clip-path:inset(0 0 0 0);transform:translateY(0) scale(1);opacity:1}}
+@media(prefers-reduced-motion:reduce){.splash-logo-trace{animation:none;clip-path:none;transform:none;opacity:1}}
