@@ -17,7 +17,7 @@ export default function LearnoraLanding({onSignIn,onStart}:Props){
  const close=()=>setMenuOpen(false)
  return <div className="public-site">
   <header className="public-nav">
-   <a className="public-brand" href="#top" aria-label="Learnora home"><span className="public-brand-mark">L</span><span><strong>learnora</strong><small>WHERE POTENTIAL BECOMES POSSIBILITY.</small></span></a>
+   <a className="public-brand" href="#top" aria-label="Learnora home"><img className="public-brand-logo" src="/brand/learnora-mark.svg" alt="" /><span><strong>learnora</strong><small>THE FUTURE OF LEARNING</small></span></a>
    <button className="public-menu-toggle" onClick={()=>setMenuOpen(v=>!v)} aria-label={menuOpen?'Close navigation':'Open navigation'}>{menuOpen?<X size={21}/>:<Menu size={21}/>}</button>
    <nav className={menuOpen?'public-nav-links is-open':'public-nav-links'} aria-label="Main navigation">
     <a href="#ecosystem" onClick={close}>The ecosystem</a><a href="#parents" onClick={close}>For parents</a><a href="#learners" onClick={close}>For learners</a><a href="#educators" onClick={close}>For educators</a><a href="#trust" onClick={close}>Our approach</a>
@@ -77,9 +77,9 @@ export default function LearnoraLanding({onSignIn,onStart}:Props){
     <div className="public-trust-copy"><p className="public-kicker">A RESPONSIBLE FOUNDATION</p><h2>Visibility with care.<br/><em>Access with purpose.</em></h2><p>Educational information deserves thoughtful protection. Learnora is designed around distinct account roles, authorised relationships and access permissions that reflect the purpose of each connection.</p><div className="public-trust-points"><div><LockKeyhole size={17}/><span><strong>Considered access</strong><small>Information is scoped to approved relationships and permissions.</small></span></div><div><Users size={17}/><span><strong>Learner-centred connections</strong><small>Family relationships are not treated as automatic access rights.</small></span></div><div><ShieldCheck size={17}/><span><strong>Clear responsibility</strong><small>Verification and consent remain important parts of the process.</small></span></div></div></div>
    </section>
 
-   <section className="public-closing"><p className="public-kicker">THE NEXT CHAPTER STARTS HERE</p><h2>Education works better<br/>when we move <em>forward together.</em></h2><p>Find your place in a more connected educational experience.</p><button className="public-button dark" onClick={()=>start('parent')}>Join Learnora <ArrowRight size={16}/></button><span className="public-closing-mark">L</span></section>
+   <section className="public-closing"><p className="public-kicker">THE NEXT CHAPTER STARTS HERE</p><h2>Education works better<br/>when we move <em>forward together.</em></h2><p>Find your place in a more connected educational experience.</p><button className="public-button dark" onClick={()=>start('parent')}>Join Learnora <ArrowRight size={16}/></button><img className="public-closing-mark" src="/brand/learnora-mark.svg" alt="" /></section>
   </main>
 
-  <footer className="public-footer"><a className="public-brand" href="#top"><span className="public-brand-mark">L</span><span><strong>learnora</strong><small>WHERE POTENTIAL BECOMES POSSIBILITY.</small></span></a><div className="public-footer-links"><a href="#ecosystem">The ecosystem</a><a href="#parents">Parents</a><a href="#learners">Learners</a><a href="#educators">Educators</a><a href="#trust">Trust & privacy</a></div><span>© {new Date().getFullYear()} Learnora. Where potential becomes possibility.</span></footer>
+  <footer className="public-footer"><a className="public-brand" href="#top"><span className="public-brand-mark">L</span><span><strong>learnora</strong><small>WHERE POTENTIAL BECOMES POSSIBILITY.</small></span></a><div className="public-footer-links"><a href="#ecosystem">The ecosystem</a><a href="#parents">Parents</a><a href="#learners">Learners</a><a href="#educators">Educators</a><a href="#trust">Trust & privacy</a></div><span>© {new Date().getFullYear()} Learnora. The Future Of Learning</span></footer>
  </div>
 }
