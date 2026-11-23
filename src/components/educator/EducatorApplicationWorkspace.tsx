@@ -25,6 +25,10 @@ type Submission = {
   submitted_at: string
   expires_at: string | null
   reviewer_notes: string | null
+  verification_method: string | null
+  verification_source: string | null
+  verification_reference: string | null
+  review_due_at: string | null
 }
 type VerificationEvent = {
   id: string
@@ -97,7 +101,7 @@ export default function EducatorApplicationWorkspace({ userId, onNotice }: { use
     setLoading(true)
     const [p, s, e] = await Promise.all([
       supabase.from('educator_profiles').select('professional_bio,teaching_philosophy,teaching_experience_years,teaching_languages,subjects,verification_status,public_display_name,teaching_levels,public_region,professional_category,professional_country_code').eq('user_id', userId).maybeSingle(),
-      supabase.from('educator_verification_submissions').select('id,credential_type,issuer,credential_reference,status,submitted_at,expires_at,reviewer_notes').eq('educator_user_id', userId).order('submitted_at', { ascending: false }).limit(30),
+      supabase.from('educator_verification_submissions').select('id,credential_type,issuer,credential_reference,status,submitted_at,expires_at,reviewer_notes,verification_method,verification_source,verification_reference,review_due_at').eq('educator_user_id', userId).order('submitted_at', { ascending: false }).limit(30),
       supabase.from('educator_verification_events').select('id,submission_id,event_type,previous_status,new_status,notes,created_at').eq('educator_user_id', userId).order('created_at', { ascending: false }).limit(50),
     ])
     setLoading(false)
@@ -260,7 +264,7 @@ export default function EducatorApplicationWorkspace({ userId, onNotice }: { use
       <section className="studio-panel educator-submission-history">
         <div className="panel-heading"><div><p className="eyebrow">YOUR RECORD</p><h2>Credential submissions</h2></div><BookOpenCheck size={22} /></div>
         {submissions.length === 0 ? <p className="form-hint">No credentials have been submitted yet.</p> : submissions.map(item => <article className="admin-row" key={item.id}>
-          <div><strong>{labelFor(item.credential_type)}</strong><small>{item.issuer ?? 'Issuer not supplied'} · {item.credential_reference ?? 'No reference supplied'}</small><small>Submitted {new Date(item.submitted_at).toLocaleString()} · {item.status}{item.expires_at ? ` · Expires ${new Date(item.expires_at).toLocaleDateString()}` : ''}</small>{item.reviewer_notes && <small>Reviewer note: {item.reviewer_notes}</small>}</div>
+          <div><strong>{labelFor(item.credential_type)}</strong><small>{item.issuer ?? 'Issuer not supplied'} · {item.credential_reference ?? 'No reference supplied'}</small><small>Submitted {new Date(item.submitted_at).toLocaleString()} · {item.status}{item.expires_at ? ` · Expires ${new Date(item.expires_at).toLocaleDateString()}` : ''}</small>{item.expires_at && item.expires_at < new Date().toISOString().slice(0, 10) && <small role="status">Expiry date passed. This credential needs reviewer reassessment; Learnora does not automatically renew or re-verify it.</small>}{item.verification_method && <small>Review method: {labelFor(item.verification_method)}{item.verification_source ? ` · Source: ${item.verification_source}` : ''}</small>}{item.verification_reference && <small>Verification reference: {item.verification_reference}</small>}{item.review_due_at && <small>Next review due: {new Date(item.review_due_at).toLocaleDateString()}</small>}{item.reviewer_notes && <small>Reviewer note: {item.reviewer_notes}</small>}</div>
         </article>)}
       </section>
       <section className="studio-panel educator-verification-history">
