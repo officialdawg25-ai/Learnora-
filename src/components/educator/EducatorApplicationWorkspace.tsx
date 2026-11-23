@@ -196,6 +196,8 @@ export default function EducatorApplicationWorkspace({ userId, onNotice }: { use
   }
 
   const verified = profile?.verification_status === 'verified'
+  const today = new Date().toISOString().slice(0, 10)
+  const expiredCredentials = submissions.filter(x => x.expires_at && x.expires_at < today).length
   const pending = submissions.filter(x => x.status === 'pending').length
 
   return <section className="educator-application">
@@ -207,8 +209,8 @@ export default function EducatorApplicationWorkspace({ userId, onNotice }: { use
     <div className="educator-application-status">
       <ShieldCheck />
       <div>
-        <strong>{profile?.verification_status ?? 'Profile not started'}</strong>
-        <small>{verified ? 'Your professional verification is approved.' : pending ? `${pending} credential submission(s) awaiting review.` : 'Complete your profile and submit relevant evidence for independent review.'}</small>
+        <strong>{expiredCredentials ? 'Review required' : profile?.verification_status ?? 'Profile not started'}</strong>
+        <small>{expiredCredentials ? `${expiredCredentials} credential record(s) have passed their expiry date and need reviewer reassessment.` : verified ? 'Your professional verification is approved.' : pending ? `${pending} credential submission(s) awaiting review.` : 'Complete your profile and submit relevant evidence for independent review.'}</small>
       </div>
     </div>
     <div className="educator-onboarding-progress">
@@ -264,7 +266,7 @@ export default function EducatorApplicationWorkspace({ userId, onNotice }: { use
       <section className="studio-panel educator-submission-history">
         <div className="panel-heading"><div><p className="eyebrow">YOUR RECORD</p><h2>Credential submissions</h2></div><BookOpenCheck size={22} /></div>
         {submissions.length === 0 ? <p className="form-hint">No credentials have been submitted yet.</p> : submissions.map(item => <article className="admin-row" key={item.id}>
-          <div><strong>{labelFor(item.credential_type)}</strong><small>{item.issuer ?? 'Issuer not supplied'} · {item.credential_reference ?? 'No reference supplied'}</small><small>Submitted {new Date(item.submitted_at).toLocaleString()} · {item.status}{item.expires_at ? ` · Expires ${new Date(item.expires_at).toLocaleDateString()}` : ''}</small>{item.expires_at && item.expires_at < new Date().toISOString().slice(0, 10) && <small role="status">Expiry date passed. This credential needs reviewer reassessment; Learnora does not automatically renew or re-verify it.</small>}{item.verification_method && <small>Review method: {labelFor(item.verification_method)}{item.verification_source ? ` · Source: ${item.verification_source}` : ''}</small>}{item.verification_reference && <small>Verification reference: {item.verification_reference}</small>}{item.review_due_at && <small>Next review due: {new Date(item.review_due_at).toLocaleDateString()}</small>}{item.reviewer_notes && <small>Reviewer note: {item.reviewer_notes}</small>}</div>
+          <div><strong>{labelFor(item.credential_type)}</strong><small>{item.issuer ?? 'Issuer not supplied'} · {item.credential_reference ?? 'No reference supplied'}</small><small>Submitted {new Date(item.submitted_at).toLocaleString()} · {item.status}{item.expires_at ? ` · Expires ${new Date(item.expires_at).toLocaleDateString()}` : ''}</small>{item.expires_at && item.expires_at < today && <small role="status">Expiry date passed. This credential needs reviewer reassessment; Learnora does not automatically renew or re-verify it.</small>}{item.verification_method && <small>Review method: {labelFor(item.verification_method)}{item.verification_source ? ` · Source: ${item.verification_source}` : ''}</small>}{item.verification_reference && <small>Verification reference: {item.verification_reference}</small>}{item.review_due_at && <small>Next review due: {new Date(item.review_due_at).toLocaleDateString()}</small>}{item.reviewer_notes && <small>Reviewer note: {item.reviewer_notes}</small>}</div>
         </article>)}
       </section>
       <section className="studio-panel educator-verification-history">
