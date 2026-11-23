@@ -7,6 +7,7 @@ type CourseOption = { id: string; title: string; publication_status: string }
 type ModuleOption = { id: string; title: string; position: number; description: string | null }
 type LessonOption = { id: string; title: string; lesson_type: string; position: number }
 type VersionOption = { id: string; version_number: number; created_at: string; created_by: string | null; snapshot: any }
+type PublicationStatus = { review_id:string|null; review_status:string|null; reviewer_notes:string|null; requested_at:string|null; reviewed_at:string|null; course_status:string }
 
 type Props = {
   academyId: string
@@ -22,6 +23,8 @@ export default function CourseBuilder({ academyId, refreshKey, onNotice }: Props
   const [lessons, setLessons] = useState<LessonOption[]>([])
   const [versions, setVersions] = useState<VersionOption[]>([])
   const [selectedVersion, setSelectedVersion] = useState('')
+  const [publicationStatus,setPublicationStatus]=useState<PublicationStatus|null>(null)
+  const [requestingReview,setRequestingReview]=useState(false)
   const [moduleTitle, setModuleTitle] = useState('')
   const [moduleDescription, setModuleDescription] = useState('')
   const [lessonTitle, setLessonTitle] = useState('')
@@ -105,6 +108,18 @@ export default function CourseBuilder({ academyId, refreshKey, onNotice }: Props
   },[courseId,onNotice])
 
   useEffect(() => {
+    if(!supabase||!courseId){setPublicationStatus(null);return}
+    let active=true
+    supabase.rpc('get_educator_course_publication_status',{p_course_id:courseId}).then(({data,error})=>{
+      if(!active)return
+      if(error){onNotice('Could not load publication status: '+error.message);return}
+      const row=Array.isArray(data)?data[0]:data
+      setPublicationStatus((row??null) as PublicationStatus|null)
+    })
+    return ()=>{active=false}
+  },[courseId,onNotice])
+
+  useEffect(() => {
     if (!supabase || !moduleId) {
       setLessons([])
       return
@@ -122,6 +137,18 @@ export default function CourseBuilder({ academyId, refreshKey, onNotice }: Props
       })
     return () => { active = false }
   }, [moduleId, onNotice])
+
+  async function requestPublicationReview() {
+    if(!supabase||!courseId)return
+    setRequestingReview(true)
+    const {data,error}=await supabase.rpc('request_educator_course_publication_review',{p_course_id:courseId})
+    setRequestingReview(false)
+    if(error){onNotice('Publication review was not requested: '+error.message);return}
+    const result=data as {review_id:string;review_status:string;course_status:string;already_pending:boolean}
+    setPublicationStatus({review_id:result.review_id,review_status:result.review_status,reviewer_notes:null,requested_at:new Date().toISOString(),reviewed_at:null,course_status:result.course_status})
+    setCourses(current=>current.map(item=>item.id===courseId?{...item,publication_status:result.course_status}:item))
+    onNotice(result.already_pending?'This course is already awaiting publication review.':'Course submitted for publication review.')
+  }
 
   async function addModule(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -188,7 +215,7 @@ export default function CourseBuilder({ academyId, refreshKey, onNotice }: Props
         </div>
         <Layers3 size={22} />
       </div>
-      <p className="form-hint">Add structured modules and text/activity lessons to your academy's draft courses. Content stays private until a reviewed publishing workflow is available.</p>
+      <p className="form-hint">Add structured modules and text/activity lessons to your academy's draft courses. Content stays private until an authorised reviewer approves publication.</p>
 
       {loadingCourses ? <p className="form-hint">Loading courses…</p> : courses.length === 0 ? (
         <div className="callout"><BookOpen size={18} /><p>Create a draft course above. It will appear here for module and lesson authoring.</p></div>
@@ -199,6 +226,12 @@ export default function CourseBuilder({ academyId, refreshKey, onNotice }: Props
               {courses.map(course => <option key={course.id} value={course.id}>{course.title} · {course.publication_status}</option>)}
             </select>
           </label>
+          <div className="course-publication-panel">
+            <div><span className="eyebrow">PUBLISHING MANAGER</span><strong>{(publicationStatus?.course_status??courses.find(x=>x.id===courseId)?.publication_status??'draft').replaceAll('_',' ')}</strong></div>
+            {publicationStatus?.review_status==='pending'?<p className="form-hint">Your course is in the review queue. It remains private until an authorised reviewer approves it.</p>:publicationStatus?.reviewer_notes?<p className="form-hint">Latest reviewer feedback: {publicationStatus.reviewer_notes}</p>:<p className="form-hint">Submit a complete course for academic quality review. Only an authorised reviewer can publish it.</p>}
+            {(publicationStatus?.course_status??courses.find(x=>x.id===courseId)?.publication_status)==='draft'&&<button className="button button-outline" type="button" disabled={requestingReview} onClick={()=>void requestPublicationReview()}>{requestingReview?'Submitting…':'Request publication review'}</button>}
+            {publicationStatus?.requested_at&&<small>Latest request: {new Date(publicationStatus.requested_at).toLocaleString()}</small>}
+          </div>
 
           <div className="builder-columns">
             <div>
