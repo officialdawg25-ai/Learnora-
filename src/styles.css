@@ -882,3 +882,20 @@ body{background:var(--paper);color:var(--ink)}
 .splash-logo-trace{display:block;width:100%;height:100%;object-fit:contain;overflow:visible;filter:none;stroke:none;fill:currentColor;clip-path:inset(100% 0 0 0);transform:translateY(12px) scale(.96);opacity:0;animation:learnora-official-logo-reveal 1.65s cubic-bezier(.2,.78,.22,1) .2s forwards}
 @keyframes learnora-official-logo-reveal{0%{clip-path:inset(100% 0 0 0);transform:translateY(12px) scale(.96);opacity:0}55%{opacity:1}100%{clip-path:inset(0 0 0 0);transform:translateY(0) scale(1);opacity:1}}
 @media(prefers-reduced-motion:reduce){.splash-logo-trace{animation:none;clip-path:none;transform:none;opacity:1}}
+
+/* Educator trust onboarding — responsive progress and evidence history. */
+.educator-onboarding-progress{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;border-bottom:1px solid var(--line);padding:16px 0}
+.educator-onboarding-progress>div{display:grid;gap:7px;padding:8px 16px;border-right:1px solid var(--line)}
+.educator-onboarding-progress>div:first-child{padding-left:0}
+.educator-onboarding-progress>div:last-child{border-right:0}
+.educator-onboarding-progress span{font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.educator-onboarding-progress strong{font-size:12px;font-weight:600;text-transform:capitalize}
+.educator-application-form .eyebrow{grid-column:1/-1}
+.educator-application-form select,.educator-evidence-form select,.educator-evidence-form input:not([type=file]){width:100%;padding:12px;border:1px solid var(--line);background:#fbfaf7;font:12px Arial,Helvetica,sans-serif;color:var(--ink);border-radius:0}
+.educator-evidence-form>div:first-child{grid-column:1/-1}
+.educator-submission-history,.educator-verification-history{margin-top:18px;padding:20px 0;border-top:1px solid var(--line)}
+.educator-submission-history .admin-row,.educator-verification-history .builder-list-item{border-bottom:1px solid var(--line);padding:14px 0}
+.educator-submission-history .admin-row>div:first-child,.educator-verification-history .builder-list-item>span:last-child{display:grid;gap:6px}
+.educator-submission-history small,.educator-verification-history small{font-size:10px;line-height:1.6;color:var(--muted)}
+.educator-verification-history .builder-index{font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:#77709e}
+@media(max-width:620px){.educator-onboarding-progress{grid-template-columns:1fr}.educator-onboarding-progress>div{padding:12px 0;border-right:0;border-bottom:1px solid var(--line)}.educator-onboarding-progress>div:last-child{border-bottom:0}.educator-application-form .eyebrow,.educator-evidence-form>div:first-child{grid-column:auto}}
