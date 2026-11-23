@@ -822,3 +822,10 @@ body{background:var(--paper);color:var(--ink)}
 @keyframes parent-spin{to{transform:rotate(360deg)}}
 @media(max-width:850px){.parent-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.parent-metrics article:nth-child(2){border-right:0}.parent-metrics article:nth-child(3){padding-left:0;border-top:1px solid var(--line)}.parent-metrics article:nth-child(4){border-top:1px solid var(--line)}.parent-data-grid,.parent-privacy-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:650px){.parent-portal{padding:14px 0 45px}.parent-hero{display:block;padding:22px 0 25px}.parent-hero h1{font-size:46px;letter-spacing:-1.4px}.parent-hero-actions{justify-content:space-between;margin-top:18px}.parent-tabs{margin:0 -2px}.parent-tabs button{padding:10px;font-size:9px}.parent-welcome{display:block;padding-top:26px}.parent-welcome>.button{margin-top:14px}.parent-metrics{margin-bottom:32px}.parent-metrics article{padding:14px 10px 14px 0}.parent-metrics article+article{padding-left:12px}.parent-metrics article:nth-child(3){padding-left:0}.parent-metrics article>strong{font-size:26px}.parent-child-grid,.parent-bottom-grid,.parent-data-grid,.parent-privacy-grid{grid-template-columns:1fr}.parent-section-heading{align-items:flex-start;flex-direction:column}.parent-child-select{width:100%}.parent-notification-list article{align-items:flex-start;flex-direction:column}.parent-profile .studio-panel{padding:18px}}
+
+
+/* Learnora brand promise — shared by every role's splash and loading experience. */
+.splash-slogan,.splash-loading-slogan{margin:18px 0 0;font-size:clamp(11px,1.55vw,14px);font-weight:400;letter-spacing:.22em;line-height:1.6;color:rgba(244,242,235,.78);text-align:center;animation:splash-fade-up .9s .85s both}
+.splash-loading-slogan{margin:0;color:#77766f;font-size:10px;letter-spacing:.2em;animation:none}
+@media(max-width:600px){.splash-slogan{font-size:11px;letter-spacing:.16em;margin-top:14px}.splash-loading-slogan{font-size:9px;letter-spacing:.15em}}
+@media(prefers-reduced-motion:reduce){.splash-slogan{animation:none;opacity:1}}

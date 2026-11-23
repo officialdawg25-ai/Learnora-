@@ -11,7 +11,7 @@ export default function SplashExperience({ loading = false, onComplete }: Props)
     return () => window.clearTimeout(timer);
   }, [loading, onComplete]);
 
-  if (loading) return <main className="splash-loading" role="status" aria-label="Loading Learnora"><div className="splash-loading-inner"><div className="splash-loading-mark"><img src="/brand/learnora-mark.svg" alt="" /></div><span className="splash-loading-track" /></div></main>;
+  if (loading) return <main className="splash-loading" role="status" aria-label="Loading Learnora"><div className="splash-loading-inner"><div className="splash-loading-mark"><img src="/brand/learnora-mark.svg" alt="" /></div><p className="splash-loading-slogan">The Future Of Learning</p><span className="splash-loading-track" /></div></main>;
 
   const skip = () => onComplete?.();
   return (
@@ -33,6 +33,7 @@ export default function SplashExperience({ loading = false, onComplete }: Props)
           <path className="splash-logo-path" d={logoPath} />
         </svg>
       </div>
+      <p className="splash-slogan">The Future Of Learning</p>
     </main>
   );
 }
